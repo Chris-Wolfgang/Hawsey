@@ -1,4 +1,6 @@
 #pragma warning disable AsyncFixer01
+#pragma warning disable AsyncFixer03
+#pragma warning disable VSTHRD101
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -168,11 +170,11 @@ public class GameViewModel : INotifyPropertyChanged
 
     private async Task PlaceBidAsync(string bidString)
     {
-        if (bidString == "pass")
+        if (string.Equals(bidString, "pass", StringComparison.Ordinal))
         {
             _gameService.PlaceHumanBid(BidAction.PassBid.Instance);
         }
-        else if (bidString == "hawsey")
+        else if (string.Equals(bidString, "hawsey", StringComparison.Ordinal))
         {
             _gameService.PlaceHumanBid(BidAction.HawseyBid.Instance);
         }
@@ -195,7 +197,7 @@ public class GameViewModel : INotifyPropertyChanged
             "diamonds" => Suit.Diamonds,
             "clubs" => Suit.Clubs,
             "spades" => Suit.Spades,
-            _ => null // ace high
+            _ => null
         };
 
         IsTrumpPickerVisible = false;
@@ -230,58 +232,19 @@ public class GameViewModel : INotifyPropertyChanged
         switch (state.Phase)
         {
             case GamePhase.Bidding:
-                var humanNeedsToBid = await _gameService.AdvanceAiBiddingAsync();
-
-                if (humanNeedsToBid)
-                {
-                    StatusMessage = "Your turn to bid";
-                    IsBiddingVisible = true;
-                }
-                else
-                {
-                    await AdvanceGameAsync();
-                }
-
+                await AdvanceBiddingPhaseAsync();
                 break;
 
             case GamePhase.TrumpSelection:
-                var humanSelectsTrump = await _gameService.HandleTrumpSelectionAsync();
-
-                if (humanSelectsTrump)
-                {
-                    StatusMessage = "Choose trump suit or Ace High";
-                    IsTrumpPickerVisible = true;
-                }
-                else
-                {
-                    await AdvanceGameAsync();
-                }
-
+                await AdvanceTrumpSelectionPhaseAsync();
                 break;
 
             case GamePhase.HawseyExchange:
-                var humanExchanges = await _gameService.HandleHawseyExchangeAsync();
-
-                if (humanExchanges)
-                {
-                    StatusMessage = "Hawsey! Select cards to exchange";
-                    // TODO: show exchange UI
-                }
-                else
-                {
-                    await AdvanceGameAsync();
-                }
-
+                await AdvanceHawseyExchangePhaseAsync();
                 break;
 
             case GamePhase.TrickPlay:
-                var humanPlays = await _gameService.AdvanceAiPlaysAsync();
-
-                if (humanPlays)
-                {
-                    StatusMessage = "Your turn to play";
-                }
-
+                await AdvanceTrickPlayPhaseAsync();
                 break;
 
             case GamePhase.RoundScoring:
@@ -292,6 +255,68 @@ public class GameViewModel : INotifyPropertyChanged
 
             case GamePhase.GameOver:
                 break;
+        }
+    }
+
+
+
+    private async Task AdvanceBiddingPhaseAsync()
+    {
+        var humanNeedsToBid = await _gameService.AdvanceAiBiddingAsync();
+
+        if (humanNeedsToBid)
+        {
+            StatusMessage = "Your turn to bid";
+            IsBiddingVisible = true;
+        }
+        else
+        {
+            await AdvanceGameAsync();
+        }
+    }
+
+
+
+    private async Task AdvanceTrumpSelectionPhaseAsync()
+    {
+        var humanSelectsTrump = await _gameService.HandleTrumpSelectionAsync();
+
+        if (humanSelectsTrump)
+        {
+            StatusMessage = "Choose trump suit or Ace High";
+            IsTrumpPickerVisible = true;
+        }
+        else
+        {
+            await AdvanceGameAsync();
+        }
+    }
+
+
+
+    private async Task AdvanceHawseyExchangePhaseAsync()
+    {
+        var humanExchanges = await _gameService.HandleHawseyExchangeAsync();
+
+        if (humanExchanges)
+        {
+            StatusMessage = "Hawsey! Select cards to exchange";
+        }
+        else
+        {
+            await AdvanceGameAsync();
+        }
+    }
+
+
+
+    private async Task AdvanceTrickPlayPhaseAsync()
+    {
+        var humanPlays = await _gameService.AdvanceAiPlaysAsync();
+
+        if (humanPlays)
+        {
+            StatusMessage = "Your turn to play";
         }
     }
 
@@ -352,13 +377,29 @@ public class GameViewModel : INotifyPropertyChanged
             return;
         }
 
+        UpdateScoresAndInfo(state);
+        UpdateHumanHand(state);
+        UpdateTrickArea(state);
+    }
+
+
+
+    private void UpdateScoresAndInfo(GameState state)
+    {
         NorthSouthScore = state.NorthSouthScore;
         EastWestScore = state.EastWestScore;
         NorthCardCount = state.Hands[PlayerPosition.North].Count;
         EastCardCount = state.Hands[PlayerPosition.East].Count;
         WestCardCount = state.Hands[PlayerPosition.West].Count;
 
-        // Update trump display
+        TrumpDisplay = GetTrumpDisplayText(state);
+        BidInfoDisplay = GetBidInfoText(state);
+    }
+
+
+
+    private static string GetTrumpDisplayText(GameState state)
+    {
         if (state.TrumpSuit.HasValue)
         {
             var symbol = state.TrumpSuit.Value switch
@@ -369,33 +410,41 @@ public class GameViewModel : INotifyPropertyChanged
                 Suit.Spades => "\u2660",
                 _ => "?"
             };
-            TrumpDisplay = $"Trump: {symbol}";
-        }
-        else if (state.TrumpMode == TrumpMode.AceHigh)
-        {
-            TrumpDisplay = "Ace High";
-        }
-        else
-        {
-            TrumpDisplay = "";
+
+            return $"Trump: {symbol}";
         }
 
-        // Update bid info
-        if (state.BiddingResult != null)
+        return state.TrumpMode == TrumpMode.AceHigh ? "Ace High" : "";
+    }
+
+
+
+    private static string GetBidInfoText(GameState state)
+    {
+        if (state.BiddingResult == null)
         {
-            var result = state.BiddingResult;
-            BidInfoDisplay = result.IsHawsey
-                ? $"{result.Winner} called Hawsey!"
-                : result.IsStuck
-                    ? $"{result.Winner} stuck at {result.BidAmount}"
-                    : $"{result.Winner} bid {result.BidAmount}";
-        }
-        else
-        {
-            BidInfoDisplay = "";
+            return "";
         }
 
-        // Update human hand
+        var result = state.BiddingResult;
+
+        if (result.IsHawsey)
+        {
+            return $"{result.Winner} called Hawsey!";
+        }
+
+        if (result.IsStuck)
+        {
+            return $"{result.Winner} stuck at {result.BidAmount}";
+        }
+
+        return $"{result.Winner} bid {result.BidAmount}";
+    }
+
+
+
+    private void UpdateHumanHand(GameState state)
+    {
         var legalPlays = state.Phase == GamePhase.TrickPlay && state.NextToAct == GameService.HumanPosition
             ? state.GetLegalPlays()
             : Array.Empty<Card>();
@@ -420,8 +469,12 @@ public class GameViewModel : INotifyPropertyChanged
 
             HumanCards.Add(new CardViewModel(card, isLegal));
         }
+    }
 
-        // Update trick area
+
+
+    private void UpdateTrickArea(GameState state)
+    {
         TrickCards.Clear();
 
         if (state.CurrentTrick != null)
@@ -447,80 +500,4 @@ public class GameViewModel : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         return true;
     }
-}
-
-
-
-public class CardViewModel
-{
-    public CardViewModel(Card card, bool isLegal)
-    {
-        Card = card;
-        IsLegal = isLegal;
-        RankText = card.Rank switch
-        {
-            Rank.Nine => "9",
-            Rank.Ten => "10",
-            Rank.Jack => "J",
-            Rank.Queen => "Q",
-            Rank.King => "K",
-            Rank.Ace => "A",
-            _ => "?"
-        };
-        SuitSymbol = card.Suit switch
-        {
-            Suit.Hearts => "\u2665",
-            Suit.Diamonds => "\u2666",
-            Suit.Clubs => "\u2663",
-            Suit.Spades => "\u2660",
-            _ => "?"
-        };
-        SuitColor = card.Suit.IsRed() ? Colors.Red : Colors.Black;
-    }
-
-
-
-    public Card Card { get; }
-    public bool IsLegal { get; }
-    public string RankText { get; }
-    public string SuitSymbol { get; }
-    public Color SuitColor { get; }
-}
-
-
-
-public class TrickCardViewModel
-{
-    public TrickCardViewModel(Card card, PlayerPosition player)
-    {
-        Card = card;
-        Player = player;
-        RankText = card.Rank switch
-        {
-            Rank.Nine => "9",
-            Rank.Ten => "10",
-            Rank.Jack => "J",
-            Rank.Queen => "Q",
-            Rank.King => "K",
-            Rank.Ace => "A",
-            _ => "?"
-        };
-        SuitSymbol = card.Suit switch
-        {
-            Suit.Hearts => "\u2665",
-            Suit.Diamonds => "\u2666",
-            Suit.Clubs => "\u2663",
-            Suit.Spades => "\u2660",
-            _ => "?"
-        };
-        SuitColor = card.Suit.IsRed() ? Colors.Red : Colors.Black;
-    }
-
-
-
-    public Card Card { get; }
-    public PlayerPosition Player { get; }
-    public string RankText { get; }
-    public string SuitSymbol { get; }
-    public Color SuitColor { get; }
 }

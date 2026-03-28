@@ -18,6 +18,8 @@ public class SimpleAiStrategy : IPlayerStrategy
 
     public Suit? DecideTrump(GameState state, PlayerPosition player)
     {
+        ArgumentNullException.ThrowIfNull(state);
+
         var hand = state.Hands[player];
         var suitCounts = new int[4];
 
@@ -46,6 +48,8 @@ public class SimpleAiStrategy : IPlayerStrategy
 
     public Card DecidePlay(GameState state, PlayerPosition player)
     {
+        ArgumentNullException.ThrowIfNull(state);
+
         var legalPlays = state.GetLegalPlays();
 
         if (legalPlays.Count == 1)
@@ -97,6 +101,8 @@ public class SimpleAiStrategy : IPlayerStrategy
         out Card[] cardsToDiscard,
         out Card[] cardsFromPartner)
     {
+        ArgumentNullException.ThrowIfNull(state);
+
         var bidderHand = state.Hands[bidder];
 
         // Discard two lowest non-trump cards
