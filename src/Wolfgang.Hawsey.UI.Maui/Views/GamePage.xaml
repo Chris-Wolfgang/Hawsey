@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Wolfgang.Hawsey.UI.Maui.ViewModels"
+             x:Class="Wolfgang.Hawsey.UI.Maui.Views.GamePage"
+             x:DataType="vm:GameViewModel"
+             Title="Hawsey"
+             BackgroundColor="#1B5E20">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto"
+          Padding="10">
+
+        <!-- Top bar: scores and info -->
+        <Grid Row="0" ColumnDefinitions="*,Auto,*" Padding="5">
+            <Label Grid.Column="0"
+                   Text="{Binding BidInfoDisplay}"
+                   TextColor="White" FontSize="14"
+                   VerticalOptions="Center" />
+            <HorizontalStackLayout Grid.Column="1" Spacing="20">
+                <Label Text="{Binding NorthSouthScore, StringFormat='NS: {0}'}"
+                       TextColor="#81C784" FontSize="18" FontAttributes="Bold" />
+                <Label Text="—" TextColor="White" FontSize="18" />
+                <Label Text="{Binding EastWestScore, StringFormat='EW: {0}'}"
+                       TextColor="#EF9A9A" FontSize="18" FontAttributes="Bold" />
+            </HorizontalStackLayout>
+            <HorizontalStackLayout Grid.Column="2" HorizontalOptions="End" Spacing="10">
+                <Label Text="{Binding TrumpDisplay}"
+                       TextColor="Gold" FontSize="16" FontAttributes="Bold"
+                       VerticalOptions="Center" />
+                <Button Text="New Game"
+                        Command="{Binding NewGameCommand}"
+                        BackgroundColor="#4CAF50" TextColor="White"
+                        FontSize="12" HeightRequest="35" Padding="10,0" />
+            </HorizontalStackLayout>
+        </Grid>
+
+        <!-- North hand (partner, face down) -->
+        <HorizontalStackLayout Row="1" HorizontalOptions="Center" Spacing="-20" Padding="0,5">
+            <BindableLayout.ItemsSource>
+                <x:Array Type="{x:Type x:Int32}">
+                    <x:Int32>1</x:Int32><x:Int32>2</x:Int32><x:Int32>3</x:Int32>
+                    <x:Int32>4</x:Int32><x:Int32>5</x:Int32><x:Int32>6</x:Int32>
+                </x:Array>
+            </BindableLayout.ItemsSource>
+            <BindableLayout.ItemTemplate>
+                <DataTemplate>
+                    <Border StrokeShape="RoundRectangle 4"
+                            BackgroundColor="#1565C0"
+                            Stroke="#0D47A1"
+                            StrokeThickness="1"
+                            WidthRequest="35" HeightRequest="50">
+                        <Label Text="N" TextColor="#1E88E5"
+                               HorizontalOptions="Center" VerticalOptions="Center"
+                               FontSize="10" />
+                    </Border>
+                </DataTemplate>
+            </BindableLayout.ItemTemplate>
+        </HorizontalStackLayout>
+
+        <!-- Middle area: West, Trick, East -->
+        <Grid Row="2" ColumnDefinitions="80,*,80" RowDefinitions="*">
+
+            <!-- West hand (face down, vertical) -->
+            <VerticalStackLayout Grid.Column="0" VerticalOptions="Center" Spacing="-25">
+                <BindableLayout.ItemsSource>
+                    <x:Array Type="{x:Type x:Int32}">
+                        <x:Int32>1</x:Int32><x:Int32>2</x:Int32><x:Int32>3</x:Int32>
+                        <x:Int32>4</x:Int32><x:Int32>5</x:Int32><x:Int32>6</x:Int32>
+                    </x:Array>
+                </BindableLayout.ItemsSource>
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <Border StrokeShape="RoundRectangle 4"
+                                BackgroundColor="#1565C0"
+                                Stroke="#0D47A1"
+                                StrokeThickness="1"
+                                WidthRequest="50" HeightRequest="35">
+                            <Label Text="W" TextColor="#1E88E5"
+                                   HorizontalOptions="Center" VerticalOptions="Center"
+                                   FontSize="10" />
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+
+            <!-- Trick area (center) -->
+            <Grid Grid.Column="1"
+                  RowDefinitions="60,60,60" ColumnDefinitions="*,80,*"
+                  HorizontalOptions="Center" VerticalOptions="Center">
+
+                <!-- North card slot -->
+                <Border Grid.Row="0" Grid.Column="1"
+                        StrokeShape="RoundRectangle 4"
+                        BackgroundColor="#2E7D32"
+                        Stroke="#388E3C"
+                        StrokeThickness="1"
+                        WidthRequest="55" HeightRequest="50"
+                        HorizontalOptions="Center">
+                    <Label Text="N" TextColor="#4CAF50" FontSize="10"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+
+                <!-- West card slot -->
+                <Border Grid.Row="1" Grid.Column="0"
+                        StrokeShape="RoundRectangle 4"
+                        BackgroundColor="#2E7D32"
+                        Stroke="#388E3C"
+                        StrokeThickness="1"
+                        WidthRequest="55" HeightRequest="50"
+                        HorizontalOptions="End">
+                    <Label Text="W" TextColor="#4CAF50" FontSize="10"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+
+                <!-- East card slot -->
+                <Border Grid.Row="1" Grid.Column="2"
+                        StrokeShape="RoundRectangle 4"
+                        BackgroundColor="#2E7D32"
+                        Stroke="#388E3C"
+                        StrokeThickness="1"
+                        WidthRequest="55" HeightRequest="50"
+                        HorizontalOptions="Start">
+                    <Label Text="E" TextColor="#4CAF50" FontSize="10"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+
+                <!-- South card slot -->
+                <Border Grid.Row="2" Grid.Column="1"
+                        StrokeShape="RoundRectangle 4"
+                        BackgroundColor="#2E7D32"
+                        Stroke="#388E3C"
+                        StrokeThickness="1"
+                        WidthRequest="55" HeightRequest="50"
+                        HorizontalOptions="Center">
+                    <Label Text="S" TextColor="#4CAF50" FontSize="10"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+
+                <!-- Played trick cards overlay -->
+                <CollectionView Grid.Row="0" Grid.RowSpan="3"
+                                Grid.Column="0" Grid.ColumnSpan="3"
+                                ItemsSource="{Binding TrickCards}"
+                                InputTransparent="True">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Horizontal" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:TrickCardViewModel">
+                            <Border StrokeShape="RoundRectangle 6"
+                                    BackgroundColor="#FFFFF8E1"
+                                    Stroke="#424242"
+                                    StrokeThickness="1"
+                                    WidthRequest="55" HeightRequest="75"
+                                    Margin="2">
+                                <VerticalStackLayout HorizontalOptions="Center"
+                                                     VerticalOptions="Center"
+                                                     Spacing="2">
+                                    <Label Text="{Binding RankText}"
+                                           TextColor="{Binding SuitColor}"
+                                           FontSize="16" FontAttributes="Bold"
+                                           HorizontalOptions="Center" />
+                                    <Label Text="{Binding SuitSymbol}"
+                                           TextColor="{Binding SuitColor}"
+                                           FontSize="20"
+                                           HorizontalOptions="Center" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+
+            <!-- East hand (face down, vertical) -->
+            <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Spacing="-25">
+                <BindableLayout.ItemsSource>
+                    <x:Array Type="{x:Type x:Int32}">
+                        <x:Int32>1</x:Int32><x:Int32>2</x:Int32><x:Int32>3</x:Int32>
+                        <x:Int32>4</x:Int32><x:Int32>5</x:Int32><x:Int32>6</x:Int32>
+                    </x:Array>
+                </BindableLayout.ItemsSource>
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <Border StrokeShape="RoundRectangle 4"
+                                BackgroundColor="#1565C0"
+                                Stroke="#0D47A1"
+                                StrokeThickness="1"
+                                WidthRequest="50" HeightRequest="35">
+                            <Label Text="E" TextColor="#1E88E5"
+                                   HorizontalOptions="Center" VerticalOptions="Center"
+                                   FontSize="10" />
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- Status message -->
+        <Label Row="3" Text="{Binding StatusMessage}"
+               TextColor="White" FontSize="16"
+               HorizontalOptions="Center" Padding="0,5" />
+
+        <!-- Human hand (South, face up, interactive) -->
+        <CollectionView Row="4"
+                         ItemsSource="{Binding HumanCards}"
+                         HorizontalOptions="Center"
+                         HeightRequest="110">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Horizontal"
+                                   ItemSpacing="-15" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:CardViewModel">
+                    <Border StrokeShape="RoundRectangle 6"
+                            BackgroundColor="#FFFFF8E1"
+                            Stroke="{Binding IsLegal, Converter={StaticResource BoolToStrokeConverter}}"
+                            StrokeThickness="2"
+                            WidthRequest="65" HeightRequest="95"
+                            Opacity="{Binding IsLegal, Converter={StaticResource BoolToOpacityConverter}}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:GameViewModel}}, Path=PlayCardCommand}"
+                                CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <Grid RowDefinitions="Auto,*,Auto" Padding="4">
+                            <Label Grid.Row="0"
+                                   Text="{Binding RankText}"
+                                   TextColor="{Binding SuitColor}"
+                                   FontSize="12" FontAttributes="Bold" />
+                            <Label Grid.Row="1"
+                                   Text="{Binding SuitSymbol}"
+                                   TextColor="{Binding SuitColor}"
+                                   FontSize="26"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                            <Label Grid.Row="2"
+                                   Text="{Binding RankText}"
+                                   TextColor="{Binding SuitColor}"
+                                   FontSize="12" FontAttributes="Bold"
+                                   HorizontalOptions="End"
+                                   Rotation="180" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Bidding overlay -->
+        <Grid Row="0" RowSpan="5"
+              IsVisible="{Binding IsBiddingVisible}"
+              BackgroundColor="#CC000000">
+            <Border StrokeShape="RoundRectangle 12"
+                    BackgroundColor="#424242"
+                    Stroke="#616161"
+                    StrokeThickness="2"
+                    Padding="20"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    MaximumWidthRequest="350">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Place Your Bid"
+                           TextColor="White" FontSize="22"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center" />
+                    <FlexLayout Wrap="Wrap" JustifyContent="Center"
+                                AlignItems="Center">
+                        <Button Text="6" Command="{Binding PlaceBidCommand}" CommandParameter="6"
+                                BackgroundColor="#2196F3" TextColor="White"
+                                Margin="4" MinimumWidthRequest="50" />
+                        <Button Text="7" Command="{Binding PlaceBidCommand}" CommandParameter="7"
+                                BackgroundColor="#2196F3" TextColor="White"
+                                Margin="4" MinimumWidthRequest="50" />
+                        <Button Text="8" Command="{Binding PlaceBidCommand}" CommandParameter="8"
+                                BackgroundColor="#2196F3" TextColor="White"
+                                Margin="4" MinimumWidthRequest="50" />
+                        <Button Text="9" Command="{Binding PlaceBidCommand}" CommandParameter="9"
+                                BackgroundColor="#2196F3" TextColor="White"
+                                Margin="4" MinimumWidthRequest="50" />
+                        <Button Text="10" Command="{Binding PlaceBidCommand}" CommandParameter="10"
+                                BackgroundColor="#2196F3" TextColor="White"
+                                Margin="4" MinimumWidthRequest="50" />
+                        <Button Text="11" Command="{Binding PlaceBidCommand}" CommandParameter="11"
+                                BackgroundColor="#2196F3" TextColor="White"
+                                Margin="4" MinimumWidthRequest="50" />
+                        <Button Text="12" Command="{Binding PlaceBidCommand}" CommandParameter="12"
+                                BackgroundColor="#2196F3" TextColor="White"
+                                Margin="4" MinimumWidthRequest="50" />
+                    </FlexLayout>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <Button Grid.Column="0" Text="Pass"
+                                Command="{Binding PlaceBidCommand}" CommandParameter="pass"
+                                BackgroundColor="#757575" TextColor="White" />
+                        <Button Grid.Column="1" Text="Hawsey!"
+                                Command="{Binding PlaceBidCommand}" CommandParameter="hawsey"
+                                BackgroundColor="#F44336" TextColor="White" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- Trump picker overlay -->
+        <Grid Row="0" RowSpan="5"
+              IsVisible="{Binding IsTrumpPickerVisible}"
+              BackgroundColor="#CC000000">
+            <Border StrokeShape="RoundRectangle 12"
+                    BackgroundColor="#424242"
+                    Stroke="#616161"
+                    StrokeThickness="2"
+                    Padding="20"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    MaximumWidthRequest="300">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Choose Trump"
+                           TextColor="White" FontSize="22"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center" />
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto"
+                          ColumnSpacing="10" RowSpacing="10">
+                        <Button Grid.Row="0" Grid.Column="0"
+                                Text="&#x2665; Hearts"
+                                Command="{Binding SelectTrumpCommand}" CommandParameter="hearts"
+                                BackgroundColor="#C62828" TextColor="White" FontSize="16" />
+                        <Button Grid.Row="0" Grid.Column="1"
+                                Text="&#x2666; Diamonds"
+                                Command="{Binding SelectTrumpCommand}" CommandParameter="diamonds"
+                                BackgroundColor="#C62828" TextColor="White" FontSize="16" />
+                        <Button Grid.Row="1" Grid.Column="0"
+                                Text="&#x2663; Clubs"
+                                Command="{Binding SelectTrumpCommand}" CommandParameter="clubs"
+                                BackgroundColor="#212121" TextColor="White" FontSize="16" />
+                        <Button Grid.Row="1" Grid.Column="1"
+                                Text="&#x2660; Spades"
+                                Command="{Binding SelectTrumpCommand}" CommandParameter="spades"
+                                BackgroundColor="#212121" TextColor="White" FontSize="16" />
+                    </Grid>
+                    <Button Text="Ace High (No Trump)"
+                            Command="{Binding SelectTrumpCommand}" CommandParameter="acehigh"
+                            BackgroundColor="#FF8F00" TextColor="White" FontSize="16" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- Game over overlay -->
+        <Grid Row="0" RowSpan="5"
+              IsVisible="{Binding IsGameOverVisible}"
+              BackgroundColor="#CC000000">
+            <Border StrokeShape="RoundRectangle 12"
+                    BackgroundColor="#424242"
+                    Stroke="#FFD600"
+                    StrokeThickness="3"
+                    Padding="30"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    MaximumWidthRequest="350">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Game Over!"
+                           TextColor="#FFD600" FontSize="28"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center" />
+                    <Label Text="{Binding GameOverMessage}"
+                           TextColor="White" FontSize="18"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center" />
+                    <Button Text="New Game"
+                            Command="{Binding NewGameCommand}"
+                            BackgroundColor="#4CAF50" TextColor="White"
+                            FontSize="18" HeightRequest="50" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

@@ -1,8 +1,10 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Wolfgang.Hawsey.Engine/Wolfgang.Hawsey.Engine.csproj" />
+    <Project Path="src/Wolfgang.Hawsey.UI.Maui/Wolfgang.Hawsey.UI.Maui.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Wolfgang.Hawsey.Engine.Tests.Unit/Wolfgang.Hawsey.Engine.Tests.Unit.csproj" />
+    <Project Path="tests/Wolfgang.Hawsey.UI.Maui.Tests.Unit/Wolfgang.Hawsey.UI.Maui.Tests.Unit.csproj" />
   </Folder>
 </Solution>
