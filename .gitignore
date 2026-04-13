@@ -429,3 +429,6 @@ nuget-packages/
 docfx_project/_site/
 docfx_project/obj/
 
+
+# Claude Code local settings
+.claude/
