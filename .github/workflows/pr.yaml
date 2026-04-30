@@ -44,18 +44,32 @@ jobs:
     if: github.repository != 'Chris-Wolfgang/repo-template'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: refs/pull/${{ github.event.pull_request.number }}/head
           persist-credentials: false
           fetch-depth: 0
 
+      - name: Fetch trusted gitleaks config from main
+        # Prevent PR from modifying .gitleaks.toml to bypass the scan
+        run: |
+          git fetch origin main --depth=1
+          git checkout origin/main -- .gitleaks.toml 2>/dev/null || true
+        shell: bash
+
       - name: Run gitleaks
         # gitleaks-action@v2 does not support pull_request_target, so invoke the CLI directly
+        # Pinned to a specific version with SHA256 checksum verification for supply-chain safety
         run: |
           GITLEAKS_VERSION="8.24.0"
-          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
-            | tar xz -C /usr/local/bin gitleaks
+          GITLEAKS_SHA256="cb49b7de5ee986510fe8666ca0273a6cc15eb82571f2f14832c9e8920751f3a4"
+          mkdir -p "$HOME/.local/bin"
+          TARBALL="$(mktemp)"
+          curl -sSfL -o "$TARBALL" "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_SHA256}  ${TARBALL}" | sha256sum -c - || { echo "Checksum verification failed!"; exit 1; }
+          tar xzf "$TARBALL" -C "$HOME/.local/bin" gitleaks
+          rm -f "$TARBALL"
+          export PATH="$HOME/.local/bin:$PATH"
           gitleaks detect --source . --verbose --redact
         shell: bash
 
@@ -71,7 +85,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: refs/pull/${{ github.event.pull_request.number }}/head
           persist-credentials: false
@@ -206,7 +220,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: refs/pull/${{ github.event.pull_request.number }}/head
           persist-credentials: false
@@ -319,7 +333,7 @@ jobs:
           sudo rm /etc/apt/sources.list.d/focal-security.list
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: |
             3.1.x
@@ -385,10 +399,17 @@ jobs:
           for proj in "${projects[@]}"; do
             echo "Building: $proj"
             
-            # Extract target frameworks from the project file
-            # Support both <TargetFramework> (single) and <TargetFrameworks> (multiple)
-            # Collapse newlines so multi-line <TargetFrameworks> values are handled correctly
-            frameworks=$(tr '\n' ' ' < "$proj" | grep -oP '<TargetFramework[s]?>\s*\K[^<]+' | tr ';' '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -E '^(net(5\.0|6\.0|7\.0|8\.0|9\.0|10\.0)|netcoreapp[0-9.]+|netstandard[0-9.]+)$' || true)
+            # Extract target frameworks via MSBuild property evaluation.
+            # This handles multi-line <TargetFrameworks> XML, conditional property groups,
+            # and TFMs inherited from Directory.Build.props — all of which break grep-based parsing.
+            # Falls back from <TargetFrameworks> (multiple) to <TargetFramework> (single).
+            tfm_raw=$(dotnet msbuild "$proj" -noLogo -getProperty:TargetFrameworks 2>/dev/null \
+              | grep -v '^[[:space:]]*$' | tail -n1 | sed 's/^TargetFrameworks[=:][[:space:]]*//' | tr -d '[:space:]')
+            if [ -z "$tfm_raw" ]; then
+              tfm_raw=$(dotnet msbuild "$proj" -noLogo -getProperty:TargetFramework 2>/dev/null \
+                | grep -v '^[[:space:]]*$' | tail -n1 | sed 's/^TargetFramework[=:][[:space:]]*//' | tr -d '[:space:]')
+            fi
+            frameworks=$(printf '%s' "$tfm_raw" | tr ';' '\n' | grep -E '^(net(5\.0|6\.0|7\.0|8\.0|9\.0|10\.0)|netcoreapp[0-9.]+|netstandard[0-9.]+)$' || true)
             
             if [ -z "$frameworks" ]; then
               echo "⚠️  No Linux-compatible frameworks found in $proj"
@@ -418,12 +439,20 @@ jobs:
 
       - name: Run tests with coverage (.NET Core 5.0 - 10.0)
         run: |
-          # Find all test projects (C#, VB.NET, F#)
+          # Find all test projects (C#, VB.NET, F#).
+          # Gracefully skip if there is no ./tests directory (e.g. template-publishing
+          # repos or library repos in early development that have no tests yet).
+          # The downstream coverage steps already handle the no-coverage-files case.
+          if [ ! -d ./tests ]; then
+            echo "ℹ️  No ./tests directory — skipping test stage."
+            exit 0
+          fi
+
           mapfile -d '' -t test_projects < <(find ./tests -type f \( -name "*.csproj" -o -name "*.vbproj" -o -name "*.fsproj" \) -print0)
-          
+
           if [ ${#test_projects[@]} -eq 0 ]; then
-            echo "❌ No test projects found in ./tests directory!"
-            exit 1
+            echo "ℹ️  No test projects found under ./tests — skipping test stage."
+            exit 0
           fi
           
           echo "=========================================="
@@ -437,9 +466,16 @@ jobs:
             echo "Testing project: $test_proj"
             echo "=========================================="
             
-            # Extract target frameworks from the project file
-            # Support both <TargetFramework> (single) and <TargetFrameworks> (multiple)
-            frameworks=$(grep -oP '<TargetFramework[s]?>\K[^<]+' "$test_proj" | tr ';' '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -E '^(net(5\.0|6\.0|7\.0|8\.0|9\.0|10\.0)|netcoreapp3\.1)$' || true)
+            # Extract target frameworks via MSBuild property evaluation (handles multi-line XML
+            # and Directory.Build.props inheritance — both break grep-based parsing).
+            # Falls back from <TargetFrameworks> (multiple) to <TargetFramework> (single).
+            tfm_raw=$(dotnet msbuild "$test_proj" -noLogo -getProperty:TargetFrameworks 2>/dev/null \
+              | grep -v '^[[:space:]]*$' | tail -n1 | sed 's/^TargetFrameworks[=:][[:space:]]*//' | tr -d '[:space:]')
+            if [ -z "$tfm_raw" ]; then
+              tfm_raw=$(dotnet msbuild "$test_proj" -noLogo -getProperty:TargetFramework 2>/dev/null \
+                | grep -v '^[[:space:]]*$' | tail -n1 | sed 's/^TargetFramework[=:][[:space:]]*//' | tr -d '[:space:]')
+            fi
+            frameworks=$(printf '%s' "$tfm_raw" | tr ';' '\n' | grep -E '^(net(5\.0|6\.0|7\.0|8\.0|9\.0|10\.0)|netcoreapp3\.1)$' || true)
             
             if [ -z "$frameworks" ]; then
               echo "⊘ Skipping: No compatible .NET 5.0-10.0 target frameworks found"
@@ -459,6 +495,7 @@ jobs:
                 --configuration Release \
                 --framework "$fw" \
                 --collect:"XPlat Code Coverage" \
+                --settings coverlet.runsettings \
                 --results-directory "./TestResults" \
                 --logger "console;verbosity=minimal" || exit 1
             done <<< "$frameworks"
@@ -540,7 +577,7 @@ jobs:
 
       - name: Upload Linux coverage results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-linux
           path: |
@@ -548,7 +585,7 @@ jobs:
             CoverageReport/
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: build-output
           path: |
@@ -566,17 +603,13 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: refs/pull/${{ github.event.pull_request.number }}/head
           persist-credentials: false
       
       - name: Fetch trusted configuration files from main branch
         shell: pwsh
-        # Skip for Dependabot — its package-version bumps to protected files (e.g.
-        # Directory.Build.props) are legitimate and should not be overwritten by main's
-        # older versions. Dependabot's identity is GitHub-controlled and not spoofable.
-        if: github.event.pull_request.user.login != 'dependabot[bot]'
         run: |
           Write-Host "Fetching configuration files from main branch to prevent malicious overrides..."
           
@@ -622,10 +655,6 @@ jobs:
 
       - name: Fetch trusted configuration files from main branch
         shell: pwsh
-        # Skip for Dependabot — its package-version bumps to protected files (e.g.
-        # Directory.Build.props) are legitimate and should not be overwritten by main's
-        # older versions. Dependabot's identity is GitHub-controlled and not spoofable.
-        if: github.event.pull_request.user.login != 'dependabot[bot]'
         run: |
           Write-Host "Fetching configuration files from main branch to prevent malicious overrides..."
 
@@ -670,7 +699,7 @@ jobs:
           Write-Host "✅ Configuration files secured - using versions from main branch"
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: |
             3.1.x
@@ -691,12 +720,19 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          
+
+          # Gracefully skip if there is no ./tests directory (e.g. template-publishing
+          # repos or library repos in early development that have no tests yet).
+          if (-not (Test-Path -Path './tests' -PathType Container)) {
+            Write-Host "ℹ️  No ./tests directory — skipping test stage."
+            exit 0
+          }
+
           $testProjects = @(Get-ChildItem -Path './tests/*' -Recurse -File -Include '*.csproj','*.vbproj','*.fsproj')
-          
+
           if (@($testProjects).Count -eq 0) {
-            Write-Error "❌ No test projects found in ./tests directory!"
-            exit 1
+            Write-Host "ℹ️  No test projects found under ./tests — skipping test stage."
+            exit 0
           }
           
           Write-Host "==========================================" -ForegroundColor Cyan
@@ -840,7 +876,7 @@ jobs:
 
       - name: Upload Windows coverage results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-windows
           path: |
@@ -858,7 +894,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: refs/pull/${{ github.event.pull_request.number }}/head
           persist-credentials: false
@@ -962,7 +998,7 @@ jobs:
           echo "✅ Configuration files secured - using versions from main branch"
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: |
             6.0.x
@@ -1026,10 +1062,16 @@ jobs:
           for proj in "${projects[@]}"; do
             echo "Building: $proj"
             
-            # Extract target frameworks from the project file
-            # Support both <TargetFramework> (single) and <TargetFrameworks> (multiple)
-            # Trim whitespace from each framework before filtering
-            frameworks=$(tr -d '\n\r' < "$proj" | sed -n -E 's/.*<TargetFrameworks?>[[:space:]]*>([^<]+)<\/TargetFrameworks?>.*/\1/p' | tr ';' '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -E '^net(6\.0|7\.0|8\.0|9\.0|10\.0)$' || true)
+            # Extract target frameworks via MSBuild property evaluation (handles multi-line XML
+            # and Directory.Build.props inheritance). Filter to .NET 6+ for macOS ARM64 compatibility.
+            # Falls back from <TargetFrameworks> (multiple) to <TargetFramework> (single).
+            tfm_raw=$(dotnet msbuild "$proj" -noLogo -getProperty:TargetFrameworks 2>/dev/null \
+              | grep -v '^[[:space:]]*$' | tail -n1 | sed 's/^TargetFrameworks[=:][[:space:]]*//' | tr -d '[:space:]')
+            if [ -z "$tfm_raw" ]; then
+              tfm_raw=$(dotnet msbuild "$proj" -noLogo -getProperty:TargetFramework 2>/dev/null \
+                | grep -v '^[[:space:]]*$' | tail -n1 | sed 's/^TargetFramework[=:][[:space:]]*//' | tr -d '[:space:]')
+            fi
+            frameworks=$(printf '%s' "$tfm_raw" | tr ';' '\n' | grep -E '^net(6\.0|7\.0|8\.0|9\.0|10\.0)$' || true)
             
             if [ -z "$frameworks" ]; then
               echo "⚠️  No macOS ARM64-compatible frameworks found in $proj"
@@ -1059,15 +1101,22 @@ jobs:
 
       - name:  Run tests (.NET 6.0 - 10.0 only - ARM64 compatible)
         run: |
-          # Find all test projects (C#, VB.NET, F#)
+          # Find all test projects (C#, VB.NET, F#).
+          # Gracefully skip if there is no ./tests directory (e.g. template-publishing
+          # repos or library repos in early development that have no tests yet).
+          if [ ! -d ./tests ]; then
+            echo "ℹ️  No ./tests directory — skipping test stage."
+            exit 0
+          fi
+
           test_projects=()
           while IFS= read -r -d '' file; do
           test_projects+=("$file")
-          done < <(find ./tests -type f \( -name "*.csproj" -o -name "*.vbproj" -o -name "*.fsproj" \) -print0)          
-          
+          done < <(find ./tests -type f \( -name "*.csproj" -o -name "*.vbproj" -o -name "*.fsproj" \) -print0)
+
           if [ ${#test_projects[@]} -eq 0 ]; then
-            echo "❌ No test projects found in ./tests directory!"
-            exit 1
+            echo "ℹ️  No test projects found under ./tests — skipping test stage."
+            exit 0
           fi
           
           echo "=========================================="
@@ -1081,11 +1130,16 @@ jobs:
             echo "Testing project: $test_proj"
             echo "=========================================="
             
-            # Extract target frameworks from the project file
-            # Support both <TargetFramework> (single) and <TargetFrameworks> (multiple)
-            # Only include .NET 6.0+ (ARM64 compatible on macOS)
-            # Normalize line endings to handle multi-line <TargetFramework> / <TargetFrameworks> elements
-            frameworks=$(tr -d '\n\r' < "$test_proj" | grep -Eo '<TargetFrameworks?>[^<]+' | sed -E 's/<TargetFrameworks?>//' | tr ';' '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -E '^net(6\.0|7\.0|8\.0|9\.0|10\.0)$' || true)
+            # Extract target frameworks via MSBuild property evaluation (handles multi-line XML
+            # and Directory.Build.props inheritance). Filter to .NET 6+ for macOS ARM64 compatibility.
+            # Falls back from <TargetFrameworks> (multiple) to <TargetFramework> (single).
+            tfm_raw=$(dotnet msbuild "$test_proj" -noLogo -getProperty:TargetFrameworks 2>/dev/null \
+              | grep -v '^[[:space:]]*$' | tail -n1 | sed 's/^TargetFrameworks[=:][[:space:]]*//' | tr -d '[:space:]')
+            if [ -z "$tfm_raw" ]; then
+              tfm_raw=$(dotnet msbuild "$test_proj" -noLogo -getProperty:TargetFramework 2>/dev/null \
+                | grep -v '^[[:space:]]*$' | tail -n1 | sed 's/^TargetFramework[=:][[:space:]]*//' | tr -d '[:space:]')
+            fi
+            frameworks=$(printf '%s' "$tfm_raw" | tr ';' '\n' | grep -E '^net(6\.0|7\.0|8\.0|9\.0|10\.0)$' || true)
             
             if [ -z "$frameworks" ]; then
               echo "⊘ Skipping: No compatible .NET 6.0-10.0 target frameworks found (ARM64 required)"
@@ -1173,7 +1227,7 @@ jobs:
 
       - name: Upload macOS coverage results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-macos
           path: |
@@ -1223,7 +1277,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: refs/pull/${{ github.event.pull_request.number }}/head
           persist-credentials: false
@@ -1360,7 +1414,7 @@ jobs:
 
       - name: Upload security scan results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: devskim-results
           path: devskim-results.txt
