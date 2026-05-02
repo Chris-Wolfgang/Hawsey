@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:Wolfgang.Hawsey.UI.Maui.Converters"
+             x:Class="Wolfgang.Hawsey.UI.Maui.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/CardStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <converters:BoolToStrokeConverter x:Key="BoolToStrokeConverter" />
+            <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
+            <converters:SuitToColorConverter x:Key="SuitToColorConverter" />
+            <converters:SuitToSymbolConverter x:Key="SuitToSymbolConverter" />
+            <converters:RankToStringConverter x:Key="RankToStringConverter" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
