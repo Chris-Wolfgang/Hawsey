@@ -16,7 +16,7 @@ Hawsey is a **4-player partnership trick-taking game** dealt from a 48-card pino
 2. **Trump declaration** — The winning bidder names the trump suit (and, in some house rules, the trump-card priority mode).
 3. **Trick play** — Players follow suit when possible; the trick is won by the highest trump or, if no trump was played, the highest card of the lead suit.
 
-Scoring rewards both card-point capture (taking aces, tens, kings) and the *last trick*. The bidding team must meet their bid or be **set** (lose the bid amount).
+Scoring rewards both card-point capture (taking aces, tens, kings) and the *last trick*. The bidding team must meet their bid or be **bucked** (lose the bid amount).
 
 This implementation supports configurable **house rules** (trump-card priority modes, bidding minimums, partner-call variants) so you can play the variant your grandparents taught you.
 
