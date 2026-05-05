@@ -327,7 +327,13 @@ jobs:
       # repository so APT verifies the package via GPG instead of a plain wget download.
       - name: Install OpenSSL 1.1 for .NET 5.0
         run: |
-          echo "deb https://security.ubuntu.com/ubuntu focal-security main" | sudo tee /etc/apt/sources.list.d/focal-security.list
+          # signed-by= points apt at the Canonical archive keyring that ships on all
+          # GitHub-hosted Ubuntu runners. It contains the same signing key Canonical
+          # uses across releases (focal, jammy, noble), so it can verify focal-security
+          # packages from a non-focal runner without disabling signature checking.
+          # Earlier iteration used [trusted=yes] (skipping verification) as a quick
+          # unblock; this restores end-to-end signature verification.
+          echo "deb [signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] https://security.ubuntu.com/ubuntu focal-security main" | sudo tee /etc/apt/sources.list.d/focal-security.list
           sudo apt-get update -q
           sudo apt-get install --yes libssl1.1
           sudo rm /etc/apt/sources.list.d/focal-security.list
@@ -343,6 +349,12 @@ jobs:
             8.0.x
             9.0.x
             10.0.x
+
+      - name: Restore .NET workloads
+        # Some projects (MAUI / MauiHybrid / Android / iOS / WPF) declare workloads via
+        # their TFMs (e.g. net10.0-android). For workload-bearing repos this installs them
+        # before restore; for pure libraries it's a fast no-op.
+        run: dotnet workload restore
 
       - name: Restore and build (exclude .NET Framework-only projects)
         run: |
@@ -710,6 +722,12 @@ jobs:
             9.0.x
             10.0.x
 
+      - name: Restore .NET workloads
+        # Some projects (MAUI / MauiHybrid / Android / iOS / WPF) declare workloads via
+        # their TFMs (e.g. net10.0-android). For workload-bearing repos this installs them
+        # before restore; for pure libraries it's a fast no-op.
+        run: dotnet workload restore
+
       - name: Restore dependencies
         run: dotnet restore
 
@@ -1006,6 +1024,12 @@ jobs:
             8.0.x
             9.0.x
             10.0.x
+
+      - name: Restore .NET workloads
+        # Some projects (MAUI / MauiHybrid / Android / iOS / WPF) declare workloads via
+        # their TFMs (e.g. net10.0-android). For workload-bearing repos this installs them
+        # before restore; for pure libraries it's a fast no-op.
+        run: dotnet workload restore
 
       - name: Restore and build (exclude .NET Framework-only projects)
         run: |
