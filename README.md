@@ -13,12 +13,19 @@ A C# implementation of **Hawsey**, a four-player team trick-taking card game pla
 Hawsey is a **4-player partnership trick-taking game** dealt from a 48-card pinochle deck (two each of 9, 10, J, Q, K, A in all four suits). Two teams of two players sit across from each other. Each hand has three phases:
 
 1. **Bidding** — Players bid for the right to name trump, with the highest bidder committing to take a minimum number of points.
-2. **Trump declaration** — The winning bidder names the trump suit (and, in some house rules, the trump-card priority mode).
+2. **Trump declaration** — The winning bidder names the trump suit, declares no-trump, or commits to a Hawsey (see below).
 3. **Trick play** — Players follow suit when possible; the trick is won by the highest trump or, if no trump was played, the highest card of the lead suit.
 
-Scoring rewards both card-point capture (taking aces, tens, kings) and the *last trick*. The bidding team must meet their bid or be **bucked** (lose the bid amount).
+Scoring rewards both card-point capture (taking aces, tens, kings) and the *last trick*. The bidding team must meet their bid or be **bucked** (lose the bid amount). **First team to reach 62 points wins the game.**
 
-This implementation supports configurable **house rules** (trump-card priority modes, bidding minimums, partner-call variants) so you can play the variant your grandparents taught you.
+### Notable bid types
+
+Beyond the standard pass / numeric bid, Hawsey has two distinctive variants:
+
+- **No trump** — aces are highest in every suit; no suit ranks above another for the round. Risk and reward both go up because there's no trump to seize control of a trick you've lost the lead on.
+- **Asking for two / Hawsey** — the game's namesake bid: the bidder commits to taking all 12 tricks **alone**, without their partner. Make it and the team scores big; miss it and the buck is steep.
+
+This implementation supports configurable **house rules** (must-beat, must-trump, minimum-bid threshold, etc.) so you can play the variant your grandparents taught you.
 
 ---
 
@@ -42,7 +49,7 @@ The engine is pure, deterministic, and UI-agnostic. State transitions are immuta
 - **Pinochle deck modeling** — `Card`, `Rank`, `Suit`, `Deck` with shuffle support
 - **Bidding phase** — `BidAction`, `BiddingPhase`, `BiddingResult` with validation
 - **Trick play** — `Trick`, `PlayedCard`, `FollowSuitValidator`, `TrickResult`
-- **Configurable house rules** — `HouseRules`, `TrumpMode` (Ace-high, Jack-high variants)
+- **Configurable house rules** — `HouseRules` (must-beat, must-trump, minimum-bid), `TrumpMode` (suited or no-trump)
 - **Player & team modeling** — `PlayerHand`, `PlayerPosition`, `Team`, `DealerRotation`
 - **Scoring** — `ScoreKeeper`, `RoundScore`, `GameResult`
 - **Strategy hooks** — `IPlayerStrategy`, `GameRunner` for plugging in human or AI players
