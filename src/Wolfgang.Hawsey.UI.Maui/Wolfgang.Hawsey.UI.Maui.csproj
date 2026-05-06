@@ -22,6 +22,12 @@
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</SupportedOSPlatformVersion>
     <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</TargetPlatformMinVersion>
     <WindowsPackageType>None</WindowsPackageType>
+
+    <!-- Enable Windows targeting so the win-x64 runtime pack downloads during restore.
+         Without this, Stage 2 (Windows runner) fails the net10.0-windows10.0.19041.0
+         TFM build with NETSDK1112 ("runtime pack for Microsoft.NETCore.App.Runtime.win-x64
+         was not downloaded"). -->
+    <EnableWindowsTargeting Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">true</EnableWindowsTargeting>
   </PropertyGroup>
 
   <ItemGroup>

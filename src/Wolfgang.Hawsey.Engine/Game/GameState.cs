@@ -12,11 +12,11 @@ public sealed class GameState
     (
         GamePhase phase,
         PlayerPosition dealer,
-        Dictionary<PlayerPosition, List<Card>> hands,
+        IDictionary<PlayerPosition, List<Card>> hands,
         Suit? trumpSuit,
         TrumpMode trumpMode,
         BiddingResult? biddingResult,
-        List<TrickResult> completedTricks,
+        IList<TrickResult> completedTricks,
         Trick? currentTrick,
         int northSouthScore,
         int eastWestScore,
@@ -63,7 +63,7 @@ public sealed class GameState
     /// <summary>
     /// Gets the hands for each player.
     /// </summary>
-    public Dictionary<PlayerPosition, List<Card>> Hands { get; }
+    public IDictionary<PlayerPosition, List<Card>> Hands { get; }
 
 
 
@@ -91,7 +91,7 @@ public sealed class GameState
     /// <summary>
     /// Gets the tricks completed in the current round.
     /// </summary>
-    public List<TrickResult> CompletedTricks { get; }
+    public IList<TrickResult> CompletedTricks { get; }
 
 
 

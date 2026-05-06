@@ -1,9 +1,13 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Wolfgang.Hawsey.Engine;
 
 /// <summary>
 /// The core game engine that manages state transitions for a Hawsey game.
 /// Each method takes the current state and returns a new state.
 /// </summary>
+[SuppressMessage("Major Code Smell", "S2325:Methods and properties that don't access instance data should be static",
+    Justification = "GameEngine is intentionally an instance class so callers can hold a single engine reference and so future extension (e.g. injected logger, metrics, timing) can be added without churning every call site. Every public method conceptually belongs to a long-lived engine instance even when the current implementation is stateless.")]
 public sealed class GameEngine
 {
     /// <summary>
@@ -302,7 +306,7 @@ public sealed class GameEngine
     private GameState ScoreRound
     (
         GameState state,
-        Dictionary<PlayerPosition, List<Card>> hands,
+        IDictionary<PlayerPosition, List<Card>> hands,
         List<TrickResult> completedTricks,
         int tricksPlayed
     )
@@ -417,7 +421,7 @@ public sealed class GameEngine
 
     private static Dictionary<PlayerPosition, List<Card>> RemoveCardFromHand
     (
-        Dictionary<PlayerPosition, List<Card>> hands,
+        IDictionary<PlayerPosition, List<Card>> hands,
         PlayerPosition player,
         Card card
     )
@@ -435,7 +439,7 @@ public sealed class GameEngine
     private static GameState CreateTrickInProgressState
     (
         GameState state,
-        Dictionary<PlayerPosition, List<Card>> hands,
+        IDictionary<PlayerPosition, List<Card>> hands,
         Trick trick,
         PlayerPosition nextToAct
     )
@@ -465,7 +469,7 @@ public sealed class GameEngine
     private GameState CompleteTrick
     (
         GameState state,
-        Dictionary<PlayerPosition, List<Card>> hands,
+        IDictionary<PlayerPosition, List<Card>> hands,
         Trick trick
     )
     {
