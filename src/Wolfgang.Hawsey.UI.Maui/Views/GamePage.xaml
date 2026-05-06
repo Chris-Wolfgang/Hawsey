@@ -11,7 +11,7 @@
           Padding="10">
 
         <!-- Top bar: scores and new game -->
-        <Grid Row="0" ColumnDefinitions="*,Auto,*" Padding="5">
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,*" Padding="5">
             <Label Grid.Column="0"
                    Text="{Binding BidInfoDisplay}"
                    TextColor="White" FontSize="14"
@@ -35,7 +35,7 @@
         </Grid>
 
         <!-- Trick area (center) -->
-        <VerticalStackLayout Row="1" VerticalOptions="Center" HorizontalOptions="Center" Spacing="5">
+        <VerticalStackLayout Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Center" Spacing="5">
             <Label Text="Trick Area" TextColor="#4CAF50" FontSize="14" HorizontalOptions="Center" />
             <HorizontalStackLayout Spacing="5" HorizontalOptions="Center">
                 <BindableLayout.ItemsSource>
@@ -68,12 +68,12 @@
         </VerticalStackLayout>
 
         <!-- Status message -->
-        <Label Row="2" Text="{Binding StatusMessage}"
+        <Label Grid.Row="2" Text="{Binding StatusMessage}"
                TextColor="White" FontSize="16"
                HorizontalOptions="Center" Padding="0,5" />
 
         <!-- Human hand (South, face up, interactive) -->
-        <ScrollView Row="3" Orientation="Horizontal" HorizontalOptions="Center">
+        <ScrollView Grid.Row="3" Orientation="Horizontal" HorizontalOptions="Center">
             <HorizontalStackLayout Spacing="4"
                                    BindableLayout.ItemsSource="{Binding HumanCards}">
                 <BindableLayout.ItemTemplate>
@@ -116,7 +116,7 @@
         </ScrollView>
 
         <!-- Bidding overlay -->
-        <Grid Row="0" RowSpan="4"
+        <Grid Grid.Row="0" Grid.RowSpan="4"
               IsVisible="{Binding IsBiddingVisible}"
               BackgroundColor="#CC000000">
             <Border StrokeShape="RoundRectangle 12"
@@ -161,7 +161,7 @@
         </Grid>
 
         <!-- Trump picker overlay -->
-        <Grid Row="0" RowSpan="4"
+        <Grid Grid.Row="0" Grid.RowSpan="4"
               IsVisible="{Binding IsTrumpPickerVisible}"
               BackgroundColor="#CC000000">
             <Border StrokeShape="RoundRectangle 12"
@@ -200,7 +200,7 @@
         </Grid>
 
         <!-- Game over overlay -->
-        <Grid Row="0" RowSpan="4"
+        <Grid Grid.Row="0" Grid.RowSpan="4"
               IsVisible="{Binding IsGameOverVisible}"
               BackgroundColor="#CC000000">
             <Border StrokeShape="RoundRectangle 12"
