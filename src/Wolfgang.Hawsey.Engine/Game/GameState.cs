@@ -1,15 +1,21 @@
 namespace Wolfgang.Hawsey.Engine;
 
 /// <summary>
-/// An immutable snapshot of the entire game state at a point in time.
+/// A snapshot of the entire game state at a point in time. Each method on
+/// <see cref="GameEngine"/> returns a freshly-constructed instance rather than mutating
+/// the previous state, so callers should treat the exposed <see cref="Hands"/> and
+/// <see cref="CompletedTricks"/> collections as read-only — mutating them is unsupported
+/// and can corrupt subsequent engine transitions.
 /// </summary>
-// MA0016: GameState exposes Dictionary&lt;,&gt; and List&lt;&gt; on its public surface to keep
-// engine-internal construction simple. The class is documented as immutable; callers
-// treat the collections read-only. Suppressed at the type level rather than redesigning
-// the API in this fix.
+// MA0016: GameState exposes Dictionary<,> and List<> on its public surface so the engine
+// can pass the collections it constructs internally without copying or wrapping. Switching
+// to abstractions would require lossy conversions because IReadOnlyDictionary<TKey, TValue>
+// is invariant in TValue (Dictionary<P, List<Card>> is not assignable to
+// IReadOnlyDictionary<P, IReadOnlyList<Card>>). Callers must treat these collections as
+// read-only per the type's XML doc.
 [System.Diagnostics.CodeAnalysis.SuppressMessage(
     "Design", "MA0016:Prefer using collection abstraction instead of implementation",
-    Justification = "Engine returns concrete types; class is documented as immutable.")]
+    Justification = "Engine returns concrete types; callers must treat collections as read-only per the type's XML doc.")]
 public sealed class GameState
 {
     /// <summary>
