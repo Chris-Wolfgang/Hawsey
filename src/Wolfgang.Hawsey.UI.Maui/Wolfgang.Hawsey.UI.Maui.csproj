@@ -22,6 +22,15 @@
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</SupportedOSPlatformVersion>
     <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</TargetPlatformMinVersion>
     <WindowsPackageType>None</WindowsPackageType>
+
+    <!-- Hint to restore that the Windows TFM needs the win-x64 runtime pack.
+         Without this CI restores without a RID and Exe build later fails with
+         NETSDK1112 ("The runtime pack for Microsoft.NETCore.App.Runtime.win-x64
+         was not downloaded"). Pair with SelfContained=false so the Windows
+         App SDK doesn't try to switch into self-contained mode. -->
+    <RuntimeIdentifiers Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">win-x64</RuntimeIdentifiers>
+    <SelfContained Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">false</SelfContained>
+    <WindowsAppSDKSelfContained Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">false</WindowsAppSDKSelfContained>
   </PropertyGroup>
 
   <ItemGroup>
