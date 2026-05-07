@@ -289,12 +289,10 @@ public class GameEngineTests
         var bidder = state.HawseyBidder!.Value;
         var partner = bidder.Partner();
 
-        // Use a card that's definitely not in the bidder's hand
-        var fakeCard = new Card(Rank.Nine, Suit.Hearts);
         var bidderHand = state.Hands[bidder];
 
         // Find a card NOT in bidder's hand
-        Card notInHand = default;
+        Card? notInHand = null;
         foreach (var suit in new[] { Suit.Hearts, Suit.Diamonds, Suit.Clubs, Suit.Spades })
         {
             foreach (var rank in new[] { Rank.Nine, Rank.Ten, Rank.Jack, Rank.Queen, Rank.King, Rank.Ace })
@@ -306,18 +304,20 @@ public class GameEngineTests
                     break;
                 }
             }
-            if (!bidderHand.Contains(notInHand) && notInHand.Rank != 0)
+            if (notInHand.HasValue)
             {
                 break;
             }
         }
+
+        Assert.True(notInHand.HasValue, "Test setup: failed to find a card outside the bidder's hand.");
 
         Assert.Throws<InvalidOperationException>
         (
             () => _engine.ExchangeHawseyCards
             (
                 state,
-                new[] { notInHand, state.Hands[bidder][0] },
+                new[] { notInHand.Value, state.Hands[bidder][0] },
                 new[] { state.Hands[partner][0], state.Hands[partner][1] }
             )
         );
