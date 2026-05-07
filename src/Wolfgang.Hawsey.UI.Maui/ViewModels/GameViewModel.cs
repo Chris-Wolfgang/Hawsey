@@ -332,11 +332,11 @@ public class GameViewModel : INotifyPropertyChanged
 
 
 
-    private void OnTrickCompleted(object? sender, PlayerPosition winner)
+    private void OnTrickCompleted(object? sender, TrickCompletedEventArgs e)
     {
         MainThread.BeginInvokeOnMainThread(() =>
         {
-            StatusMessage = $"{winner} wins the trick!";
+            StatusMessage = $"{e.Winner} wins the trick!";
         });
     }
 
@@ -357,12 +357,12 @@ public class GameViewModel : INotifyPropertyChanged
 
 
 
-    private void OnGameOver(object? sender, Team winner)
+    private void OnGameOver(object? sender, GameOverEventArgs e)
     {
         MainThread.BeginInvokeOnMainThread(() =>
         {
             var state = _gameService.CurrentState;
-            var winnerText = winner == Team.NorthSouth ? "North/South (Your team)" : "East/West";
+            var winnerText = e.Winner == Team.NorthSouth ? "North/South (Your team)" : "East/West";
             GameOverMessage = $"{winnerText} wins!\n\nNS: {state?.NorthSouthScore} — EW: {state?.EastWestScore}";
             IsGameOverVisible = true;
             StatusMessage = "Game Over!";
