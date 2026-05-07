@@ -4,11 +4,15 @@ namespace Wolfgang.Hawsey.Engine;
 /// The core game engine that manages state transitions for a Hawsey game.
 /// Each method takes the current state and returns a new state.
 /// </summary>
-// S2325: methods are intentionally instance methods so callers can substitute or
-// mock a custom engine. Making them static would be an unnecessary API break.
+// S2325: methods are kept as instance methods to preserve the existing public API.
+// Existing call sites use `engine.StartGame(...)`, `engine.PlayCard(...)`, etc.
+// Switching to static would be a CS0176 break for every consumer (UI projects,
+// tests, external callers). The instance form is also DI-friendly — consumers can
+// register a single GameEngine in their service container even though no instance
+// state is currently held.
 [System.Diagnostics.CodeAnalysis.SuppressMessage(
     "Performance", "S2325:Methods and properties that don't access instance data should be static",
-    Justification = "Instance API is intentional to allow extension/mocking.")]
+    Justification = "Instance API preserved to avoid CS0176 breaks at existing call sites and to keep the type DI-friendly.")]
 public sealed class GameEngine
 {
     /// <summary>
