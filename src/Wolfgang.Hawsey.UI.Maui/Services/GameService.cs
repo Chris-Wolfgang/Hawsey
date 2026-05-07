@@ -27,7 +27,7 @@ public class GameService
 
 
 
-    public event EventHandler<PlayerPosition>? TrickCompleted;
+    public event EventHandler<TrickCompletedEventArgs>? TrickCompleted;
 
 
 
@@ -35,7 +35,7 @@ public class GameService
 
 
 
-    public event EventHandler<Team>? GameOver;
+    public event EventHandler<GameOverEventArgs>? GameOver;
 
 
 
@@ -225,7 +225,7 @@ public class GameService
                 _state.CompletedTricks.Count > 0)
             {
                 var lastTrick = _state.CompletedTricks[_state.CompletedTricks.Count - 1];
-                TrickCompleted?.Invoke(this, lastTrick.Winner);
+                TrickCompleted?.Invoke(this, new TrickCompletedEventArgs(lastTrick.Winner));
                 await Task.Delay(800).ConfigureAwait(false);
             }
         }
@@ -241,7 +241,7 @@ public class GameService
             var winner = _state.NorthSouthScore >= _state.Rules.PointsToWin
                 ? Team.NorthSouth
                 : Team.EastWest;
-            GameOver?.Invoke(this, winner);
+            GameOver?.Invoke(this, new GameOverEventArgs(winner));
             return false;
         }
 
@@ -262,3 +262,6 @@ public class GameService
         StateChanged?.Invoke(this, EventArgs.Empty);
     }
 }
+
+
+
