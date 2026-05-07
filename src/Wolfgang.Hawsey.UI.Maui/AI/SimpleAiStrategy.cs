@@ -73,13 +73,11 @@ public class SimpleAiStrategy : IPlayerStrategy
 
             for (var i = 0; i < legalPlays.Count; i++)
             {
-                if (comparer.Compare(legalPlays[i], currentWinner.Value) > 0)
+                if (comparer.Compare(legalPlays[i], currentWinner.Value) > 0
+                    && (!lowestWinner.HasValue ||
+                        comparer.Compare(legalPlays[i], lowestWinner.Value) < 0))
                 {
-                    if (!lowestWinner.HasValue ||
-                        comparer.Compare(legalPlays[i], lowestWinner.Value) < 0)
-                    {
-                        lowestWinner = legalPlays[i];
-                    }
+                    lowestWinner = legalPlays[i];
                 }
             }
 

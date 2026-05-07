@@ -7,7 +7,7 @@ namespace Wolfgang.Hawsey.UI.Maui.Tests.Unit.Services;
 /// Integration tests that verify the game flow patterns used by GameService.
 /// Tests the engine + AI strategy interaction without MAUI dependencies.
 /// </summary>
-public class GameServiceIntegrationTests
+public class GameServiceTests
 {
     private readonly GameEngine _engine = new();
     private readonly SimpleAiStrategy _ai = new();

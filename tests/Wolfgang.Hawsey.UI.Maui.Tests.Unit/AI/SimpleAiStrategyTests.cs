@@ -75,7 +75,9 @@ public class SimpleAiStrategyTests
 
         state = engine.SelectTrump(state, Suit.Hearts);
 
-        // Play through most of the game to exhaust hands
+        // Play through most of the game to exhaust hands. Every card the strategy
+        // returns must be in the legal-plays set for the player at that moment —
+        // including the case where only one play is legal.
         for (var i = 0; i < 44; i++)
         {
             if (state.Phase != GamePhase.TrickPlay)
@@ -84,7 +86,9 @@ public class SimpleAiStrategyTests
             }
 
             var player = state.NextToAct!.Value;
+            var legalAtPlay = state.GetLegalPlays();
             var play = _strategy.DecidePlay(state, player);
+            Assert.Contains(play, legalAtPlay);
             state = engine.PlayCard(state, player, play);
         }
     }
