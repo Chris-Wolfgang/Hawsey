@@ -153,13 +153,13 @@ public class SimpleAiStrategy : IPlayerStrategy
             var currentIsTrump = CardRanking.IsTrump(cards[i], trumpSuit);
             var lowestIsTrump = CardRanking.IsTrump(lowest, trumpSuit);
 
-            if (!currentIsTrump && lowestIsTrump)
-            {
-                lowest = cards[i];
-            }
-            else if (currentIsTrump == lowestIsTrump &&
-                     CardRanking.GetEffectiveRank(cards[i], trumpSuit) <
-                     CardRanking.GetEffectiveRank(lowest, trumpSuit))
+            var preferAsLowest =
+                (!currentIsTrump && lowestIsTrump)
+                || (currentIsTrump == lowestIsTrump
+                    && CardRanking.GetEffectiveRank(cards[i], trumpSuit) <
+                       CardRanking.GetEffectiveRank(lowest, trumpSuit));
+
+            if (preferAsLowest)
             {
                 lowest = cards[i];
             }

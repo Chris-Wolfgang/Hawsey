@@ -36,10 +36,13 @@ public class GameViewModel : INotifyPropertyChanged
         _gameService.RoundCompleted += OnRoundCompleted;
         _gameService.GameOver += OnGameOver;
 
-        NewGameCommand = new Command(async () => await StartNewGameAsync());
-        PlaceBidCommand = new Command<string>(async (s) => await PlaceBidAsync(s));
-        SelectTrumpCommand = new Command<string>(async (s) => await SelectTrumpAsync(s));
-        PlayCardCommand = new Command<CardViewModel>(async (c) => await PlayCardAsync(c));
+        // Command takes Action/Action<T>; an `async () => await ...` lambda would be
+        // async-void (MA0147). Discard the Task instead — MAUI's Command pattern is
+        // already fire-and-forget for the caller.
+        NewGameCommand = new Command(() => _ = StartNewGameAsync());
+        PlaceBidCommand = new Command<string>(s => _ = PlaceBidAsync(s));
+        SelectTrumpCommand = new Command<string>(s => _ = SelectTrumpAsync(s));
+        PlayCardCommand = new Command<CardViewModel>(c => _ = PlayCardAsync(c));
     }
 
 
@@ -163,7 +166,7 @@ public class GameViewModel : INotifyPropertyChanged
     {
         IsGameOverVisible = false;
         _gameService.StartNewGame();
-        await AdvanceGameAsync();
+        await AdvanceGameAsync().ConfigureAwait(true);
     }
 
 
@@ -178,13 +181,13 @@ public class GameViewModel : INotifyPropertyChanged
         {
             _gameService.PlaceHumanBid(BidAction.HawseyBid.Instance);
         }
-        else if (int.TryParse(bidString, out var amount))
+        else if (int.TryParse(bidString, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out var amount))
         {
             _gameService.PlaceHumanBid(new BidAction.NumberBid(amount));
         }
 
         IsBiddingVisible = false;
-        await AdvanceGameAsync();
+        await AdvanceGameAsync().ConfigureAwait(true);
     }
 
 
@@ -202,7 +205,7 @@ public class GameViewModel : INotifyPropertyChanged
 
         IsTrumpPickerVisible = false;
         _gameService.SelectTrump(trump);
-        await AdvanceGameAsync();
+        await AdvanceGameAsync().ConfigureAwait(true);
     }
 
 
@@ -215,7 +218,7 @@ public class GameViewModel : INotifyPropertyChanged
         }
 
         _gameService.PlayHumanCard(cardVm.Card);
-        await AdvanceGameAsync();
+        await AdvanceGameAsync().ConfigureAwait(true);
     }
 
 
@@ -232,25 +235,25 @@ public class GameViewModel : INotifyPropertyChanged
         switch (state.Phase)
         {
             case GamePhase.Bidding:
-                await AdvanceBiddingPhaseAsync();
+                await AdvanceBiddingPhaseAsync().ConfigureAwait(true);
                 break;
 
             case GamePhase.TrumpSelection:
-                await AdvanceTrumpSelectionPhaseAsync();
+                await AdvanceTrumpSelectionPhaseAsync().ConfigureAwait(true);
                 break;
 
             case GamePhase.HawseyExchange:
-                await AdvanceHawseyExchangePhaseAsync();
+                await AdvanceHawseyExchangePhaseAsync().ConfigureAwait(true);
                 break;
 
             case GamePhase.TrickPlay:
-                await AdvanceTrickPlayPhaseAsync();
+                await AdvanceTrickPlayPhaseAsync().ConfigureAwait(true);
                 break;
 
             case GamePhase.RoundScoring:
-                await Task.Delay(1500);
+                await Task.Delay(1500).ConfigureAwait(true);
                 _gameService.StartNextRound();
-                await AdvanceGameAsync();
+                await AdvanceGameAsync().ConfigureAwait(true);
                 break;
 
             case GamePhase.GameOver:
@@ -262,7 +265,7 @@ public class GameViewModel : INotifyPropertyChanged
 
     private async Task AdvanceBiddingPhaseAsync()
     {
-        var humanNeedsToBid = await _gameService.AdvanceAiBiddingAsync();
+        var humanNeedsToBid = await _gameService.AdvanceAiBiddingAsync().ConfigureAwait(true);
 
         if (humanNeedsToBid)
         {
@@ -271,7 +274,7 @@ public class GameViewModel : INotifyPropertyChanged
         }
         else
         {
-            await AdvanceGameAsync();
+            await AdvanceGameAsync().ConfigureAwait(true);
         }
     }
 
@@ -279,7 +282,7 @@ public class GameViewModel : INotifyPropertyChanged
 
     private async Task AdvanceTrumpSelectionPhaseAsync()
     {
-        var humanSelectsTrump = await _gameService.HandleTrumpSelectionAsync();
+        var humanSelectsTrump = await _gameService.HandleTrumpSelectionAsync().ConfigureAwait(true);
 
         if (humanSelectsTrump)
         {
@@ -288,7 +291,7 @@ public class GameViewModel : INotifyPropertyChanged
         }
         else
         {
-            await AdvanceGameAsync();
+            await AdvanceGameAsync().ConfigureAwait(true);
         }
     }
 
@@ -296,7 +299,7 @@ public class GameViewModel : INotifyPropertyChanged
 
     private async Task AdvanceHawseyExchangePhaseAsync()
     {
-        var humanExchanges = await _gameService.HandleHawseyExchangeAsync();
+        var humanExchanges = await _gameService.HandleHawseyExchangeAsync().ConfigureAwait(true);
 
         if (humanExchanges)
         {
@@ -304,7 +307,7 @@ public class GameViewModel : INotifyPropertyChanged
         }
         else
         {
-            await AdvanceGameAsync();
+            await AdvanceGameAsync().ConfigureAwait(true);
         }
     }
 
@@ -312,7 +315,7 @@ public class GameViewModel : INotifyPropertyChanged
 
     private async Task AdvanceTrickPlayPhaseAsync()
     {
-        var humanPlays = await _gameService.AdvanceAiPlaysAsync();
+        var humanPlays = await _gameService.AdvanceAiPlaysAsync().ConfigureAwait(true);
 
         if (humanPlays)
         {
@@ -322,14 +325,14 @@ public class GameViewModel : INotifyPropertyChanged
 
 
 
-    private void OnStateChanged()
+    private void OnStateChanged(object? sender, EventArgs e)
     {
         MainThread.BeginInvokeOnMainThread(UpdateFromState);
     }
 
 
 
-    private void OnTrickCompleted(PlayerPosition winner)
+    private void OnTrickCompleted(object? sender, PlayerPosition winner)
     {
         MainThread.BeginInvokeOnMainThread(() =>
         {
@@ -339,7 +342,7 @@ public class GameViewModel : INotifyPropertyChanged
 
 
 
-    private void OnRoundCompleted()
+    private void OnRoundCompleted(object? sender, EventArgs e)
     {
         MainThread.BeginInvokeOnMainThread(() =>
         {
@@ -354,7 +357,7 @@ public class GameViewModel : INotifyPropertyChanged
 
 
 
-    private void OnGameOver(Team winner)
+    private void OnGameOver(object? sender, Team winner)
     {
         MainThread.BeginInvokeOnMainThread(() =>
         {

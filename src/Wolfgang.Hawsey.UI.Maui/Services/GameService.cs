@@ -23,19 +23,19 @@ public class GameService
 
 
 
-    public event Action? StateChanged;
+    public event EventHandler? StateChanged;
 
 
 
-    public event Action<PlayerPosition>? TrickCompleted;
+    public event EventHandler<PlayerPosition>? TrickCompleted;
 
 
 
-    public event Action? RoundCompleted;
+    public event EventHandler? RoundCompleted;
 
 
 
-    public event Action<Team>? GameOver;
+    public event EventHandler<Team>? GameOver;
 
 
 
@@ -48,7 +48,7 @@ public class GameService
         _random = new Random();
         _state = _engine.StartGame(rules ?? HouseRules.Default, PlayerPosition.North, _random);
         _biddingPhase = new BiddingPhase(_state.Dealer, _state.Rules.MinimumBid);
-        StateChanged?.Invoke();
+        StateChanged?.Invoke(this, EventArgs.Empty);
     }
 
 
@@ -81,7 +81,7 @@ public class GameService
 
             var aiBid = _aiStrategy.DecideBid(_state, nextBidder.Value);
             _state = _engine.PlaceBid(_state, nextBidder.Value, aiBid, _biddingPhase);
-            StateChanged?.Invoke();
+            StateChanged?.Invoke(this, EventArgs.Empty);
         }
 
         return false;
@@ -97,7 +97,7 @@ public class GameService
         }
 
         _state = _engine.PlaceBid(_state, HumanPosition, action, _biddingPhase);
-        StateChanged?.Invoke();
+        StateChanged?.Invoke(this, EventArgs.Empty);
     }
 
 
@@ -110,7 +110,7 @@ public class GameService
         }
 
         _state = _engine.SelectTrump(_state, trumpSuit);
-        StateChanged?.Invoke();
+        StateChanged?.Invoke(this, EventArgs.Empty);
     }
 
 
@@ -148,7 +148,7 @@ public class GameService
         }
 
         _state = _engine.ExchangeHawseyCards(_state, discard, fromPartner);
-        StateChanged?.Invoke();
+        StateChanged?.Invoke(this, EventArgs.Empty);
     }
 
 
@@ -191,7 +191,7 @@ public class GameService
         }
 
         _state = _engine.PlayCard(_state, HumanPosition, card);
-        StateChanged?.Invoke();
+        StateChanged?.Invoke(this, EventArgs.Empty);
     }
 
 
@@ -218,21 +218,21 @@ public class GameService
             var player = _state.NextToAct!.Value;
             var card = _aiStrategy.DecidePlay(_state, player);
             _state = _engine.PlayCard(_state, player, card);
-            StateChanged?.Invoke();
+            StateChanged?.Invoke(this, EventArgs.Empty);
 
             // Check if trick just completed
             if (_state.CurrentTrick != null && _state.CurrentTrick.Plays.Count == 0 &&
                 _state.CompletedTricks.Count > 0)
             {
                 var lastTrick = _state.CompletedTricks[_state.CompletedTricks.Count - 1];
-                TrickCompleted?.Invoke(lastTrick.Winner);
+                TrickCompleted?.Invoke(this, lastTrick.Winner);
                 await Task.Delay(800).ConfigureAwait(false);
             }
         }
 
         if (_state.Phase == GamePhase.RoundScoring)
         {
-            RoundCompleted?.Invoke();
+            RoundCompleted?.Invoke(this, EventArgs.Empty);
             return false;
         }
 
@@ -241,7 +241,7 @@ public class GameService
             var winner = _state.NorthSouthScore >= _state.Rules.PointsToWin
                 ? Team.NorthSouth
                 : Team.EastWest;
-            GameOver?.Invoke(winner);
+            GameOver?.Invoke(this, winner);
             return false;
         }
 
@@ -259,6 +259,6 @@ public class GameService
 
         _state = _engine.StartNextRound(_state, _random);
         _biddingPhase = new BiddingPhase(_state.Dealer, _state.Rules.MinimumBid);
-        StateChanged?.Invoke();
+        StateChanged?.Invoke(this, EventArgs.Empty);
     }
 }
