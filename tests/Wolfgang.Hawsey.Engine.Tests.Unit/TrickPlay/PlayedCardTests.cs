@@ -1,3 +1,5 @@
+using Wolfgang.Hawsey.Engine;
+
 namespace Wolfgang.Hawsey.Engine.Tests.Unit.TrickPlay;
 
 public class PlayedCardTests
