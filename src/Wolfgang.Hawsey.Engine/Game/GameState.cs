@@ -3,6 +3,13 @@ namespace Wolfgang.Hawsey.Engine;
 /// <summary>
 /// An immutable snapshot of the entire game state at a point in time.
 /// </summary>
+// MA0016: GameState exposes Dictionary&lt;,&gt; and List&lt;&gt; on its public surface to keep
+// engine-internal construction simple. The class is documented as immutable; callers
+// treat the collections read-only. Suppressed at the type level rather than redesigning
+// the API in this fix.
+[System.Diagnostics.CodeAnalysis.SuppressMessage(
+    "Design", "MA0016:Prefer using collection abstraction instead of implementation",
+    Justification = "Engine returns concrete types; class is documented as immutable.")]
 public sealed class GameState
 {
     /// <summary>

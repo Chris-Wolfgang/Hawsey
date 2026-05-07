@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace Wolfgang.Hawsey.Engine;
 
 /// <summary>
@@ -5,6 +7,7 @@ namespace Wolfgang.Hawsey.Engine;
 /// </summary>
 /// <param name="Rank">The rank of the card.</param>
 /// <param name="Suit">The suit of the card.</param>
+[StructLayout(LayoutKind.Auto)]
 public readonly record struct Card(Rank Rank, Suit Suit)
 {
     /// <inheritdoc />
