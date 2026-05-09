@@ -92,6 +92,20 @@ public class GameService
                 LogAi($"{nextBidder.Value} ideal bid {n.Amount} not above current high {_highBidAmount} — passing.");
                 aiBid = BidAction.PassBid.Instance;
             }
+
+            // Stuck-dealer cap: if everyone else passed and this is the dealer, no need
+            // to overbid empty competition — bid the minimum.
+            var isStuckDealer =
+                nextBidder.Value == _state.Dealer
+                && _bidHistory.Count == 3
+                && _highBidAmount == 0
+                && aiBid is BidAction.NumberBid;
+            if (isStuckDealer && aiBid is BidAction.NumberBid stuckBid
+                && stuckBid.Amount > _state.Rules.MinimumBid)
+            {
+                LogAi($"{nextBidder.Value} is stuck — capping bid at minimum {_state.Rules.MinimumBid} (would have bid {stuckBid.Amount}).");
+                aiBid = new BidAction.NumberBid(_state.Rules.MinimumBid);
+            }
             _state = _engine.PlaceBid(_state, nextBidder.Value, aiBid, _biddingPhase);
             RecordBid(nextBidder.Value, aiBid);
             StateChanged?.Invoke();

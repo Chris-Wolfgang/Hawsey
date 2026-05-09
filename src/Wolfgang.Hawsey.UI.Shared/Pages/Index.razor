@@ -194,7 +194,15 @@
     {
         <div class="modal-backdrop">
             <div class="modal-card round-summary">
-                <h2>@(rs.IsGameOver ? $"{rs.GameWinnerLabel} wins the game!" : "Round complete")</h2>
+                @if (rs.IsGameOver)
+                {
+                    var winClass = rs.GameWinnerLabel == "US" ? "us" : "them";
+                    <h2 class="@winClass"><span class="@winClass">@rs.GameWinnerLabel</span> wins the game!</h2>
+                }
+                else
+                {
+                    <h2>Round complete</h2>
+                }
 
                 <div class="rs-bid">
                     <span class="@(rs.BidTeamLabel == "US" ? "us" : "them")">@rs.BidTeamLabel</span>
