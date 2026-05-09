@@ -114,10 +114,18 @@
     <div class="hand">
         @for (var i = 0; i < HumanHand.Count; i++)
         {
+            var index = i;
             var card = HumanHand[i];
             var legal = LegalPlays.Contains(card);
             var canPlay = IsHumanPlayTurn && legal;
-            <div class="card @(IsRed(card) ? "red" : "") @(canPlay ? "playable" : "disabled")"
+            var isDragging = _dragIndex == index;
+            <div class="card @(IsRed(card) ? "red" : "") @(canPlay ? "playable" : "disabled") @(isDragging ? "dragging" : "")"
+                 draggable="true"
+                 @ondragstart="@(() => OnDragStart(index))"
+                 @ondragover:preventDefault="true"
+                 @ondragover="@(() => { })"
+                 @ondragend="OnDragEnd"
+                 @ondrop="@(() => OnDrop(index))"
                  @onclick="() => OnCardClickAsync(card)">
                 <span class="rank">@RankText(card.Rank)</span>
                 <span class="suit">@SuitSymbol(card.Suit)</span>
@@ -278,6 +286,9 @@
         }
     }
 
+    private List<Card>? _customOrder;
+    private int? _dragIndex;
+
     private IReadOnlyList<Card> HumanHand
     {
         get
@@ -287,8 +298,75 @@
             {
                 return Array.Empty<Card>();
             }
-            return hand;
+            SyncCustomOrder(hand);
+            return _customOrder ?? hand;
         }
+    }
+
+    private void SyncCustomOrder(List<Card> hand)
+    {
+        if (_customOrder is null || hand.Count > _customOrder.Count)
+        {
+            // Initial deal or fresh hand: re-sort.
+            _customOrder = new List<Card>(hand);
+            _customOrder.Sort(CompareForDisplay);
+            return;
+        }
+
+        if (hand.Count < _customOrder.Count)
+        {
+            // A card was played: drop the missing card while keeping the user's order.
+            var remaining = new List<Card>(hand);
+            var newOrder = new List<Card>(_customOrder.Count);
+            for (var i = 0; i < _customOrder.Count; i++)
+            {
+                var idx = remaining.IndexOf(_customOrder[i]);
+                if (idx >= 0)
+                {
+                    newOrder.Add(_customOrder[i]);
+                    remaining.RemoveAt(idx);
+                }
+            }
+            _customOrder = newOrder;
+        }
+    }
+
+    private static int CompareForDisplay(Card a, Card b)
+    {
+        var sa = SuitDisplayOrder(a.Suit);
+        var sb = SuitDisplayOrder(b.Suit);
+        if (sa != sb) return sa - sb;
+        return (int)b.Rank - (int)a.Rank;
+    }
+
+    private static int SuitDisplayOrder(Suit s) => s switch
+    {
+        Suit.Spades   => 0,
+        Suit.Hearts   => 1,
+        Suit.Clubs    => 2,
+        Suit.Diamonds => 3,
+        _ => 99
+    };
+
+    private void OnDragStart(int index) => _dragIndex = index;
+    private void OnDragEnd() => _dragIndex = null;
+
+    private void OnDrop(int dropIndex)
+    {
+        if (_dragIndex is not int from || _customOrder is null)
+        {
+            _dragIndex = null;
+            return;
+        }
+        _dragIndex = null;
+        if (from == dropIndex) return;
+
+        var card = _customOrder[from];
+        _customOrder.RemoveAt(from);
+        var insertAt = dropIndex > from ? dropIndex - 1 : dropIndex;
+        if (insertAt < 0) insertAt = 0;
+        if (insertAt > _customOrder.Count) insertAt = _customOrder.Count;
+        _customOrder.Insert(insertAt, card);
     }
 
     private IReadOnlyList<Card> LegalPlays =>
@@ -453,6 +531,8 @@
         BidPickerVisible = false;
         TrumpPickerVisible = false;
         RoundSummary = null;
+        _customOrder = null;
+        _dragIndex = null;
         Game.StartNewGame();
         await DriveLoopAsync();
     }

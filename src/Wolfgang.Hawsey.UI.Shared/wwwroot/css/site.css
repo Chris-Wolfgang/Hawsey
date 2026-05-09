@@ -266,6 +266,11 @@ html, body {
 .hand .card.disabled:hover { transform: none; }
 .hand .card.playable { box-shadow: 0 0 0 2px #6cf06c, var(--card-shadow); }
 
+/* Drag-to-reorder visual */
+.hand .card.dragging { opacity: 0.4; }
+.hand .card { cursor: grab; }
+.hand .card:active { cursor: grabbing; }
+
 /* ─── Status bar + bottom controls ────────────────────────────── */
 .statusbar {
     position: absolute;
