@@ -131,11 +131,73 @@
         <button class="btn" @onclick="StartNewGameAsync">&#9776; NEW GAME</button>
     </div>
 
+    @if (BidPickerVisible)
+    {
+        <div class="modal-backdrop bid-mode">
+            <div class="modal-card">
+                <h2>Your bid</h2>
+                <p class="modal-sub">
+                    @if (IsHumanStuck)
+                    {
+                        <span>You're <strong>stuck</strong> as dealer — bid <strong>@Game.MinimumLegalBid</strong> or call Hawsey.</span>
+                    }
+                    else if (Game.HighBidAmount > 0)
+                    {
+                        <span>Current high bid: <strong>@Game.HighBidAmount</strong></span>
+                    }
+                    else
+                    {
+                        <span>No bids yet. Minimum: <strong>@Game.MinimumLegalBid</strong></span>
+                    }
+                </p>
+                <div class="bid-buttons">
+                    @if (IsHumanStuck)
+                    {
+                        var stuckAmount = Game.MinimumLegalBid;
+                        <button class="btn" @onclick="@(() => PlaceHumanBidAsync(new BidAction.NumberBid(stuckAmount)))">Bid @stuckAmount</button>
+                    }
+                    else
+                    {
+                        @for (var n = Game.MinimumLegalBid; n <= 11; n++)
+                        {
+                            var amount = n;
+                            <button class="btn" @onclick="@(() => PlaceHumanBidAsync(new BidAction.NumberBid(amount)))">Bid @amount</button>
+                        }
+                    }
+                </div>
+                <button class="btn red" @onclick="@(() => PlaceHumanBidAsync(BidAction.HawseyBid.Instance))">Hawsey (24)</button>
+                @if (!IsHumanStuck)
+                {
+                    <button class="btn" @onclick="@(() => PlaceHumanBidAsync(BidAction.PassBid.Instance))">Pass</button>
+                }
+            </div>
+        </div>
+    }
+
 </div>
 
 @code {
     private GameState? State => Game.CurrentState;
+    private bool BidPickerVisible;
     private string StatusMessage = "Welcome to Hawsey. Click NEW GAME to start.";
+
+    private bool IsHumanStuck
+    {
+        get
+        {
+            if (State is null) return false;
+            if (State.Phase != GamePhase.Bidding) return false;
+            if (State.NextToAct != PlayerPosition.South) return false;
+            if (State.Dealer != PlayerPosition.South) return false;
+            var bids = Game.BidHistory;
+            if (bids.Count != 3) return false;
+            for (var i = 0; i < bids.Count; i++)
+            {
+                if (bids[i].Action is not BidAction.PassBid) return false;
+            }
+            return true;
+        }
+    }
 
     private IReadOnlyList<Card> HumanHand
     {
@@ -309,7 +371,15 @@
 
     private async Task StartNewGameAsync()
     {
+        BidPickerVisible = false;
         Game.StartNewGame();
+        await DriveLoopAsync();
+    }
+
+    private async Task PlaceHumanBidAsync(BidAction action)
+    {
+        BidPickerVisible = false;
+        Game.PlaceHumanBid(action);
         await DriveLoopAsync();
     }
 
@@ -327,8 +397,10 @@
                     var humanBids = await Game.AdvanceAiBiddingAsync();
                     if (humanBids)
                     {
-                        // Auto-pass for now; bidding modal lands in the next commit.
-                        Game.PlaceHumanBid(BidAction.PassBid.Instance);
+                        BidPickerVisible = true;
+                        StatusMessage = "Your turn to bid.";
+                        await InvokeAsync(StateHasChanged);
+                        return;
                     }
                     break;
 

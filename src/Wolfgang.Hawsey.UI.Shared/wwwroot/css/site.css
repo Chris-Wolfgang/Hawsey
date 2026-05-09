@@ -305,3 +305,50 @@ html, body {
     border-color: #6cf06c;
     color: #eaffea;
 }
+.btn.red   { color: #ff8a8a; }
+.btn.black { color: #f5f5f5; }
+
+/* ─── Modals ─────────────────────────────────────────────────── */
+.modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    /* Let drag/click pass through to the table; the modal-card itself re-enables. */
+    pointer-events: none;
+}
+/* Bid modal sits above the hand so cards remain visible and draggable. */
+.modal-backdrop.bid-mode {
+    align-items: flex-start;
+    padding-top: 3.5rem;
+    background: rgba(0, 0, 0, 0.35);
+}
+.modal-card {
+    background: #1a3a26;
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 1.5rem 2rem;
+    color: #f5f5f5;
+    text-align: center;
+    min-width: 300px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.7);
+    pointer-events: auto;
+}
+.modal-card h2 { margin: 0 0 1rem 0; color: var(--gold); font-size: 1.3rem; letter-spacing: 0.05em; }
+
+.modal-sub {
+    margin: 0 0 1rem 0;
+    color: #cfcfcf;
+    font-size: 0.9rem;
+}
+.modal-sub strong { color: var(--gold); }
+
+.bid-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+    margin-bottom: 0.6rem;
+}
