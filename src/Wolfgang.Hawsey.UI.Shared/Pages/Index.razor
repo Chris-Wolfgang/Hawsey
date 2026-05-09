@@ -131,6 +131,66 @@
         <button class="btn" @onclick="StartNewGameAsync">&#9776; NEW GAME</button>
     </div>
 
+    @if (TrumpPickerVisible)
+    {
+        <div class="modal-backdrop">
+            <div class="modal-card">
+                <h2>Pick trump</h2>
+                <div class="trump-buttons">
+                    <button class="btn red"   @onclick="@(() => SelectTrumpAsync(Suit.Hearts))">♥ Hearts</button>
+                    <button class="btn red"   @onclick="@(() => SelectTrumpAsync(Suit.Diamonds))">♦ Diamonds</button>
+                    <button class="btn black" @onclick="@(() => SelectTrumpAsync(Suit.Clubs))">♣ Clubs</button>
+                    <button class="btn black" @onclick="@(() => SelectTrumpAsync(Suit.Spades))">♠ Spades</button>
+                </div>
+                <button class="btn" @onclick="@(() => SelectTrumpAsync(null))">Ace High (no trump)</button>
+            </div>
+        </div>
+    }
+
+    @if (RoundSummary is { } rs)
+    {
+        <div class="modal-backdrop">
+            <div class="modal-card round-summary">
+                <h2>@(rs.IsGameOver ? $"{rs.GameWinnerLabel} wins the game!" : "Round complete")</h2>
+
+                <div class="rs-bid">
+                    <span class="@(rs.BidTeamLabel == "US" ? "us" : "them")">@rs.BidTeamLabel</span>
+                    bid <strong>@rs.BidText</strong>
+                    @(rs.Made
+                        ? (MarkupString)"<span class=\"made\">made it</span>"
+                        : (MarkupString)"<span class=\"set\">went set</span>")
+                </div>
+
+                <div class="rs-grid">
+                    <div></div>
+                    <div class="us">US</div>
+                    <div class="them">THEM</div>
+
+                    <div>Tricks</div>
+                    <div>@rs.UsTricks</div>
+                    <div>@rs.ThemTricks</div>
+
+                    <div>This round</div>
+                    <div class="@(rs.UsDelta < 0 ? "neg" : "pos")">@FormatDelta(rs.UsDelta)</div>
+                    <div class="@(rs.ThemDelta < 0 ? "neg" : "pos")">@FormatDelta(rs.ThemDelta)</div>
+
+                    <div>Total</div>
+                    <div>@rs.UsTotal</div>
+                    <div>@rs.ThemTotal</div>
+                </div>
+
+                @if (rs.IsGameOver)
+                {
+                    <button class="btn primary" @onclick="StartNewGameAsync">Play again</button>
+                }
+                else
+                {
+                    <button class="btn primary" @onclick="OnNextRoundAsync">Next round</button>
+                }
+            </div>
+        </div>
+    }
+
     @if (BidPickerVisible)
     {
         <div class="modal-backdrop bid-mode">
@@ -179,7 +239,26 @@
 @code {
     private GameState? State => Game.CurrentState;
     private bool BidPickerVisible;
+    private bool TrumpPickerVisible;
+    private RoundSummarySnapshot? RoundSummary;
     private string StatusMessage = "Welcome to Hawsey. Click NEW GAME to start.";
+
+    private sealed record RoundSummarySnapshot
+    (
+        string BidTeamLabel,
+        string BidText,
+        bool Made,
+        int UsTricks,
+        int ThemTricks,
+        int UsDelta,
+        int ThemDelta,
+        int UsTotal,
+        int ThemTotal,
+        bool IsGameOver,
+        string GameWinnerLabel
+    );
+
+    private static string FormatDelta(int n) => n > 0 ? $"+{n}" : n.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
     private bool IsHumanStuck
     {
@@ -372,6 +451,8 @@
     private async Task StartNewGameAsync()
     {
         BidPickerVisible = false;
+        TrumpPickerVisible = false;
+        RoundSummary = null;
         Game.StartNewGame();
         await DriveLoopAsync();
     }
@@ -381,6 +462,85 @@
         BidPickerVisible = false;
         Game.PlaceHumanBid(action);
         await DriveLoopAsync();
+    }
+
+    private async Task SelectTrumpAsync(Suit? trump)
+    {
+        TrumpPickerVisible = false;
+        Game.SelectTrump(trump);
+        await DriveLoopAsync();
+    }
+
+    private async Task OnNextRoundAsync()
+    {
+        RoundSummary = null;
+        Game.StartNextRound();
+        await DriveLoopAsync();
+    }
+
+    private RoundSummarySnapshot CaptureRoundSummary(bool isGameOver)
+    {
+        var s = State;
+        var br = s?.BiddingResult;
+
+        var usTricks = 0;
+        var themTricks = 0;
+        if (s is not null)
+        {
+            for (var i = 0; i < s.CompletedTricks.Count; i++)
+            {
+                var w = s.CompletedTricks[i].Winner;
+                if (w is PlayerPosition.North or PlayerPosition.South) usTricks++;
+                else themTricks++;
+            }
+        }
+
+        var bidTeam = br?.Winner.GetTeam() ?? Team.NorthSouth;
+        var biddingTeamTricks = bidTeam == Team.NorthSouth ? usTricks : themTricks;
+        var defendingTeamTricks = 12 - biddingTeamTricks;
+        var bidAmount = br?.BidAmount ?? 0;
+        var isHawsey = br?.IsHawsey ?? false;
+
+        int biddingDelta;
+        if (isHawsey)
+        {
+            biddingDelta = biddingTeamTricks == 12 ? 24 : -24;
+        }
+        else
+        {
+            biddingDelta = biddingTeamTricks >= bidAmount ? biddingTeamTricks : -bidAmount;
+        }
+        var defendingDelta = defendingTeamTricks;
+
+        var (usDelta, themDelta) = bidTeam == Team.NorthSouth
+            ? (biddingDelta, defendingDelta)
+            : (defendingDelta, biddingDelta);
+
+        var made = isHawsey ? biddingTeamTricks == 12 : biddingTeamTricks >= bidAmount;
+        var bidText = isHawsey ? "Hawsey (24)" : bidAmount.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        var bidTeamLabel = bidTeam == Team.NorthSouth ? "US" : "THEM";
+
+        var winnerLabel = "";
+        if (isGameOver && s is not null)
+        {
+            var winner = s.NorthSouthScore >= s.Rules.PointsToWin ? Team.NorthSouth : Team.EastWest;
+            winnerLabel = winner == Team.NorthSouth ? "US" : "THEM";
+        }
+
+        return new RoundSummarySnapshot
+        (
+            BidTeamLabel: bidTeamLabel,
+            BidText: bidText,
+            Made: made,
+            UsTricks: usTricks,
+            ThemTricks: themTricks,
+            UsDelta: usDelta,
+            ThemDelta: themDelta,
+            UsTotal: s?.NorthSouthScore ?? 0,
+            ThemTotal: s?.EastWestScore ?? 0,
+            IsGameOver: isGameOver,
+            GameWinnerLabel: winnerLabel
+        );
     }
 
     private async Task DriveLoopAsync()
@@ -408,8 +568,10 @@
                     var humanPicksTrump = await Game.HandleTrumpSelectionAsync();
                     if (humanPicksTrump)
                     {
-                        // Auto-pick best suit for now; trump-picker modal lands in the next commit.
-                        Game.SelectTrump(Suit.Hearts);
+                        TrumpPickerVisible = true;
+                        StatusMessage = "Pick trump.";
+                        await InvokeAsync(StateHasChanged);
+                        return;
                     }
                     break;
 
@@ -429,14 +591,17 @@
 
                 case GamePhase.RoundScoring:
                     StatusMessage = "Round complete.";
-                    await Task.Delay(1500).ConfigureAwait(true);
-                    Game.StartNextRound();
-                    break;
+                    RoundSummary = CaptureRoundSummary(isGameOver: false);
+                    await InvokeAsync(StateHasChanged);
+                    return;
 
                 case GamePhase.GameOver:
-                    StatusMessage = State?.NorthSouthScore >= State?.Rules.PointsToWin
-                        ? "US wins the game!"
-                        : "THEM wins the game.";
+                    StatusMessage = "Game over.";
+                    if (RoundSummary is null)
+                    {
+                        RoundSummary = CaptureRoundSummary(isGameOver: true);
+                        await InvokeAsync(StateHasChanged);
+                    }
                     return;
 
                 default:
