@@ -2,6 +2,8 @@
   <Folder Name="/src/">
     <Project Path="src/Wolfgang.Hawsey.Engine/Wolfgang.Hawsey.Engine.csproj" />
     <Project Path="src/Wolfgang.Hawsey.UI.Maui/Wolfgang.Hawsey.UI.Maui.csproj" />
+    <Project Path="src/Wolfgang.Hawsey.UI.Shared/Wolfgang.Hawsey.UI.Shared.csproj" />
+    <Project Path="src/Wolfgang.Hawsey.UI.Blazor/Wolfgang.Hawsey.UI.Blazor.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Wolfgang.Hawsey.Engine.Tests.Unit/Wolfgang.Hawsey.Engine.Tests.Unit.csproj" />
