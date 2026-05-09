@@ -40,6 +40,24 @@ html, body {
     overflow: hidden;
 }
 
+/* ─── Trump suit watermarks at the four corners ──────────────── */
+.trump-corner {
+    position: absolute;
+    font-size: 6rem;
+    line-height: 1;
+    opacity: 0.22;
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+}
+.trump-corner.red   { color: #c41a1a; }
+.trump-corner.black { color: #0a0a0a; }
+.trump-corner.top-left     { top: 28%; left: 28%; }
+.trump-corner.top-right    { top: 28%; right: 28%; }
+.trump-corner.bottom-left  { bottom: 28%; left: 28%; }
+.trump-corner.bottom-right { bottom: 28%; right: 28%; }
+
 /* ─── Top panels ──────────────────────────────────────────────── */
 .panel {
     position: absolute;
@@ -270,6 +288,68 @@ html, body {
 .hand .card.dragging { opacity: 0.4; }
 .hand .card { cursor: grab; }
 .hand .card:active { cursor: grabbing; }
+
+/* ─── Active-seat highlight + dealer puck + bid badges ───────── */
+.seat.active .nameplate {
+    box-shadow: 0 0 0 2px var(--gold);
+}
+
+.dealer-puck {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 30%, #fff8d8 0%, #f0d878 35%, #c8a23a 80%, #8b6f1a 100%);
+    border: 2px solid #6a5314;
+    color: #4a3a0a;
+    font-weight: 800;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.55), inset 0 -2px 4px rgba(0, 0, 0, 0.25);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+    z-index: 5;
+}
+.seat.you     .dealer-puck { left: 50%; transform: translateX(-50%); top: -54px; }
+.seat.partner .dealer-puck { left: 50%; transform: translateX(-50%); bottom: -54px; }
+.seat.left    .dealer-puck { top: 50%;  transform: translateY(-50%); right: -54px; }
+.seat.right   .dealer-puck { top: 50%;  transform: translateY(-50%); left: -54px; }
+
+.bid-badge {
+    position: absolute;
+    padding: 0.2rem 0.7rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+    z-index: 6;
+}
+.bid-badge.pass {
+    background: rgba(40, 40, 40, 0.85);
+    border-color: #8a8a8a;
+    color: #d8d8d8;
+}
+.bid-badge.number {
+    background: rgba(0, 70, 30, 0.85);
+    border-color: #6cf06c;
+    color: #d4ffd4;
+}
+.bid-badge.hawsey {
+    background: rgba(110, 0, 0, 0.85);
+    border-color: var(--them-red);
+    color: #ffd0d0;
+}
+
+.seat.you     .bid-badge { left: 50%; transform: translateX(-50%); top: -28px; }
+.seat.partner .bid-badge { left: 50%; transform: translateX(-50%); bottom: -28px; }
+.seat.left    .bid-badge { top: 50%;  transform: translateY(-50%); right: -90px; }
+.seat.right   .bid-badge { top: 50%;  transform: translateY(-50%); left: -90px; }
 
 /* ─── Status bar + bottom controls ────────────────────────────── */
 .statusbar {

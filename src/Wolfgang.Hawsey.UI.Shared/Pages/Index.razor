@@ -7,6 +7,16 @@
 
 <div class="table">
 
+    @if (State?.TrumpSuit is { } trump)
+    {
+        var sym = SuitSymbol(trump);
+        var color = trump is Suit.Hearts or Suit.Diamonds ? "red" : "black";
+        <div class="trump-corner top-left @color">@sym</div>
+        <div class="trump-corner top-right @color">@sym</div>
+        <div class="trump-corner bottom-left @color">@sym</div>
+        <div class="trump-corner bottom-right @color">@sym</div>
+    }
+
     <div class="panel tricks">
         <div class="label">Tricks (Total)</div>
         <div class="pair">
@@ -34,12 +44,14 @@
         </div>
     </div>
 
-    <div class="seat partner">
+    <div class="seat partner @SeatActiveClass(PlayerPosition.North)">
         <div class="nameplate">
             <div class="avatar"></div>
             <span class="name">PARTNER</span>
             <span>Tricks: @TricksWon(PlayerPosition.North)</span>
         </div>
+        @if (BidBadge(PlayerPosition.North) is { } pb) { <span class="bid-badge @pb.Class">@pb.Text</span> }
+        @if (IsDealer(PlayerPosition.North)) { <div class="dealer-puck">D</div> }
         <div class="opponent-hand">
             @for (var i = 0; i < HandCount(PlayerPosition.North); i++)
             {
@@ -48,7 +60,7 @@
         </div>
     </div>
 
-    <div class="seat left">
+    <div class="seat left @SeatActiveClass(PlayerPosition.West)">
         <div class="opponent-hand vertical">
             @for (var i = 0; i < HandCount(PlayerPosition.West); i++)
             {
@@ -60,9 +72,11 @@
             <span class="name">OPPONENT LEFT</span>
             <span>Tricks: @TricksWon(PlayerPosition.West)</span>
         </div>
+        @if (BidBadge(PlayerPosition.West) is { } wb) { <span class="bid-badge @wb.Class">@wb.Text</span> }
+        @if (IsDealer(PlayerPosition.West)) { <div class="dealer-puck">D</div> }
     </div>
 
-    <div class="seat right">
+    <div class="seat right @SeatActiveClass(PlayerPosition.East)">
         <div class="opponent-hand vertical">
             @for (var i = 0; i < HandCount(PlayerPosition.East); i++)
             {
@@ -74,6 +88,8 @@
             <span class="name">OPPONENT RIGHT</span>
             <span>Tricks: @TricksWon(PlayerPosition.East)</span>
         </div>
+        @if (BidBadge(PlayerPosition.East) is { } eb) { <span class="bid-badge @eb.Class">@eb.Text</span> }
+        @if (IsDealer(PlayerPosition.East)) { <div class="dealer-puck">D</div> }
     </div>
 
     <div class="trick-area">
@@ -103,12 +119,14 @@
         </div>
     </div>
 
-    <div class="seat you">
+    <div class="seat you @SeatActiveClass(PlayerPosition.South)">
+        @if (IsDealer(PlayerPosition.South)) { <div class="dealer-puck">D</div> }
         <div class="nameplate">
             <div class="avatar"></div>
             <span class="name">YOU</span>
             <span>Tricks: @TricksWon(PlayerPosition.South)</span>
         </div>
+        @if (BidBadge(PlayerPosition.South) is { } sb) { <span class="bid-badge @sb.Class">@sb.Text</span> }
     </div>
 
     <div class="hand">
@@ -267,6 +285,34 @@
     );
 
     private static string FormatDelta(int n) => n > 0 ? $"+{n}" : n.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+    private string SeatActiveClass(PlayerPosition p) =>
+        State?.Phase == GamePhase.Bidding && State.NextToAct == p ? "active" : "";
+
+    private bool IsDealer(PlayerPosition p) => State?.Dealer == p;
+
+    private (string Text, string Class)? BidBadge(PlayerPosition p)
+    {
+        if (State?.Phase is GamePhase.TrickPlay or GamePhase.RoundScoring or GamePhase.GameOver)
+        {
+            return null;
+        }
+
+        for (var i = Game.BidHistory.Count - 1; i >= 0; i--)
+        {
+            if (Game.BidHistory[i].Player == p)
+            {
+                return Game.BidHistory[i].Action switch
+                {
+                    BidAction.PassBid => ("Pass", "pass"),
+                    BidAction.NumberBid n => ($"Bid {n.Amount}", "number"),
+                    BidAction.HawseyBid => ("Hawsey", "hawsey"),
+                    _ => default((string, string)?)
+                };
+            }
+        }
+        return null;
+    }
 
     private bool IsHumanStuck
     {
