@@ -155,7 +155,24 @@
 
     <div class="controls left">
         <button class="btn" @onclick="StartNewGameAsync">&#9776; NEW GAME</button>
+        <button class="btn" @onclick="() => LogVisible = !LogVisible">AI log</button>
     </div>
+
+    @if (LogVisible)
+    {
+        <div class="ai-log">
+            <div class="ai-log-header">
+                <span>AI log</span>
+                <button class="btn small" @onclick="() => LogVisible = false">close</button>
+            </div>
+            <div class="ai-log-entries">
+                @foreach (var entry in Game.AiLog)
+                {
+                    <div class="ai-log-entry">@entry</div>
+                }
+            </div>
+        </div>
+    }
 
     @if (TrumpPickerVisible)
     {
@@ -266,6 +283,7 @@
     private GameState? State => Game.CurrentState;
     private bool BidPickerVisible;
     private bool TrumpPickerVisible;
+    private bool LogVisible;
     private RoundSummarySnapshot? RoundSummary;
     private string StatusMessage = "Welcome to Hawsey. Click NEW GAME to start.";
 
