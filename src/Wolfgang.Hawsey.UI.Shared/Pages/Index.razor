@@ -1,7 +1,390 @@
 @page "/"
+@using Wolfgang.Hawsey.Engine
+@inject GameService Game
+@implements IDisposable
 
 <PageTitle>Hawsey</PageTitle>
 
 <div class="table">
-    <p style="color:#fff;padding:2rem;">Hawsey — UI bootstrap. Game UI lands in the next commit.</p>
+
+    <div class="panel tricks">
+        <div class="label">Tricks (Total)</div>
+        <div class="pair">
+            <div class="col-us"><span class="heading">US</span><span class="value">@UsTricks</span></div>
+            <div class="col-them"><span class="heading">THEM</span><span class="value">@ThemTricks</span></div>
+        </div>
+        <div class="trump">
+            Trump: <span class="suit-mark @TrumpColorClass">@TrumpSymbol</span>
+            @if (TrumpSetterTeam is not null)
+            {
+                <span class="who @(TrumpSetterTeam == "US" ? "us" : "them")">@TrumpSetterTeam</span>
+                @if (BidAmountText is { } amt)
+                {
+                    <span class="bid-amount">· @amt</span>
+                }
+            }
+        </div>
+    </div>
+
+    <div class="panel score">
+        <div class="label">Score</div>
+        <div class="pair">
+            <div class="col-us"><span class="heading">US</span><span class="value">@UsScore</span></div>
+            <div class="col-them"><span class="heading">THEM</span><span class="value">@ThemScore</span></div>
+        </div>
+    </div>
+
+    <div class="seat partner">
+        <div class="nameplate">
+            <div class="avatar"></div>
+            <span class="name">PARTNER</span>
+            <span>Tricks: @TricksWon(PlayerPosition.North)</span>
+        </div>
+        <div class="opponent-hand">
+            @for (var i = 0; i < HandCount(PlayerPosition.North); i++)
+            {
+                <div class="card-back"></div>
+            }
+        </div>
+    </div>
+
+    <div class="seat left">
+        <div class="opponent-hand vertical">
+            @for (var i = 0; i < HandCount(PlayerPosition.West); i++)
+            {
+                <div class="card-back"></div>
+            }
+        </div>
+        <div class="nameplate">
+            <div class="avatar"></div>
+            <span class="name">OPPONENT LEFT</span>
+            <span>Tricks: @TricksWon(PlayerPosition.West)</span>
+        </div>
+    </div>
+
+    <div class="seat right">
+        <div class="opponent-hand vertical">
+            @for (var i = 0; i < HandCount(PlayerPosition.East); i++)
+            {
+                <div class="card-back"></div>
+            }
+        </div>
+        <div class="nameplate">
+            <div class="avatar"></div>
+            <span class="name">OPPONENT RIGHT</span>
+            <span>Tricks: @TricksWon(PlayerPosition.East)</span>
+        </div>
+    </div>
+
+    <div class="trick-area">
+        <div class="trick-slot north">
+            @{ var north = PlayInTrick(PlayerPosition.North); }
+            @if (north is not null) { @RenderPlayedCard(north) }
+        </div>
+        <div class="trick-slot west">
+            @{ var west = PlayInTrick(PlayerPosition.West); }
+            @if (west is not null) { @RenderPlayedCard(west) }
+        </div>
+
+        <div class="trick-info">
+            <div class="heading">CURRENT TRICK</div>
+            <div class="led">@LedByText</div>
+            <div class="winner-label">Winning Card</div>
+            <div class="winner-card">@WinningCardText</div>
+        </div>
+
+        <div class="trick-slot east">
+            @{ var east = PlayInTrick(PlayerPosition.East); }
+            @if (east is not null) { @RenderPlayedCard(east) }
+        </div>
+        <div class="trick-slot south">
+            @{ var south = PlayInTrick(PlayerPosition.South); }
+            @if (south is not null) { @RenderPlayedCard(south) }
+        </div>
+    </div>
+
+    <div class="seat you">
+        <div class="nameplate">
+            <div class="avatar"></div>
+            <span class="name">YOU</span>
+            <span>Tricks: @TricksWon(PlayerPosition.South)</span>
+        </div>
+    </div>
+
+    <div class="hand">
+        @for (var i = 0; i < HumanHand.Count; i++)
+        {
+            var card = HumanHand[i];
+            var legal = LegalPlays.Contains(card);
+            var canPlay = IsHumanPlayTurn && legal;
+            <div class="card @(IsRed(card) ? "red" : "") @(canPlay ? "playable" : "disabled")"
+                 @onclick="() => OnCardClickAsync(card)">
+                <span class="rank">@RankText(card.Rank)</span>
+                <span class="suit">@SuitSymbol(card.Suit)</span>
+            </div>
+        }
+    </div>
+
+    <div class="statusbar">@StatusMessage</div>
+
+    <div class="controls left">
+        <button class="btn" @onclick="StartNewGameAsync">&#9776; NEW GAME</button>
+    </div>
+
 </div>
+
+@code {
+    private GameState? State => Game.CurrentState;
+    private string StatusMessage = "Welcome to Hawsey. Click NEW GAME to start.";
+
+    private IReadOnlyList<Card> HumanHand
+    {
+        get
+        {
+            if (State is null) return Array.Empty<Card>();
+            if (!State.Hands.TryGetValue(PlayerPosition.South, out var hand) || hand is null)
+            {
+                return Array.Empty<Card>();
+            }
+            return hand;
+        }
+    }
+
+    private IReadOnlyList<Card> LegalPlays =>
+        IsHumanPlayTurn ? State!.GetLegalPlays() : Array.Empty<Card>();
+
+    private bool IsHumanPlayTurn =>
+        State?.Phase == GamePhase.TrickPlay && State.NextToAct == PlayerPosition.South;
+
+    private int UsScore => State?.NorthSouthScore ?? 0;
+    private int ThemScore => State?.EastWestScore ?? 0;
+
+    private int UsTricks => CountTricks(t => t == PlayerPosition.North || t == PlayerPosition.South);
+    private int ThemTricks => CountTricks(t => t == PlayerPosition.East || t == PlayerPosition.West);
+
+    private int CountTricks(Func<PlayerPosition, bool> match)
+    {
+        var tricks = State?.CompletedTricks;
+        if (tricks is null) return 0;
+        var count = 0;
+        for (var i = 0; i < tricks.Count; i++) if (match(tricks[i].Winner)) count++;
+        return count;
+    }
+
+    private int TricksWon(PlayerPosition p) =>
+        State is null ? 0 : CountTricks(w => w == p);
+
+    private int HandCount(PlayerPosition p) =>
+        State?.Hands.TryGetValue(p, out var h) == true ? h.Count : 0;
+
+    private string TrumpSymbol => State?.TrumpSuit is { } s ? SuitSymbol(s) : "—";
+    private string TrumpColorClass => State?.TrumpSuit is Suit.Hearts or Suit.Diamonds ? "red" : "black";
+
+    private string? TrumpSetterTeam
+    {
+        get
+        {
+            var winner = State?.BiddingResult?.Winner;
+            if (winner is null) return null;
+            return winner is PlayerPosition.North or PlayerPosition.South ? "US" : "THEM";
+        }
+    }
+
+    private string? BidAmountText
+    {
+        get
+        {
+            var br = State?.BiddingResult;
+            if (br is null) return null;
+            return br.IsHawsey ? "Hawsey (24)" : br.BidAmount.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        }
+    }
+
+    private string LedByText
+    {
+        get
+        {
+            if (Game.RecentlyCompletedTrick is { } recent && recent.Cards.Count > 0)
+            {
+                return $"Led by {LeaderName(recent.Cards[0].Player)}";
+            }
+            var trick = State?.CurrentTrick;
+            if (trick is null || trick.Plays.Count == 0) return "";
+            return $"Led by {LeaderName(trick.Plays[0].Player)}";
+        }
+    }
+
+    private string WinningCardText
+    {
+        get
+        {
+            if (Game.RecentlyCompletedTrick is { } recent)
+            {
+                for (var i = 0; i < recent.Cards.Count; i++)
+                {
+                    if (recent.Cards[i].Player == recent.Winner)
+                    {
+                        var c = recent.Cards[i].Card;
+                        return $"{RankText(c.Rank)} {SuitSymbol(c.Suit)}";
+                    }
+                }
+            }
+            var winner = State?.CurrentTrick?.GetCurrentWinner();
+            return winner is null ? "—" : $"{RankText(winner.Value.Rank)} {SuitSymbol(winner.Value.Suit)}";
+        }
+    }
+
+    private static string LeaderName(PlayerPosition p) => p switch
+    {
+        PlayerPosition.North => "Partner",
+        PlayerPosition.East  => "Right",
+        PlayerPosition.South => "You",
+        PlayerPosition.West  => "Left",
+        _ => p.ToString()
+    };
+
+    private PlayedCard? PlayInTrick(PlayerPosition p)
+    {
+        var plays = Game.RecentlyCompletedTrick is { } recent
+            ? recent.Cards
+            : State?.CurrentTrick?.Plays;
+
+        if (plays is null) return null;
+        for (var i = 0; i < plays.Count; i++)
+        {
+            if (plays[i].Player == p) return plays[i];
+        }
+        return null;
+    }
+
+    private static bool IsRed(Card c) => c.Suit is Suit.Hearts or Suit.Diamonds;
+
+    private static string SuitSymbol(Suit s) => s switch
+    {
+        Suit.Hearts   => "♥",
+        Suit.Diamonds => "♦",
+        Suit.Clubs    => "♣",
+        Suit.Spades   => "♠",
+        _ => "?"
+    };
+
+    private static string RankText(Rank r) => r switch
+    {
+        Rank.Nine  => "9",
+        Rank.Ten   => "10",
+        Rank.Jack  => "J",
+        Rank.Queen => "Q",
+        Rank.King  => "K",
+        Rank.Ace   => "A",
+        _ => "?"
+    };
+
+    private static RenderFragment RenderPlayedCard(PlayedCard play) => builder =>
+    {
+        var card = play.Card;
+        builder.OpenElement(0, "div");
+        builder.AddAttribute(1, "class", "trick-card" + (IsRed(card) ? " red" : ""));
+        builder.OpenElement(2, "span");
+        builder.AddAttribute(3, "class", "rank");
+        builder.AddContent(4, RankText(card.Rank));
+        builder.CloseElement();
+        builder.OpenElement(5, "span");
+        builder.AddAttribute(6, "class", "suit");
+        builder.AddContent(7, SuitSymbol(card.Suit));
+        builder.CloseElement();
+        builder.CloseElement();
+    };
+
+    protected override void OnInitialized()
+    {
+        Game.StateChanged += OnStateChanged;
+    }
+
+    public void Dispose()
+    {
+        Game.StateChanged -= OnStateChanged;
+    }
+
+    private void OnStateChanged() => InvokeAsync(StateHasChanged);
+
+    private async Task StartNewGameAsync()
+    {
+        Game.StartNewGame();
+        await DriveLoopAsync();
+    }
+
+    private async Task DriveLoopAsync()
+    {
+        while (true)
+        {
+            var s = Game.CurrentState;
+            if (s is null) return;
+
+            switch (s.Phase)
+            {
+                case GamePhase.Bidding:
+                    StatusMessage = "Bidding...";
+                    var humanBids = await Game.AdvanceAiBiddingAsync();
+                    if (humanBids)
+                    {
+                        // Auto-pass for now; bidding modal lands in the next commit.
+                        Game.PlaceHumanBid(BidAction.PassBid.Instance);
+                    }
+                    break;
+
+                case GamePhase.TrumpSelection:
+                    var humanPicksTrump = await Game.HandleTrumpSelectionAsync();
+                    if (humanPicksTrump)
+                    {
+                        // Auto-pick best suit for now; trump-picker modal lands in the next commit.
+                        Game.SelectTrump(Suit.Hearts);
+                    }
+                    break;
+
+                case GamePhase.HawseyExchange:
+                    await Game.HandleHawseyExchangeAsync();
+                    break;
+
+                case GamePhase.TrickPlay:
+                    var humanPlays = await Game.AdvanceAiPlaysAsync();
+                    if (humanPlays)
+                    {
+                        StatusMessage = "Your turn. Play a card.";
+                        await InvokeAsync(StateHasChanged);
+                        return;
+                    }
+                    break;
+
+                case GamePhase.RoundScoring:
+                    StatusMessage = "Round complete.";
+                    await Task.Delay(1500).ConfigureAwait(true);
+                    Game.StartNextRound();
+                    break;
+
+                case GamePhase.GameOver:
+                    StatusMessage = State?.NorthSouthScore >= State?.Rules.PointsToWin
+                        ? "US wins the game!"
+                        : "THEM wins the game.";
+                    return;
+
+                default:
+                    return;
+            }
+        }
+    }
+
+    private async Task OnCardClickAsync(Card card)
+    {
+        if (!IsHumanPlayTurn) return;
+        var legal = State!.GetLegalPlays();
+        var found = false;
+        for (var i = 0; i < legal.Count; i++)
+        {
+            if (legal[i].Equals(card)) { found = true; break; }
+        }
+        if (!found) return;
+
+        await Game.PlayHumanCardAsync(card);
+        await DriveLoopAsync();
+    }
+}
