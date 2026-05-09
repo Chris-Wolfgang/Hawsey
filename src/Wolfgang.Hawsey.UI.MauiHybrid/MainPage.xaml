@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:b="clr-namespace:Microsoft.AspNetCore.Components.WebView.Maui;assembly=Microsoft.AspNetCore.Components.WebView.Maui"
+             xmlns:shared="clr-namespace:Wolfgang.Hawsey.UI.Shared.Pages;assembly=Wolfgang.Hawsey.UI.Shared"
+             x:Class="Wolfgang.Hawsey.UI.MauiHybrid.MainPage"
+             BackgroundColor="#0a0a0a">
+
+    <b:BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html">
+        <b:BlazorWebView.RootComponents>
+            <b:RootComponent Selector="#app" ComponentType="{x:Type shared:Index}" />
+        </b:BlazorWebView.RootComponents>
+    </b:BlazorWebView>
+
+</ContentPage>
