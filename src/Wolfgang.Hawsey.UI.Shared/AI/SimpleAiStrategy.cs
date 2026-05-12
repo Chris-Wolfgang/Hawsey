@@ -232,25 +232,41 @@ public class SimpleAiStrategy : IPlayerStrategy
         const int copiesPerCard = 2;
         const int trumpDeckSize = 12;
 
-        for (var r = (int)card.Rank + 1; r <= (int)Rank.Ace; r++)
+        var myEffectiveRank = CardRanking.GetEffectiveRank(card, trumpSuit);
+        var myEffectiveSuit = CardRanking.GetEffectiveSuit(card, trumpSuit);
+
+        // Enumerate every distinct card in the deck. A card in the same *effective*
+        // suit with a higher *effective* rank beats us — including the right bower
+        // (J of trump, effective rank 16) and left bower (J of same-color suit,
+        // effective rank 15, treated as trump). Comparing only raw Rank would miss
+        // those and the AI would think A♠ is a sure winner when J♠/J♣ are unplayed.
+        foreach (Suit s in Enum.GetValues<Suit>())
         {
-            var higher = new Card((Rank)r, card.Suit);
-            played.TryGetValue(higher, out var inPlayed);
-            var inHand = CountIn(hand, higher);
-            if (copiesPerCard - inPlayed - inHand > 0) return false;
+            foreach (Rank r in Enum.GetValues<Rank>())
+            {
+                var candidate = new Card(r, s);
+                if (CardRanking.GetEffectiveSuit(candidate, trumpSuit) != myEffectiveSuit) continue;
+                if (CardRanking.GetEffectiveRank(candidate, trumpSuit) <= myEffectiveRank) continue;
+
+                played.TryGetValue(candidate, out var inPlayed);
+                var inHand = CountIn(hand, candidate);
+                if (copiesPerCard - inPlayed - inHand > 0) return false;
+            }
         }
 
-        if (trumpSuit is { } t && card.Suit != t)
+        // If our card is non-trump, opponents can still trump in. Count trumps by
+        // *effective* suit so the left bower is included.
+        if (trumpSuit is { } t && myEffectiveSuit != t)
         {
             var trumpsPlayed = 0;
             foreach (var kv in played)
             {
-                if (kv.Key.Suit == t) trumpsPlayed += kv.Value;
+                if (CardRanking.GetEffectiveSuit(kv.Key, trumpSuit) == t) trumpsPlayed += kv.Value;
             }
             var trumpsInHand = 0;
             for (var i = 0; i < hand.Count; i++)
             {
-                if (hand[i].Suit == t) trumpsInHand++;
+                if (CardRanking.GetEffectiveSuit(hand[i], trumpSuit) == t) trumpsInHand++;
             }
             if (trumpDeckSize - trumpsPlayed - trumpsInHand > 0) return false;
         }
