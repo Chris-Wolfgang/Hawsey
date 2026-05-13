@@ -728,7 +728,16 @@
                     break;
 
                 case GamePhase.HawseyExchange:
-                    await Game.HandleHawseyExchangeAsync();
+                    var humanExchanges = await Game.HandleHawseyExchangeAsync();
+                    if (humanExchanges)
+                    {
+                        // No human Hawsey-exchange picker built yet; auto-resolve
+                        // using the AI strategy so the round can proceed.
+                        StatusMessage = "Hawsey! Exchanging cards with partner.";
+                        await InvokeAsync(StateHasChanged);
+                        await Task.Delay(800).ConfigureAwait(true);
+                        Game.AutoResolveHumanHawseyExchange();
+                    }
                     break;
 
                 case GamePhase.TrickPlay:

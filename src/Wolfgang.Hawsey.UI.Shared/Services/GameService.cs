@@ -177,6 +177,28 @@ public class GameService
 
 
 
+    /// <summary>
+    /// Stand-in for the future human Hawsey-exchange UI: invokes the AI strategy
+    /// on the human's behalf so the round can proceed. Discards the bidder's 2
+    /// lowest cards and takes partner's 2 highest.
+    /// </summary>
+    public void AutoResolveHumanHawseyExchange()
+    {
+        if (_state == null || _state.Phase != GamePhase.HawseyExchange) return;
+        if (_state.HawseyBidder != HumanPosition) return;
+
+        _aiStrategy.DecideHawseyExchange(
+            _state,
+            HumanPosition,
+            out var discard,
+            out var fromPartner);
+
+        LogAi($"Human Hawsey exchange auto-resolved (discard {discard[0]}, {discard[1]}; take {fromPartner[0]}, {fromPartner[1]}).");
+        PerformHawseyExchange(discard, fromPartner);
+    }
+
+
+
     public async Task PlayHumanCardAsync(Card card)
     {
         if (_state == null) return;
