@@ -224,6 +224,7 @@ public class GameService
 
         if (_state.Phase == GamePhase.RoundScoring)
         {
+            LogAi($"--- Round complete. Cumulative: US {_state.NorthSouthScore}, THEM {_state.EastWestScore}.");
             RoundCompleted?.Invoke();
             return false;
         }
@@ -233,6 +234,7 @@ public class GameService
             var winner = _state.NorthSouthScore >= _state.Rules.PointsToWin
                 ? Team.NorthSouth
                 : Team.EastWest;
+            LogAi($"=== GAME OVER. Winner: {(winner == Team.NorthSouth ? "US" : "THEM")}. Final: US {_state.NorthSouthScore}, THEM {_state.EastWestScore}.");
             GameOver?.Invoke(winner);
             return false;
         }
@@ -258,12 +260,21 @@ public class GameService
     private async Task PlayCardWithCompletionDisplayAsync(PlayerPosition player, Card card)
     {
         var trickCountBefore = _state!.CompletedTricks.Count;
+        var trickNumber = trickCountBefore + 1;
+        var playSlot = (_state.CurrentTrick?.Plays.Count ?? 0) + 1;
+
+        LogAi($"Trick {trickNumber} play {playSlot}: {player} plays {FormatCard(card)}.");
+
         _state = _engine.PlayCard(_state, player, card);
         var trickJustCompleted = _state.CompletedTricks.Count > trickCountBefore;
 
         if (trickJustCompleted)
         {
             RecentlyCompletedTrick = _state.CompletedTricks[_state.CompletedTricks.Count - 1];
+            var winningCard = WinningCardOf(RecentlyCompletedTrick);
+            var usTricks = CountTricksByTeam(_state.CompletedTricks, Team.NorthSouth);
+            var themTricks = _state.CompletedTricks.Count - usTricks;
+            LogAi($"  → Trick {trickNumber} won by {RecentlyCompletedTrick.Winner} ({FormatCard(winningCard)}). Tricks: US {usTricks}, THEM {themTricks}.");
             StateChanged?.Invoke();
             TrickCompleted?.Invoke(RecentlyCompletedTrick.Winner);
             await Task.Delay(TrickCompletionDisplay).ConfigureAwait(false);
@@ -274,6 +285,56 @@ public class GameService
         {
             StateChanged?.Invoke();
         }
+    }
+
+
+
+    private static Card WinningCardOf(TrickResult trick)
+    {
+        for (var i = 0; i < trick.Cards.Count; i++)
+        {
+            if (trick.Cards[i].Player == trick.Winner) return trick.Cards[i].Card;
+        }
+        return trick.Cards[0].Card;
+    }
+
+
+
+    private static int CountTricksByTeam(IReadOnlyList<TrickResult> tricks, Team team)
+    {
+        var n = 0;
+        for (var i = 0; i < tricks.Count; i++)
+        {
+            var w = tricks[i].Winner;
+            var isUs = w is PlayerPosition.North or PlayerPosition.South;
+            if ((isUs && team == Team.NorthSouth) || (!isUs && team == Team.EastWest)) n++;
+        }
+        return n;
+    }
+
+
+
+    private static string FormatCard(Card c)
+    {
+        var rank = c.Rank switch
+        {
+            Rank.Nine => "9",
+            Rank.Ten => "10",
+            Rank.Jack => "J",
+            Rank.Queen => "Q",
+            Rank.King => "K",
+            Rank.Ace => "A",
+            _ => "?"
+        };
+        var suit = c.Suit switch
+        {
+            Suit.Hearts => "♥",
+            Suit.Diamonds => "♦",
+            Suit.Clubs => "♣",
+            Suit.Spades => "♠",
+            _ => "?"
+        };
+        return $"{rank}{suit}";
     }
 
 

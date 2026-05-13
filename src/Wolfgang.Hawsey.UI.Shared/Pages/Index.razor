@@ -744,6 +744,13 @@
                     var humanPlays = await Game.AdvanceAiPlaysAsync();
                     if (humanPlays)
                     {
+                        // Auto-play when there's only one card left in hand
+                        // (12th trick) — no decision for the player to make.
+                        if (HumanHand.Count == 1)
+                        {
+                            await Game.PlayHumanCardAsync(HumanHand[0]);
+                            break;
+                        }
                         StatusMessage = "Your turn. Play a card.";
                         await InvokeAsync(StateHasChanged);
                         return;
