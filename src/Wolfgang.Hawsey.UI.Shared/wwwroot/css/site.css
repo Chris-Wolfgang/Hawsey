@@ -283,6 +283,11 @@ html, body {
 .hand .card.disabled { cursor: default; opacity: 0.55; }
 .hand .card.disabled:hover { transform: none; }
 .hand .card.playable { box-shadow: 0 0 0 2px #6cf06c, var(--card-shadow); }
+.hand .card.selected-discard {
+    box-shadow: 0 0 0 3px var(--them-red), var(--card-shadow);
+    transform: translateY(-20px) !important;
+    opacity: 0.85;
+}
 
 /* Drag-to-reorder visual */
 .hand .card.dragging { opacity: 0.4; }

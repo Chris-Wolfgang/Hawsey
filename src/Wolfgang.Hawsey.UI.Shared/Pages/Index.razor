@@ -137,7 +137,9 @@
             var legal = LegalPlays.Contains(card);
             var canPlay = IsHumanPlayTurn && legal;
             var isDragging = _dragIndex == index;
-            <div class="card @(IsRed(card) ? "red" : "") @(canPlay ? "playable" : "disabled") @(isDragging ? "dragging" : "")"
+            var isSelectedForDiscard = HawseyExchangeVisible && _hawseyDiscardSelection.Contains(card);
+            var interactive = HawseyExchangeVisible || canPlay;
+            <div class="card @(IsRed(card) ? "red" : "") @(canPlay ? "playable" : "") @(!interactive ? "disabled" : "") @(isDragging ? "dragging" : "") @(isSelectedForDiscard ? "selected-discard" : "")"
                  draggable="true"
                  @ondragstart="@(() => OnDragStart(index))"
                  @ondragover:preventDefault="true"
@@ -242,6 +244,24 @@
         </div>
     }
 
+    @if (HawseyExchangeVisible)
+    {
+        <div class="modal-backdrop bid-mode">
+            <div class="modal-card">
+                <h2>Hawsey exchange</h2>
+                <p class="modal-sub">
+                    Click <strong>2 cards</strong> in your hand to discard.
+                    Your partner gives you their <strong>2 best</strong> for the chosen trump.
+                </p>
+                <p class="modal-sub">
+                    Selected: <strong>@_hawseyDiscardSelection.Count / 2</strong>
+                </p>
+                <button class="btn primary" disabled="@(_hawseyDiscardSelection.Count != 2)"
+                        @onclick="ConfirmHawseyDiscardAsync">Discard &amp; receive</button>
+            </div>
+        </div>
+    }
+
     @if (BidPickerVisible)
     {
         <div class="modal-backdrop bid-mode">
@@ -291,6 +311,8 @@
     private GameState? State => Game.CurrentState;
     private bool BidPickerVisible;
     private bool TrumpPickerVisible;
+    private bool HawseyExchangeVisible;
+    private readonly List<Card> _hawseyDiscardSelection = new();
     private bool LogVisible;
     private RoundSummarySnapshot? RoundSummary;
     private string StatusMessage = "Welcome to Hawsey. Click NEW GAME to start.";
@@ -377,30 +399,52 @@
 
     private void SyncCustomOrder(List<Card> hand)
     {
-        if (_customOrder is null || hand.Count > _customOrder.Count)
+        if (_customOrder is null)
         {
-            // Initial deal or fresh hand: re-sort.
+            // Initial deal: sort.
             _customOrder = new List<Card>(hand);
             _customOrder.Sort(CompareForDisplay);
             return;
         }
 
-        if (hand.Count < _customOrder.Count)
+        // Reconcile against the actual hand by multiset comparison. Handles every
+        // case the same way: card played (count down), Hawsey exchange (count same
+        // but contents change), or a fresh deal (count up).
+        //   1. Drop any card from _customOrder that isn't in hand any more.
+        //   2. Append any card in hand that isn't already in _customOrder.
+        // Order is preserved for cards the player has dragged into place.
+        var handBag = new Dictionary<Card, int>();
+        for (var i = 0; i < hand.Count; i++)
         {
-            // A card was played: drop the missing card while keeping the user's order.
-            var remaining = new List<Card>(hand);
-            var newOrder = new List<Card>(_customOrder.Count);
-            for (var i = 0; i < _customOrder.Count; i++)
-            {
-                var idx = remaining.IndexOf(_customOrder[i]);
-                if (idx >= 0)
-                {
-                    newOrder.Add(_customOrder[i]);
-                    remaining.RemoveAt(idx);
-                }
-            }
-            _customOrder = newOrder;
+            handBag.TryGetValue(hand[i], out var n);
+            handBag[hand[i]] = n + 1;
         }
+
+        var newOrder = new List<Card>(hand.Count);
+        for (var i = 0; i < _customOrder.Count; i++)
+        {
+            var c = _customOrder[i];
+            if (handBag.TryGetValue(c, out var n) && n > 0)
+            {
+                newOrder.Add(c);
+                handBag[c] = n - 1;
+            }
+        }
+
+        // Whatever's left in handBag is new (e.g. just received from partner via
+        // a Hawsey exchange). Append in display order so they sit with their suit.
+        var newcomers = new List<Card>();
+        foreach (var kv in handBag)
+        {
+            for (var i = 0; i < kv.Value; i++) newcomers.Add(kv.Key);
+        }
+        if (newcomers.Count > 0)
+        {
+            newcomers.Sort(CompareForDisplay);
+            newOrder.AddRange(newcomers);
+        }
+
+        _customOrder = newOrder;
     }
 
     private static int CompareForDisplay(Card a, Card b)
@@ -602,6 +646,8 @@
     {
         BidPickerVisible = false;
         TrumpPickerVisible = false;
+        HawseyExchangeVisible = false;
+        _hawseyDiscardSelection.Clear();
         RoundSummary = null;
         _customOrder = null;
         _dragIndex = null;
@@ -620,6 +666,30 @@
     {
         TrumpPickerVisible = false;
         Game.SelectTrump(trump);
+        await DriveLoopAsync();
+    }
+
+    private void ToggleHawseyDiscard(Card card)
+    {
+        if (!HawseyExchangeVisible) return;
+        var idx = _hawseyDiscardSelection.IndexOf(card);
+        if (idx >= 0)
+        {
+            _hawseyDiscardSelection.RemoveAt(idx);
+        }
+        else if (_hawseyDiscardSelection.Count < 2)
+        {
+            _hawseyDiscardSelection.Add(card);
+        }
+    }
+
+    private async Task ConfirmHawseyDiscardAsync()
+    {
+        if (_hawseyDiscardSelection.Count != 2) return;
+        var discard = _hawseyDiscardSelection.ToArray();
+        _hawseyDiscardSelection.Clear();
+        HawseyExchangeVisible = false;
+        Game.PerformHumanHawseyExchange(discard);
         await DriveLoopAsync();
     }
 
@@ -731,12 +801,11 @@
                     var humanExchanges = await Game.HandleHawseyExchangeAsync();
                     if (humanExchanges)
                     {
-                        // No human Hawsey-exchange picker built yet; auto-resolve
-                        // using the AI strategy so the round can proceed.
-                        StatusMessage = "Hawsey! Exchanging cards with partner.";
+                        HawseyExchangeVisible = true;
+                        _hawseyDiscardSelection.Clear();
+                        StatusMessage = "Hawsey! Pick 2 cards to discard.";
                         await InvokeAsync(StateHasChanged);
-                        await Task.Delay(800).ConfigureAwait(true);
-                        Game.AutoResolveHumanHawseyExchange();
+                        return;
                     }
                     break;
 
@@ -780,6 +849,13 @@
 
     private async Task OnCardClickAsync(Card card)
     {
+        // Hawsey discard-selection mode steals clicks from trick play.
+        if (HawseyExchangeVisible)
+        {
+            ToggleHawseyDiscard(card);
+            return;
+        }
+
         if (!IsHumanPlayTurn) return;
         var legal = State!.GetLegalPlays();
         var found = false;

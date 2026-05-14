@@ -178,9 +178,9 @@ public class GameService
 
 
     /// <summary>
-    /// Stand-in for the future human Hawsey-exchange UI: invokes the AI strategy
-    /// on the human's behalf so the round can proceed. Discards the bidder's 2
-    /// lowest cards and takes partner's 2 highest.
+    /// Stand-in fallback for the human Hawsey-exchange UI: invokes the AI
+    /// strategy on the human's behalf so the round can proceed. Discards the
+    /// bidder's 2 lowest cards and takes partner's 2 highest.
     /// </summary>
     public void AutoResolveHumanHawseyExchange()
     {
@@ -194,6 +194,30 @@ public class GameService
             out var fromPartner);
 
         LogAi($"Human Hawsey exchange auto-resolved (discard {discard[0]}, {discard[1]}; take {fromPartner[0]}, {fromPartner[1]}).");
+        PerformHawseyExchange(discard, fromPartner);
+    }
+
+
+
+    /// <summary>
+    /// Performs the human Hawsey exchange with the player's chosen discards.
+    /// The partner's contribution is selected by the AI strategy (their two
+    /// strongest cards relative to the current trump).
+    /// </summary>
+    public void PerformHumanHawseyExchange(Card[] discard)
+    {
+        if (_state == null || _state.Phase != GamePhase.HawseyExchange) return;
+        if (_state.HawseyBidder != HumanPosition) return;
+        if (discard is null || discard.Length != 2) return;
+
+        // Re-use the AI's "pick partner's two best for this trump" logic.
+        _aiStrategy.DecideHawseyExchange(
+            _state,
+            HumanPosition,
+            out _,
+            out var fromPartner);
+
+        LogAi($"Human Hawsey exchange: discard {discard[0]}, {discard[1]}; take {fromPartner[0]}, {fromPartner[1]} from partner.");
         PerformHawseyExchange(discard, fromPartner);
     }
 
