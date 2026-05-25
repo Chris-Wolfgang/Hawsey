@@ -5,9 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Version>0.1.0</Version>
-    <Authors>Chris Wolfgang</Authors>
     <Description>Game engine for the Hawsey card game — a 4-player team trick-taking game played with a pinochle deck.</Description>
-    <Copyright>Copyright (c) Chris Wolfgang</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
