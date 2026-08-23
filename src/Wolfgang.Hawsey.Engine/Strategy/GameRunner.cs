@@ -87,7 +87,9 @@ public sealed class GameRunner
 
             case GamePhase.TrickPlay:
                 var card = strategy.DecidePlay(state, state.NextToAct!.Value);
-                return _engine.PlayCard(state, state.NextToAct!.Value, card);
+                // Second `.Value` doesn't need `!` — flow analysis carries the
+                // non-null proof from the preceding dereference on this arm.
+                return _engine.PlayCard(state, state.NextToAct.Value, card);
 
             case GamePhase.RoundScoring:
                 return _engine.StartNextRound(state, random);
