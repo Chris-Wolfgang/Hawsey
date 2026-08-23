@@ -45,7 +45,13 @@ public class GameService
 
     public void StartNewGame(HouseRules? rules = null)
     {
+        // S2245: System.Random is fine here — this seeds a card-dealer/PRNG for
+        // gameplay, not anything security-sensitive (no keys, no tokens, no
+        // secrets). Cryptographically strong RNG would add cost and dependency
+        // for zero user-facing benefit in a bridge card game.
+#pragma warning disable S2245
         _random = new Random();
+#pragma warning restore S2245
         _state = _engine.StartGame(rules ?? HouseRules.Default, PlayerPosition.North, _random);
         _biddingPhase = new BiddingPhase(_state.Dealer, _state.Rules.MinimumBid);
         StateChanged?.Invoke(this, EventArgs.Empty);
