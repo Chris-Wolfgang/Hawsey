@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+    <PackageReference Include="xunit.runner.visualstudio" Condition="'$(TargetFramework)' != 'netcoreapp3.1' And '$(TargetFramework)' != 'net5.0'" Version="2.8.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -24,6 +24,16 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Wolfgang.Hawsey.Engine\Wolfgang.Hawsey.Engine.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1' Or '$(TargetFramework)' == 'net5.0'">
+    <!-- xunit.runner.visualstudio 2.5+ dropped netcoreapp3.1 and net5.0: the adapter loads
+         nothing and `dotnet test` reports "No test is available" while exiting 0. 2.4.5 is the
+         last runner that executes these slots; the cap keeps Dependabot from moving it. -->
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" allowedVersions="(,2.5.0)">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>
