@@ -85,8 +85,10 @@ jobs:
           print("\n".join(sorted(rows)))
           PY
             echo "## game"
-            tr -d '\r' < results/game.txt
-          } > transcript-${{ matrix.label }}.txt
+            cat results/game.txt
+            # Windows tools (Python's text stdout, dotnet run) write CRLF; normalise so only
+            # content differences, never line endings, can make platforms diverge.
+          } | tr -d '\r' > transcript-${{ matrix.label }}.txt
           wc -l transcript-${{ matrix.label }}.txt
 
       - name: Upload transcript
