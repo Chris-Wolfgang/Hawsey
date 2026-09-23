@@ -14,6 +14,11 @@ using Wolfgang.Hawsey.UI.Maui.Services;
 
 namespace Wolfgang.Hawsey.UI.Maui.ViewModels;
 
+// `partial` is required on the Windows TFM: GameViewModel implements WinRT-projected
+// interfaces, and the CsWinRT AOT source generator emits the other part of this
+// class there (without it, CsWinRT1028). InspectCode analyzes a slice where that
+// generator does not run, sees a single part, and reports the modifier as redundant.
+// ReSharper disable once PartialTypeWithSinglePart
 public partial class GameViewModel : INotifyPropertyChanged
 {
     private readonly GameService _gameService;
