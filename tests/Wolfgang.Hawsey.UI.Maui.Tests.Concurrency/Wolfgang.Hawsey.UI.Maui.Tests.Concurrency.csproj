@@ -5,7 +5,12 @@
        and after every build `dotnet coyote rewrite` instruments this assembly so
        Coyote's TestingEngine can control task scheduling and explore
        interleavings. The CLI comes from .config/dotnet-tools.json
-       (`dotnet tool restore`). -->
+       (`dotnet tool restore`).
+
+       No coverlet.collector, on purpose (like Wolfgang.Hawsey.UI.Maui.Tests.Unit):
+       coverage instrumentation on top of Coyote's binary rewrite is unsupported,
+       and the linked GameService is production code, not test code, so it must
+       not be counted against the test-assembly coverage gate. -->
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
