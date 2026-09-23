@@ -1,0 +1,51 @@
+name: "🔁 Reproducible build report"
+description: "Report the result of rebuilding a release from source (match or mismatch) — see docs/REPRODUCIBLE-BUILD.md"
+title: "[Repro]: "
+labels: [reproducible-build]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for verifying a release. Follow [docs/REPRODUCIBLE-BUILD.md](https://github.com/Chris-Wolfgang/Hawsey/blob/main/docs/REPRODUCIBLE-BUILD.md) first. Compare the DLLs inside the package, not the `.nupkg` hash.
+
+  - type: dropdown
+    id: outcome
+    attributes:
+      label: "Outcome"
+      options:
+        - "Match — rebuild, published package and manifest hashes are identical"
+        - "Mismatch — at least one hash differs"
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: "Package version"
+      placeholder: "0.2.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: "Environment"
+      description: "OS and architecture, output of `dotnet --version`, and the commit you built."
+    validations:
+      required: true
+
+  - type: textarea
+    id: hashes
+    attributes:
+      label: "Hashes"
+      description: "sha256 of both DLLs from (1) your rebuild, (2) the published .nupkg, (3) reproducible-build-manifest.json."
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: signature
+    attributes:
+      label: "Signed statement (optional)"
+      description: "Attach or paste the cosign bundle over reproducible-build-manifest.json, and the identity and OIDC issuer to verify it with."
