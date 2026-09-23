@@ -10,7 +10,8 @@
 
 The engine is a pure, in-process .NET library. It does **no** I/O, networking,
 persistence, dynamic code generation or deserialization, and it is
-declared trim- and AOT-compatible (see ADR 0002 and #79). Callers drive it by
+declared trim- and AOT-compatible (`IsAotCompatible` / `IsTrimmable` in the engine's
+`.csproj`, exercised by the Native AOT smoke consumer and `aot-smoke.yaml`, #79). Callers drive it by
 passing a `GameState` and a move. Randomness comes only from a
 `System.Random` the caller supplies. Decisions come from the caller's own code,
 either directly or through `IPlayerStrategy` (`GameRunner`).
@@ -33,20 +34,20 @@ control of the process.
 | # | Category | Threat | Mitigation | Status |
 |---|---|---|---|---|
 | S1 | Spoofing | A caller acts for a player out of turn | `GameEngine` and `BiddingPhase` check `NextToAct` / bidding order and throw `InvalidOperationException` | Mitigated |
-| S2 | Spoofing | A look-alike or typosquatted package | Releases carry a signed SLSA build-provenance attestation (`release.yaml`); consumers can verify it (#91) | Mitigated; author signing blocked on a certificate (#120) |
+| S2 | Spoofing | A look-alike or typosquatted package | **Partial.** A signed SLSA build-provenance attestation (`release.yaml`) proves a given `.nupkg` was built by this repository's release workflow, *if the consumer checks it* (docs/REPRODUCIBLE-BUILD.md, #91). It doesn't stop a typosquat from being published or installed, and there's no author signature | **Open:** needs NuGet author signing (#120, blocked on a certificate). Until then consumers must check the package ID and owner on nuget.org |
 | T1 | Tampering | A caller edits `GameState.Hands` / `CompletedTricks` (exposed as mutable collections) to cheat | Documented as read-only on `GameState`; see ADR 0002 | **Accepted:** the host is trusted and controls the process anyway |
 | T2 | Tampering | A compromised dependency or CI action injects code into the build | Actions pinned by commit SHA; Dependabot; license audit; Semgrep and CodeQL; gitleaks; protected-files guard on CI configuration | Mitigated |
 | T3 | Tampering | A rebuilt package differs from the reviewed source | Deterministic CI builds (`ContinuousIntegrationBuild`) plus a reproducibility check (#82); provenance attestation | Mitigated once #82 lands |
 | R1 | Repudiation | A player disputes a move | Out of scope for a local library. A networked host must keep its own signed move log | **Accepted** |
 | I1 | Information disclosure | Any strategy or UI can read **all four hands** from `GameState` (an AI could peek) | None in the engine, by design. The engine is a referee, not a hidden-information server | **Accepted** for local play; a networked host must project per-seat views before sending state |
 | D1 | Denial of service | A strategy that keeps returning illegal moves stalls a game | Illegal moves throw immediately; `GameRunner` has no retry loop | Mitigated |
-| D2 | Denial of service | A huge or hostile input | Inputs are enums, small integers and 48-card collections; no parsing or unbounded input | Not applicable |
-| E1 | Elevation of privilege | Code execution through the engine | No deserialization, `Process`, file access or dynamic code (the trim/AOT analyzers enforce this); the only reflection is `GetType().Name` in a `BiddingPhase` error message | Not applicable |
+| D2 | Denial of service | Oversized inputs | Normal play only ever deals 48 cards. The public API doesn't validate collection sizes, though: a host can pass `Deck.Shuffle` any `IReadOnlyList<Card>` or construct a `GameState` with arbitrarily large hands or trick lists. There's no parsing of external data | **Accepted:** under the trusted-host boundary, the host only affects its own process |
+| E1 | Elevation of privilege | Code execution through the engine | By code review: the engine has no deserialization, `Process`, file access or dynamic code, and its only reflection is `GetType().Name` in a `BiddingPhase` error message. The trim/AOT analyzers flag *trim-unsafe* reflection and dynamic code, but no automated control bans the other categories | Not applicable today; re-check at each review |
 | E2 | Elevation / fairness | Shuffles are predictable if the `Random` seed is known | Seeding is the caller's choice: `System.Random` is fine for casual play (S2245 note in `GameService`) | **Accepted:** anything with stakes must pass a `Random` backed by a cryptographic RNG |
 
 ## Accepted risks
 
-T1, R1, I1 and E2 are accepted because the engine's contract is a *trusted,
+T1, R1, I1, D2 and E2 are accepted because the engine's contract is a *trusted,
 in-process rules referee*. Each one becomes a live risk only if Hawsey is hosted
 for untrusted remote players. That change must revisit this model first. Any
 threat found in a review that is neither mitigated nor accepted here is filed as
