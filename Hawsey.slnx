@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/Wolfgang.Hawsey.Engine.Benchmarks/Wolfgang.Hawsey.Engine.Benchmarks.csproj" />
+  </Folder>
   <Folder Name="/examples/">
     <Project Path="examples/Wolfgang.Hawsey.Engine.AotSmoke/Wolfgang.Hawsey.Engine.AotSmoke.csproj" />
   </Folder>
