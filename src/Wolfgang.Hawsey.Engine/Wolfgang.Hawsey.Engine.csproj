@@ -15,6 +15,11 @@
     <Authors>Chris Wolfgang</Authors>
     <Description>Game engine for the Hawsey card game — a 4-player team trick-taking game played with a pinochle deck.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <!-- The engine is reflection-free, so it can promise trimming and Native AOT
+         to consumers. The ILLink analyzers these switch on only exist for
+         net8.0+; the netstandard2.0 slot is unaffected. -->
+    <IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">true</IsAotCompatible>
+    <IsTrimmable Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">true</IsTrimmable>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
