@@ -46,6 +46,7 @@ jobs:
         run: >
           dotnet publish examples/Wolfgang.Hawsey.Engine.AotSmoke/Wolfgang.Hawsey.Engine.AotSmoke.csproj
           -c Release -r linux-x64 -o aot-out
+          -p:PublishAot=true
           -warnaserror
 
       - name: Run the native binary

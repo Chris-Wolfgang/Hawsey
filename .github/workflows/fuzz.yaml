@@ -79,14 +79,23 @@ jobs:
     permissions:
       issues: write
     steps:
-      - name: Open issue
+      - name: Open or update the tracking issue
+        # One open issue per failure stream: a repeat failure comments on it
+        # instead of opening a new issue every week.
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          TITLE: "Fuzz: a property failed in the weekly run"
         run: |
+          existing=$(gh issue list --repo "$REPO" --state open --limit 100 --json number,title \
+                       --jq '.[] | select(.title == env.TITLE) | .number' | head -1)
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$REPO" --body "Failed again: $RUN_URL (download the \`fuzz-results\` artifact for the replay pair)."
+            exit 0
+          fi
           gh issue create --repo "$REPO" \
-            --title "Fuzz: a property failed in the weekly run" \
+            --title "$TITLE" \
             --body "The weekly FsCheck fuzz run failed: $RUN_URL
 
           Download the \`fuzz-results\` artifact. \`fuzz.log\` has FsCheck's \`Falsifiable ... (seed,gamma)\` replay pair and the shrunk counterexample.
