@@ -114,7 +114,7 @@ public sealed class GameEngine
                 nextToAct: result.Winner,
                 tricksPlayedInRound: 0,
                 isHawseyRound: result.IsHawsey,
-                hawseyBidder: result.IsHawsey ? result.Winner : (PlayerPosition?)null
+                hawseyBidder: result.IsHawsey ? result.Winner : null
             );
         }
 
