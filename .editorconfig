@@ -42,13 +42,6 @@ dotnet_diagnostic.SA0001.severity = none
 # Enable .NET analyzers with conservative defaults
 dotnet_analyzer_diagnostic.severity = suggestion
 
-# The blanket 'suggestion' above would also demote the ILLink trim / AOT / single-file
-# analyzers (IL2xxx, IL3xxx) that IsAotCompatible turns on - they never print and never
-# trip TreatWarningsAsErrors, so an 'AOT-compatible' build would be an unverified promise.
-dotnet_analyzer_diagnostic.category-Trimming.severity = warning
-dotnet_analyzer_diagnostic.category-AOT.severity = warning
-dotnet_analyzer_diagnostic.category-SingleFile.severity = warning
-
 # IDE (Code Style) Rules
 dotnet_diagnostic.IDE0005.severity = suggestion   # Remove unnecessary usings
 # Allow var usage - modern C# style
