@@ -32,7 +32,11 @@ through `CardRanking`, never through `Card.Suit` or `Card.Rank` directly.
 
 ## Consequences
 
-- Any new rule or AI heuristic must ask `CardRanking`. Using `Card.Suit` or
-  `Card.Rank` directly is a review red flag.
+- Anything that decides **legality or strength** (follow-suit checks, beating
+  the current winner, trick winners, and AI estimates of whether a card will
+  win) must ask `CardRanking`. Reading raw `Card.Suit` or `Card.Rank` there is a
+  review red flag. Reading the printed suit is still correct where it's what's
+  meant, for example counting printed suits in a hand to choose trump
+  (`SimpleAiStrategy.DecideTrump`) or showing a card.
 - FsCheck properties pin the invariants: the left bower is trump and ranks just
   below the right, and `CardComparer` is antisymmetric.
