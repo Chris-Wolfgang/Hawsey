@@ -1,0 +1,121 @@
+name: Cross-Platform Differential
+
+# Cross-platform / multi-architecture differential testing (#75).
+#
+# Runs the same engine test suite (net10.0) and the same seeded full-game run on
+# linux-x64, linux-arm64, macos-arm64 and windows-x64, reduces each to a textual
+# transcript - every test name with its outcome, plus the game transcript's
+# numbers - and diffs every platform against linux-x64. The engine is pure managed
+# code, so any divergence is a bug (floating point, culture, ordering, runtime
+# differences), not an expected platform quirk.
+#
+# Platform-specific tests, if any are ever needed, carry
+# [Trait("Category", "PlatformSpecific")] and are excluded from the diff.
+
+on:
+  pull_request:
+    paths:
+      - 'src/Wolfgang.Hawsey.Engine/**'
+      - 'tests/Wolfgang.Hawsey.Engine.Tests.Unit/**'
+      - 'examples/**'
+      - '.github/workflows/cross-platform-differential.yaml'
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 4 * * 1'   # Mondays 04:00 UTC, so drift in runner images is caught
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cross-platform-differential-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  run:
+    name: ${{ matrix.label }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { label: linux-x64,   os: ubuntu-latest }
+          - { label: linux-arm64, os: ubuntu-24.04-arm }
+          - { label: macos-arm64, os: macos-latest }
+          - { label: windows-x64, os: windows-latest }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68  # v6.0.0
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Test (net10.0) to TRX
+        run: |
+          dotnet test tests/Wolfgang.Hawsey.Engine.Tests.Unit/Wolfgang.Hawsey.Engine.Tests.Unit.csproj \
+            -c Release -f net10.0 \
+            --filter "Category!=PlatformSpecific" \
+            --logger "trx;LogFileName=results.trx" --results-directory results
+
+      - name: Seeded game transcript
+        run: dotnet run --project examples/Wolfgang.Hawsey.Engine.AotSmoke/Wolfgang.Hawsey.Engine.AotSmoke.csproj -c Release > results/game.txt
+
+      - name: Reduce to a comparable transcript
+        run: |
+          {
+            echo "## tests"
+            # testName + outcome for every result, sorted; durations and machine names dropped.
+            "$(command -v python3 || command -v python)" - results/results.trx <<'PY'
+          import sys, xml.etree.ElementTree as ET
+          ns = {"t": "http://microsoft.com/schemas/VisualStudio/TeamTest/2010"}
+          root = ET.parse(sys.argv[1]).getroot()
+          rows = []
+          for r in root.iterfind(".//t:UnitTestResult", ns):
+              msg = r.find("t:Output/t:ErrorInfo/t:Message", ns)
+              rows.append(f'{r.get("testName")}\t{r.get("outcome")}\t{(msg.text or "").strip() if msg is not None else ""}')
+          print("\n".join(sorted(rows)))
+          PY
+            echo "## game"
+            tr -d '\r' < results/game.txt
+          } > transcript-${{ matrix.label }}.txt
+          wc -l transcript-${{ matrix.label }}.txt
+
+      - name: Upload transcript
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: transcript-${{ matrix.label }}
+          path: transcript-${{ matrix.label }}.txt
+
+  diff:
+    name: Diff against linux-x64
+    needs: run
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Download transcripts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c  # v8.0.1
+        with:
+          pattern: transcript-*
+          merge-multiple: true
+
+      - name: Diff
+        run: |
+          status=0
+          for other in linux-arm64 macos-arm64 windows-x64; do
+            if diff -u transcript-linux-x64.txt "transcript-$other.txt"; then
+              echo "✅ $other matches linux-x64"
+            else
+              echo "::error::$other diverges from linux-x64 (diff above)"
+              status=1
+            fi
+          done
+          exit $status
