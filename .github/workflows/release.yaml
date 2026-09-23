@@ -455,7 +455,8 @@ jobs:
 
       # Reproducible-build manifest (#91, docs/REPRODUCIBLE-BUILD.md): for each package,
       # the SHA-256 of every assembly inside it plus what a third party needs to rebuild
-      # them byte-for-byte - the commit, the exact SDK, and the Copyright string
+      # them byte-for-byte - the commit, the exact SDK, the OS (MSBuild-generated sources
+      # carry the OS newline, so bytes are reproducible per OS), and the Copyright string
       # (Directory.Build.props stamps the current year into it). The .nupkg itself is not
       # reproducible (zip metadata), so the contract is the DLL hashes. Written next to
       # the packages so update-release-artifacts attaches it to the GitHub release.
@@ -486,6 +487,7 @@ jobs:
               version    = $version
               commit     = $env:GITHUB_SHA
               sdk        = $sdk
+              os         = if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { 'linux' }
               copyright  = $copyright
               assemblies = $assemblies
             }
