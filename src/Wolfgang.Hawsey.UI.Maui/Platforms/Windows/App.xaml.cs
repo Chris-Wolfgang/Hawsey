@@ -4,7 +4,7 @@
 // and both compile into the Windows TFM. The MAUI template's .WinUI keeps them apart.
 namespace Wolfgang.Hawsey.UI.Maui.WinUI;
 
-public partial class App : MauiWinUIApplication
+public partial class App
 {
     public App()
     {

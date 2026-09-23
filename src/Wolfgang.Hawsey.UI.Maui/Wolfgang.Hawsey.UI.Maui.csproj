@@ -32,6 +32,16 @@
     <RuntimeIdentifiers Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">win-x64</RuntimeIdentifiers>
     <SelfContained Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">false</SelfContained>
     <WindowsAppSDKSelfContained Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">false</WindowsAppSDKSelfContained>
+
+    <!-- CsWinRT1030: Command / Command<T> implement generic WinRT interfaces,
+         and the CsWinRT source generator emits their AOT-safe vtables with
+         unsafe code. Only the Windows TFM runs that generator. -->
+    <AllowUnsafeBlocks Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">true</AllowUnsafeBlocks>
+
+    <!-- XC0025: compile bindings that set Source (the RelativeSource
+         PlayCardCommand binding in GamePage) instead of resolving them by
+         reflection at run time. -->
+    <MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
   </PropertyGroup>
 
   <ItemGroup>

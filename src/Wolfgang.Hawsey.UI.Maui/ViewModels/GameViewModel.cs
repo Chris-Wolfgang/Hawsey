@@ -14,7 +14,7 @@ using Wolfgang.Hawsey.UI.Maui.Services;
 
 namespace Wolfgang.Hawsey.UI.Maui.ViewModels;
 
-public class GameViewModel : INotifyPropertyChanged
+public partial class GameViewModel : INotifyPropertyChanged
 {
     private readonly GameService _gameService;
     private string _statusMessage = "Welcome to Hawsey! Tap New Game to start.";
@@ -489,22 +489,21 @@ public class GameViewModel : INotifyPropertyChanged
             for (var i = 0; i < state.CurrentTrick.Plays.Count; i++)
             {
                 var play = state.CurrentTrick.Plays[i];
-                TrickCards.Add(new TrickCardViewModel(play.Card, play.Player));
+                TrickCards.Add(new TrickCardViewModel(play.Card));
             }
         }
     }
 
 
 
-    private bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    private void SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
         if (EqualityComparer<T>.Default.Equals(field, value))
         {
-            return false;
+            return;
         }
 
         field = value;
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        return true;
     }
 }
