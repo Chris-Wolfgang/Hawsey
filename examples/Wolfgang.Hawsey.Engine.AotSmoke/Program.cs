@@ -21,17 +21,18 @@ internal static class Program
     {
         var runner = new GameRunner();
         var failures = 0;
+        var hawseyExchanges = 0;
 
         for (var seed = 0; seed < GameCount; seed++)
         {
             var rules = new HouseRules { MustBeat = seed % 2 == 0 };
-            var state = runner.RunGame
+            var strategy = new FirstLegalCardStrategy
             (
-                new FirstLegalCardStrategy(aceHighEveryOtherRound: seed % 3 == 0),
-                rules,
-                PlayerPosition.South,
-                new Random(seed)
+                aceHighEveryOtherRound: seed % 3 == 0,
+                northCallsHawsey: seed % 4 == 1
             );
+            var state = runner.RunGame(strategy, rules, PlayerPosition.South, new Random(seed));
+            hawseyExchanges += strategy.HawseyExchanges;
 
             var topScore = Math.Max(state.NorthSouthScore, state.EastWestScore);
             if (state.Phase != GamePhase.GameOver || topScore < rules.PointsToWin)
@@ -41,23 +42,37 @@ internal static class Program
             }
         }
 
-        Console.WriteLine($"AOT smoke: {GameCount - failures}/{GameCount} games completed.");
+        if (hawseyExchanges == 0)
+        {
+            Console.Error.WriteLine("No game reached a Hawsey exchange; that path went unexercised.");
+            failures++;
+        }
+
+        Console.WriteLine($"AOT smoke: {GameCount - failures}/{GameCount} games completed, {hawseyExchanges} Hawsey exchanges.");
         return failures == 0 ? 0 : 1;
     }
 
 
 
     /// <summary>
-    /// Passes every bid (so the dealer is stuck at the minimum), names hearts
-    /// or ace-high, plays the first legal card and exchanges the first two cards.
+    /// Passes every bid (so the dealer is stuck at the minimum) unless North is
+    /// set to call Hawsey, which drives the Hawsey exchange path. Names hearts or
+    /// ace-high, plays the first legal card and exchanges the first two cards.
     /// </summary>
-    private sealed class FirstLegalCardStrategy(bool aceHighEveryOtherRound) : IPlayerStrategy
+    private sealed class FirstLegalCardStrategy(bool aceHighEveryOtherRound, bool northCallsHawsey) : IPlayerStrategy
     {
         private int _trumpCalls;
 
 
 
-        public BidAction DecideBid(GameState state, PlayerPosition player) => BidAction.PassBid.Instance;
+        public int HawseyExchanges { get; private set; }
+
+
+
+        public BidAction DecideBid(GameState state, PlayerPosition player) =>
+            northCallsHawsey && player == PlayerPosition.North
+                ? BidAction.HawseyBid.Instance
+                : BidAction.PassBid.Instance;
 
 
 
@@ -81,6 +96,7 @@ internal static class Program
             out Card[] cardsFromPartner
         )
         {
+            HawseyExchanges++;
             var bidderHand = state.Hands[bidder];
             var partnerHand = state.Hands[bidder.Partner()];
             cardsToDiscard = [bidderHand[0], bidderHand[1]];
