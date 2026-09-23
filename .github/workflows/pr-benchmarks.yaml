@@ -115,9 +115,13 @@ jobs:
                       continue
                   b_t, b_a = base[name]
                   dt, da = pct(h_t, b_t), pct(h_a, b_a)
-                  flag = dt > t_max or (b_a > 0 and da > a_max)
+                  # A benchmark that allocated nothing and now allocates has no finite
+                  # percentage; treat any new allocation as a regression.
+                  new_alloc = b_a == 0 and h_a > 0
+                  flag = dt > t_max or new_alloc or (b_a > 0 and da > a_max)
                   regressed |= flag
-                  lines.append(f"| {'⚠️ ' if flag else ''}`{name.split('.')[-1]}` | {b_t:,.1f} ns | {h_t:,.1f} ns | {dt:+.1f}% | {b_a:,} B | {h_a:,} B | {da:+.1f}% |")
+                  alloc_delta = "new allocation" if new_alloc else f"{da:+.1f}%"
+                  lines.append(f"| {'⚠️ ' if flag else ''}`{name.split('.')[-1]}` | {b_t:,.1f} ns | {h_t:,.1f} ns | {dt:+.1f}% | {b_a:,} B | {h_a:,} B | {alloc_delta} |")
               lines += ["", f"Thresholds: time +{t_max:g}%, allocations +{a_max:g}%. "
                         "Add the `perf-impact-acknowledged` label (then push) to accept a flagged regression."]
           open("comment.md", "w", encoding="utf-8").write("\n".join(lines) + "\n")
