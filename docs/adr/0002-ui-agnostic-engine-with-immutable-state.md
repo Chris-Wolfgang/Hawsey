@@ -1,4 +1,4 @@
-# ADR 0002 — A UI-agnostic engine with immutable state transitions
+# ADR 0002 — A UI-agnostic engine that returns a new GameState per move
 
 - **Status:** Accepted
 - **Date:** 2026-09-22 (records a decision made at the engine's creation)
@@ -15,11 +15,24 @@ and they drift apart.
 ## Decision
 
 All game rules live in `Wolfgang.Hawsey.Engine`, a UI-free library that targets
-`netstandard2.0` and `net10.0`. The engine is a **pure state machine**: each
-`GameEngine` operation (`PlaceBid`, `SelectTrump`, `ExchangeHawseyCards`,
-`PlayCard`, `StartNextRound`) takes a `GameState` and returns a **new** one,
-never changing its input. Decisions come in through the `IPlayerStrategy` seam,
-so a human UI, an AI and a test double are interchangeable.
+`netstandard2.0` and `net10.0`. Each `GameEngine` operation (`PlaceBid`,
+`SelectTrump`, `ExchangeHawseyCards`, `PlayCard`, `StartNextRound`) takes the
+current `GameState` and returns a **new** `GameState`. A front end never changes
+game state itself: it calls the engine and keeps the result.
+
+The engine is **not fully immutable**, and this ADR doesn't claim it is:
+
+- `PlayCard` plays onto the `Trick` object held by the incoming state
+  (`state.CurrentTrick.Play(...)`) before building the returned state, so the
+  previous `GameState` and the new one share that trick.
+- `PlaceBid` advances a caller-owned, mutable `BiddingPhase`.
+- `Hands` and `CompletedTricks` are exposed as `Dictionary<,>` / `List<>`. Callers
+  must treat them as read-only (documented on `GameState`).
+
+Decisions reach the engine in two ways. A UI calls the `GameEngine` methods
+directly when it's the human's turn and asks its AI for the others (the MAUI
+`GameService` works like this). `GameRunner` drives a whole game through the
+`IPlayerStrategy` seam, which is how simulations and tests plug in players.
 
 ## Alternatives considered
 
@@ -31,11 +44,10 @@ so a human UI, an AI and a test double are interchangeable.
 
 ## Consequences
 
-- A front end holds the current `GameState` and swaps in the returned one. Old
-  states remain valid snapshots, which gives replay and logging for free.
-- Every transition allocates a new state. That is irrelevant at card-game speed.
-- For zero-copy construction, `GameState` exposes `Dictionary<,>` and `List<>`.
-  Callers must treat them as read-only; this is documented on the type. Moving
-  to read-only abstractions is a candidate for a superseding ADR.
-- Each UI keeps only presentation and turn pacing (for example the delay that
-  keeps a finished trick visible).
+- The only safe snapshot is the latest `GameState`. A retained older state can
+  change under you (its shared `Trick`), so replay has to come from a move log,
+  not from saved states.
+- Every UI keeps only presentation and turn pacing (for example the delay that
+  keeps a finished trick visible), and every UI plays by the same rules.
+- Making `Trick`, `BiddingPhase` and the collections copy-on-write would make
+  states true snapshots. That change would be a new ADR superseding this one.

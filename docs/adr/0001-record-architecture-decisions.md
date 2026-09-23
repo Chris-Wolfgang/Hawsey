@@ -15,9 +15,10 @@ gets lost after the PR merges, and the next change re-argues the trade-off.
 
 We will keep short **Architecture Decision Records** in `docs/adr/`, one file per
 non-obvious decision, using [Michael Nygard's format](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions)
-(see [`TEMPLATE.md`](TEMPLATE.md)). An Accepted ADR is immutable. A reversal is a
-*new* ADR that supersedes it, and the old one is marked `Superseded by` rather than
-deleted. A new decision lands **in the same PR** as the code that implements it,
+(see [`TEMPLATE.md`](TEMPLATE.md)). Once an ADR is Accepted, its *content* (context, decision,
+alternatives, consequences) doesn't change. A reversal is a *new* ADR, and the
+only edit to the old one is its **Status** line, which becomes `Superseded by`
+with a link. It is never deleted. A new decision lands **in the same PR** as the code that implements it,
 so the ADR is reviewed with the code.
 
 ## Alternatives considered
