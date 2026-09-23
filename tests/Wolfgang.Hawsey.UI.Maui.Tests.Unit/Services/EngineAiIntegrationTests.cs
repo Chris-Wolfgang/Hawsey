@@ -1,4 +1,7 @@
-using Wolfgang.Hawsey.Engine;
+using Wolfgang.Hawsey.Engine.Bidding;
+using Wolfgang.Hawsey.Engine.Game;
+using Wolfgang.Hawsey.Engine.Players;
+using Wolfgang.Hawsey.Engine.Rules;
 using Wolfgang.Hawsey.UI.Maui.AI;
 
 namespace Wolfgang.Hawsey.UI.Maui.Tests.Unit.Services;

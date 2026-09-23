@@ -1,4 +1,4 @@
-namespace Wolfgang.Hawsey.UI.Maui.WinUI;
+namespace Wolfgang.Hawsey.UI.Maui.Platforms.Windows;
 
 public partial class App : MauiWinUIApplication
 {

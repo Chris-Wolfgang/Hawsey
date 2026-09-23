@@ -1,4 +1,6 @@
-namespace Wolfgang.Hawsey.Engine;
+using Wolfgang.Hawsey.Engine.Players;
+
+namespace Wolfgang.Hawsey.Engine.Scoring;
 
 /// <summary>
 /// Represents the final result of a completed Hawsey game.

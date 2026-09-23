@@ -1,4 +1,4 @@
-namespace Wolfgang.Hawsey.Engine;
+namespace Wolfgang.Hawsey.Engine.Rules;
 
 /// <summary>
 /// Represents the trump selection for a round.

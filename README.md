@@ -74,7 +74,9 @@ dotnet test
 ### Use the engine
 
 ```csharp
-using Wolfgang.Hawsey.Engine;
+using Wolfgang.Hawsey.Engine.Game;
+using Wolfgang.Hawsey.Engine.Players;
+using Wolfgang.Hawsey.Engine.Rules;
 
 var engine = new GameEngine();
 var rules = HouseRules.Default;

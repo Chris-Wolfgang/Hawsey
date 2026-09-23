@@ -1,4 +1,6 @@
-namespace Wolfgang.Hawsey.Engine;
+using Wolfgang.Hawsey.Engine.Players;
+
+namespace Wolfgang.Hawsey.Engine.Scoring;
 
 /// <summary>
 /// Tracks cumulative team scores across rounds and determines the game winner.

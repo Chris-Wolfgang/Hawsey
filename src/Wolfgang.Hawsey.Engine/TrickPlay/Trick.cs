@@ -1,4 +1,7 @@
-namespace Wolfgang.Hawsey.Engine;
+using Wolfgang.Hawsey.Engine.Cards;
+using Wolfgang.Hawsey.Engine.Players;
+
+namespace Wolfgang.Hawsey.Engine.TrickPlay;
 
 /// <summary>
 /// Manages a single trick, collecting played cards and determining the winner.

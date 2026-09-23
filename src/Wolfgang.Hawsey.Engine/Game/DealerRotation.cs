@@ -1,4 +1,6 @@
-namespace Wolfgang.Hawsey.Engine;
+using Wolfgang.Hawsey.Engine.Players;
+
+namespace Wolfgang.Hawsey.Engine.Game;
 
 /// <summary>
 /// Tracks which player is the dealer and rotates clockwise after each round.

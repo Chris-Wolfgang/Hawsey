@@ -1,4 +1,4 @@
-namespace Wolfgang.Hawsey.Engine;
+namespace Wolfgang.Hawsey.Engine.Players;
 
 /// <summary>
 /// Extension methods for <see cref="PlayerPosition"/>.

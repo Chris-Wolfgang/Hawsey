@@ -1,4 +1,9 @@
-using Wolfgang.Hawsey.Engine;
+
+using Wolfgang.Hawsey.Engine.Bidding;
+using Wolfgang.Hawsey.Engine.Cards;
+using Wolfgang.Hawsey.Engine.Game;
+using Wolfgang.Hawsey.Engine.Players;
+using Wolfgang.Hawsey.Engine.Strategy;
 
 namespace Wolfgang.Hawsey.Engine.Tests.Unit.Helpers;
 

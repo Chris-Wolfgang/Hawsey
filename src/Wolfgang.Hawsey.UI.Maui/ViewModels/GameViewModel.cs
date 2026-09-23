@@ -5,7 +5,11 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using Wolfgang.Hawsey.Engine;
+using Wolfgang.Hawsey.Engine.Bidding;
+using Wolfgang.Hawsey.Engine.Cards;
+using Wolfgang.Hawsey.Engine.Game;
+using Wolfgang.Hawsey.Engine.Players;
+using Wolfgang.Hawsey.Engine.Rules;
 using Wolfgang.Hawsey.UI.Maui.Services;
 
 namespace Wolfgang.Hawsey.UI.Maui.ViewModels;
