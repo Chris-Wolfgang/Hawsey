@@ -130,11 +130,25 @@ public class CultureInvarianceTests
 
     [Theory]
     [MemberData(nameof(Cultures))]
-    public void InCulture_restores_the_original_cultures_after_the_test(string culture)
+    public void InCulture_applies_both_cultures_inside_the_action(string culture)
+    {
+        var applied = InCulture(culture, () => (CultureInfo.CurrentCulture.Name, CultureInfo.CurrentUICulture.Name));
+
+        Assert.Equal((culture, culture), applied);
+    }
+
+
+
+    [Theory]
+    [MemberData(nameof(Cultures))]
+    public void InCulture_when_the_action_throws_restores_the_original_cultures(string culture)
     {
         var before = (CultureInfo.CurrentCulture, CultureInfo.CurrentUICulture);
 
-        _ = InCulture(culture, () => CultureInfo.CurrentCulture.Name);
+        Assert.Throws<InvalidOperationException>
+        (
+            () => InCulture<int>(culture, () => throw new InvalidOperationException("boom"))
+        );
 
         Assert.Equal(before, (CultureInfo.CurrentCulture, CultureInfo.CurrentUICulture));
     }
