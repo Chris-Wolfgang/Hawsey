@@ -2,7 +2,7 @@ using Wolfgang.Hawsey.UI.Maui.ViewModels;
 
 namespace Wolfgang.Hawsey.UI.Maui.Views;
 
-public partial class GamePage : ContentPage
+public partial class GamePage
 {
     public GamePage(GameViewModel viewModel)
     {

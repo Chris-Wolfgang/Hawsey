@@ -243,16 +243,13 @@ public class GameService
         if (_state.Phase == GamePhase.RoundScoring)
         {
             RoundCompleted?.Invoke(this, EventArgs.Empty);
-            return false;
         }
-
-        if (_state.Phase == GamePhase.GameOver)
+        else if (_state.Phase == GamePhase.GameOver)
         {
             var winner = _state.NorthSouthScore >= _state.Rules.PointsToWin
                 ? Team.NorthSouth
                 : Team.EastWest;
             GameOver?.Invoke(this, new GameOverEventArgs(winner));
-            return false;
         }
 
         return false;
