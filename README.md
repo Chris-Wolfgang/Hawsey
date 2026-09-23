@@ -119,8 +119,8 @@ The `GameRunner` plus an `IPlayerStrategy` per seat is the easiest way to drive 
 ## 🔍 Verify the Build
 
 Each release carries a signed SLSA provenance attestation and a
-`reproducible-build-manifest.json` listing the expected SHA-256 of every
-assembly in the package. You can rebuild from the tagged commit and confirm the
+`<PackageId>.<version>.reproducible-build-manifest.json` listing the expected
+SHA-256 of every assembly in the package. You can rebuild from the tagged commit and confirm the
 published DLLs are byte-identical to the source. The full procedure, including
 how to report a match or mismatch as an independent verifier, is in
 [docs/REPRODUCIBLE-BUILD.md](docs/REPRODUCIBLE-BUILD.md).

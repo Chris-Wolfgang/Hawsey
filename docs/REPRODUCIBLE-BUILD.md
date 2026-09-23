@@ -22,7 +22,10 @@ tagged source compiles to. This guide covers:
 ## Tooling
 
 The build depends on the compiler, so use the **exact SDK** the release used.
-Each GitHub release attaches `reproducible-build-manifest.json`:
+Each GitHub release attaches one manifest per package, named
+`<PackageId>.<version>.reproducible-build-manifest.json` (for example
+`Wolfgang.Hawsey.Engine.0.2.0.reproducible-build-manifest.json`). Below it's
+called `manifest.json`:
 
 ```json
 {
@@ -79,7 +82,7 @@ sha256sum src/Wolfgang.Hawsey.Engine/bin/Release/netstandard2.0/Wolfgang.Hawsey.
 Then hash the DLLs inside the published package (a `.nupkg` is a zip file):
 
 ```bash
-unzip -o -q Wolfgang.Hawsey.Engine.0.2.0.nupkg 'lib/*' -d published
+unzip -o -q Wolfgang.Hawsey.Engine.0.2.0.nupkg -d published
 sha256sum published/lib/*/Wolfgang.Hawsey.Engine.dll
 ```
 
@@ -96,11 +99,11 @@ hashes.
   sign the manifest with your own Sigstore identity and attach the bundle:
 
   ```bash
-  cosign sign-blob --yes --bundle manifest.sigstore.json reproducible-build-manifest.json
+  cosign sign-blob --yes --bundle manifest.sigstore.json manifest.json
   ```
 
   Anyone can then check it with `cosign verify-blob --bundle manifest.sigstore.json
-  --certificate-identity <you> --certificate-oidc-issuer <issuer> reproducible-build-manifest.json`.
+  --certificate-identity <you> --certificate-oidc-issuer <issuer> manifest.json`.
   This follows the [Reproducible Builds](https://reproducible-builds.org/) convention
   of independent builders publishing signed statements over the same artifact
   hashes.
