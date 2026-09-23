@@ -31,7 +31,13 @@ internal static class Program
                 aceHighEveryOtherRound: seed % 3 == 0,
                 northCallsHawsey: seed % 4 == 1
             );
-            var state = runner.RunGame(strategy, rules, PlayerPosition.South, new Random(seed));
+            // S2245: the seeded System.Random is the point - each smoke game must deal
+            // the same cards on every run and every platform (the cross-platform
+            // differential diffs this output). Nothing here is security-sensitive.
+#pragma warning disable S2245
+            var dealer = new Random(seed);
+#pragma warning restore S2245
+            var state = runner.RunGame(strategy, rules, PlayerPosition.South, dealer);
             hawseyExchanges += strategy.HawseyExchanges;
 
             var topScore = Math.Max(state.NorthSouthScore, state.EastWestScore);
