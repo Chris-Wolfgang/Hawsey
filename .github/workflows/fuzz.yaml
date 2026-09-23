@@ -1,0 +1,103 @@
+name: Fuzz
+
+# Long-running property-based fuzzing of the engine (issue #65).
+#
+# The FsCheck properties in tests/Wolfgang.Hawsey.Engine.Tests.Unit/PropertyBased
+# use [FuzzProperty], which reads its case count from HAWSEY_FUZZ_MAX_TEST. Every
+# PR run leaves it unset (100 cases per property); this workflow sets it to
+# 100,000 and runs only those properties, weekly and on demand.
+#
+# When a property fails:
+#   - the test log (with FsCheck's "Falsifiable ... (seed,gamma)" replay line and
+#     the shrunk counterexample) is uploaded as the `fuzz-results` artifact, and
+#   - an issue is filed linking the run.
+# To pin the counterexample as a deterministic regression, copy the replay pair
+# into the failing property: [FuzzProperty(Replay = "(seed,gamma)")] reproduces it
+# exactly on every normal run; or add the shrunk values as a plain [Theory] row.
+
+on:
+  schedule:
+    - cron: '0 5 * * 3'   # Wednesdays at 05:00 UTC
+  workflow_dispatch:
+    inputs:
+      max-test:
+        description: Cases per property
+        required: false
+        default: '100000'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fuzz-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  fuzz:
+    name: FsCheck properties (long run)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68  # v6.0.0
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Run properties
+        env:
+          HAWSEY_FUZZ_MAX_TEST: ${{ inputs.max-test || '100000' }}
+        run: |
+          set -o pipefail
+          mkdir -p fuzz-results
+          echo "Cases per property: $HAWSEY_FUZZ_MAX_TEST"
+          dotnet test tests/Wolfgang.Hawsey.Engine.Tests.Unit/Wolfgang.Hawsey.Engine.Tests.Unit.csproj \
+            -c Release -f net10.0 \
+            --filter "FullyQualifiedName~PropertyBased" \
+            --logger "trx;LogFileName=fuzz.trx" \
+            --results-directory fuzz-results \
+            2>&1 | tee fuzz-results/fuzz.log
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: fuzz-results
+          path: fuzz-results/
+          retention-days: 30
+
+  report:
+    name: File an issue for a failing property
+    needs: fuzz
+    if: failure() && github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - name: Open or update the tracking issue
+        # One open issue per failure stream: a repeat failure comments on it
+        # instead of opening a new issue every week.
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          TITLE: "Fuzz: a property failed in the weekly run"
+        run: |
+          existing=$(gh issue list --repo "$REPO" --state open --limit 100 --json number,title \
+                       --jq '.[] | select(.title == env.TITLE) | .number' | head -1)
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$REPO" --body "Failed again: $RUN_URL (download the \`fuzz-results\` artifact for the replay pair)."
+            exit 0
+          fi
+          gh issue create --repo "$REPO" \
+            --title "$TITLE" \
+            --body "The weekly FsCheck fuzz run failed: $RUN_URL
+
+          Download the \`fuzz-results\` artifact. \`fuzz.log\` has FsCheck's \`Falsifiable ... (seed,gamma)\` replay pair and the shrunk counterexample.
+
+          Fix the defect, and pin the case as a regression with \`[FuzzProperty(Replay = \"(seed,gamma)\")]\` or a \`[Theory]\` row (see the header of \`.github/workflows/fuzz.yaml\`)."

@@ -1,0 +1,182 @@
+name: PR Benchmarks
+
+# Per-PR performance regression detection (#90).
+#
+# Runs the BenchmarkDotNet suite (benchmarks/Wolfgang.Hawsey.Engine.Benchmarks) on
+# the PR head and on the PR's base commit, one after the other on the same runner
+# so machine noise affects both equally, then compares every benchmark's mean time
+# and allocated bytes. The result is posted as a single PR comment that is REPLACED
+# on each push. The job fails when a benchmark regresses past the thresholds below,
+# unless the PR carries the `perf-impact-acknowledged` label (labels are read from
+# the event, so push a commit after adding it).
+#
+# Two jobs on purpose: `bench` builds and runs PR code with a read-only token and
+# no write scope; `comment` never checks out PR code and is the only job that can
+# write to the PR.
+
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'benchmarks/**'
+      - '.github/workflows/pr-benchmarks.yaml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-benchmarks-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  TIME_THRESHOLD_PERCENT: '20'
+  ALLOC_THRESHOLD_PERCENT: '50'
+  BENCH_PROJECT: benchmarks/Wolfgang.Hawsey.Engine.Benchmarks/Wolfgang.Hawsey.Engine.Benchmarks.csproj
+
+jobs:
+  bench:
+    name: Benchmark head vs base
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    outputs:
+      regressed: ${{ steps.compare.outputs.regressed }}
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68  # v6.0.0
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Run benchmarks (head)
+        run: |
+          set -euo pipefail
+          run_suite() {  # $1 = checkout root, $2 = output json
+            local proj="$1/$BENCH_PROJECT"
+            [ -f "$proj" ] || { echo "no benchmark project in $1"; return 1; }
+            dotnet run --project "$proj" -c Release -- --filter "*" --job short --memory --exporters json \
+              --artifacts "$1/bdn-artifacts" > /dev/null
+            jq -s '{Benchmarks: [.[].Benchmarks[]]}' "$1"/bdn-artifacts/results/*-report-full-compressed.json > "$2"
+          }
+          declare -f run_suite > run_suite.sh
+          run_suite "$PWD" head.json
+
+      - name: Run benchmarks (base)
+        id: base
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          source run_suite.sh
+          git worktree add ../base "$BASE_SHA"
+          if run_suite "$(cd ../base && pwd)" base.json; then
+            echo "has-base=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::The base commit has no benchmark project yet; nothing to compare against."
+            echo "has-base=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Compare
+        id: compare
+        env:
+          HAS_BASE: ${{ steps.base.outputs.has-base }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          marker = "<!-- pr-benchmarks -->"
+          t_max = float(os.environ["TIME_THRESHOLD_PERCENT"])
+          a_max = float(os.environ["ALLOC_THRESHOLD_PERCENT"])
+
+          def load(path):
+              out = {}
+              for b in json.load(open(path, encoding="utf-8"))["Benchmarks"]:
+                  out[b["FullName"]] = (b["Statistics"]["Mean"], (b.get("Memory") or {}).get("BytesAllocatedPerOperation", 0))
+              return out
+
+          head = load("head.json")
+          lines = [marker, "## Benchmarks: head vs base", ""]
+          regressed = False
+          if os.environ.get("HAS_BASE") != "true":
+              lines.append("_The base commit has no benchmark project, so there is no comparison yet._")
+          else:
+              base = load("base.json")
+              lines += ["| Benchmark | Base mean | Head mean | Δ time | Base alloc | Head alloc | Δ alloc |",
+                        "|---|---:|---:|---:|---:|---:|---:|"]
+              def pct(new, old):
+                  return 0.0 if old == 0 else (new - old) / old * 100
+              for name in sorted(head):
+                  h_t, h_a = head[name]
+                  if name not in base:
+                      lines.append(f"| `{name.split('.')[-1]}` | – | {h_t:,.1f} ns | new | – | {h_a:,} B | new |")
+                      continue
+                  b_t, b_a = base[name]
+                  dt, da = pct(h_t, b_t), pct(h_a, b_a)
+                  # A benchmark that allocated nothing and now allocates has no finite
+                  # percentage; treat any new allocation as a regression.
+                  new_alloc = b_a == 0 and h_a > 0
+                  flag = dt > t_max or new_alloc or (b_a > 0 and da > a_max)
+                  regressed |= flag
+                  alloc_delta = "new allocation" if new_alloc else f"{da:+.1f}%"
+                  lines.append(f"| {'⚠️ ' if flag else ''}`{name.split('.')[-1]}` | {b_t:,.1f} ns | {h_t:,.1f} ns | {dt:+.1f}% | {b_a:,} B | {h_a:,} B | {alloc_delta} |")
+              lines += ["", f"Thresholds: time +{t_max:g}%, allocations +{a_max:g}%. "
+                        "Add the `perf-impact-acknowledged` label (then push) to accept a flagged regression."]
+          open("comment.md", "w", encoding="utf-8").write("\n".join(lines) + "\n")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+              f.write(f"regressed={'true' if regressed else 'false'}\n")
+          PY
+          cat comment.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload comment and raw results
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: pr-benchmarks
+          path: |
+            comment.md
+            head.json
+            base.json
+          if-no-files-found: ignore
+
+  comment:
+    name: Post benchmark comment
+    needs: bench
+    if: always() && needs.bench.result != 'cancelled'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Download comment
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c  # v8.0.1
+        with:
+          name: pr-benchmarks
+
+      - name: Create or replace the PR comment
+        # A fork PR's token cannot write; the table is still in the job summary.
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          id=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
+                 --jq '.[] | select(.body | startswith("<!-- pr-benchmarks -->")) | .id' | head -1)
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/$REPO/issues/comments/$id" -F body=@comment.md > /dev/null
+          else
+            gh api -X POST "repos/$REPO/issues/$PR/comments" -F body=@comment.md > /dev/null
+          fi
+
+      - name: Gate on regressions
+        env:
+          REGRESSED: ${{ needs.bench.outputs.regressed }}
+          ACKNOWLEDGED: ${{ contains(github.event.pull_request.labels.*.name, 'perf-impact-acknowledged') }}
+        run: |
+          if [ "$REGRESSED" = "true" ] && [ "$ACKNOWLEDGED" != "true" ]; then
+            echo "::error::A benchmark regressed past the threshold (see the PR comment). Fix it, or add the perf-impact-acknowledged label and push."
+            exit 1
+          fi
+          echo "No unacknowledged benchmark regressions."
