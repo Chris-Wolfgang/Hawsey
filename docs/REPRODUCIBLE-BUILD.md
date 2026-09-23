@@ -14,10 +14,19 @@ tagged source compiles to. This guide covers:
   and `lib/net10.0/Wolfgang.Hawsey.Engine.dll`. CI builds are deterministic
   (`Deterministic` plus `ContinuousIntegrationBuild`, which also normalises
   source paths to `/_/`). Two independent clones of the same commit at different
-  paths produce identical DLLs. CI checks this on every change (#82).
-- **The `.nupkg` file is not.** NuGet writes zip metadata that varies per pack,
-  so two packs of identical DLLs hash differently. Compare the DLLs *inside* the
-  package, never the package's own hash.
+  paths produce identical DLLs on the same OS and SDK. CI checks this on every
+  change by building twice on Windows and twice on Linux (#82).
+- **Rebuild on the release OS: Windows.** Reproducibility holds for the same OS
+  and the same SDK, not *across* operating systems. MSBuild writes the sources it
+  generates (`AssemblyInfo.cs`, `GlobalUsings.g.cs`, the target-framework
+  attributes) with the OS line ending: CRLF on Windows, LF on Linux and macOS.
+  Their checksums go into the PDB, and the DLL records the PDB's ID, so a Linux
+  rebuild of the same commit gives a different DLL even though the IL is the same.
+  Releases are built on `windows-latest` (the manifest's `os` field), so verify on
+  Windows.
+- **The `.nupkg` file is not reproducible.** NuGet writes zip metadata that varies
+  per pack, so two packs of identical DLLs hash differently. Compare the DLLs
+  *inside* the package, never the package's own hash.
 
 ## Tooling
 
@@ -33,6 +42,7 @@ called `manifest.json`:
   "version": "0.2.0",
   "commit": "<40-char commit SHA the tag points at>",
   "sdk": "10.0.400",
+  "os": "windows",
   "copyright": "Copyright (c) 2026 Chris Wolfgang",
   "assemblies": {
     "lib/netstandard2.0/Wolfgang.Hawsey.Engine.dll": "<sha256>",
