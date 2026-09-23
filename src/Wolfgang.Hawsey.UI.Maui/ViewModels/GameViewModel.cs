@@ -182,17 +182,25 @@ public partial class GameViewModel : INotifyPropertyChanged
 
     private async Task PlaceBidAsync(string bidString)
     {
+        BidAction? bid = null;
+
         if (string.Equals(bidString, "pass", StringComparison.Ordinal))
         {
-            _gameService.PlaceHumanBid(BidAction.PassBid.Instance);
+            bid = BidAction.PassBid.Instance;
         }
         else if (string.Equals(bidString, "hawsey", StringComparison.Ordinal))
         {
-            _gameService.PlaceHumanBid(BidAction.HawseyBid.Instance);
+            bid = BidAction.HawseyBid.Instance;
         }
         else if (int.TryParse(bidString, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out var amount))
         {
-            _gameService.PlaceHumanBid(new BidAction.NumberBid(amount));
+            bid = new BidAction.NumberBid(amount);
+        }
+
+        // A stale tap (not the human's turn to bid any more) is ignored by the service.
+        if (bid == null || !_gameService.PlaceHumanBid(bid))
+        {
+            return;
         }
 
         IsBiddingVisible = false;
@@ -212,8 +220,12 @@ public partial class GameViewModel : INotifyPropertyChanged
             _ => null
         };
 
+        if (!_gameService.SelectTrump(trump))
+        {
+            return;
+        }
+
         IsTrumpPickerVisible = false;
-        _gameService.SelectTrump(trump);
         await AdvanceGameAsync().ConfigureAwait(true);
     }
 
@@ -226,7 +238,13 @@ public partial class GameViewModel : INotifyPropertyChanged
             return;
         }
 
-        _gameService.PlayHumanCard(cardVm.Card);
+        // A double-tap, or a tap that lands during an AI turn, is rejected by the
+        // service; only an accepted move advances the game.
+        if (!_gameService.PlayHumanCard(cardVm.Card))
+        {
+            return;
+        }
+
         await AdvanceGameAsync().ConfigureAwait(true);
     }
 
