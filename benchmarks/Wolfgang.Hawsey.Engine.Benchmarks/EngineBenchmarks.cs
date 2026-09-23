@@ -23,7 +23,22 @@ public class EngineBenchmarks
     private List<Card> _hand = [];
     private CardComparer _comparer = new(Suit.Hearts, Suit.Spades);
     private Card _currentWinner;
-    private Random _shuffleRandom = new(42);
+    private Random _shuffleRandom = Seeded(42);
+
+
+
+    /// <summary>
+    /// Every benchmark input is dealt from a fixed seed so each run measures identical
+    /// work. S2245 (use a cryptographic RNG) does not apply: benchmark dealing is not
+    /// security-sensitive and must be reproducible, so it is suppressed at this one
+    /// construction site.
+    /// </summary>
+    private static Random Seeded(int seed)
+    {
+#pragma warning disable S2245
+        return new Random(seed);
+#pragma warning restore S2245
+    }
 
 
 
@@ -31,10 +46,10 @@ public class EngineBenchmarks
     public void Setup()
     {
         _deck = Deck.CreatePinochleDeck();
-        _hand = Deck.Shuffle(_deck, new Random(42)).Take(12).ToList();
+        _hand = Deck.Shuffle(_deck, Seeded(42)).Take(12).ToList();
         _comparer = new CardComparer(Suit.Hearts, Suit.Spades);
         _currentWinner = new Card(Rank.Ten, Suit.Spades);
-        _shuffleRandom = new Random(42);
+        _shuffleRandom = Seeded(42);
     }
 
 
@@ -66,7 +81,7 @@ public class EngineBenchmarks
 
     [Benchmark]
     public GameState PlayFullGame() =>
-        _runner.RunGame(new FirstLegalCardStrategy(), _rules, PlayerPosition.South, new Random(7));
+        _runner.RunGame(new FirstLegalCardStrategy(), _rules, PlayerPosition.South, Seeded(7));
 
 
 
