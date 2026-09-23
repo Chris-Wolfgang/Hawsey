@@ -90,6 +90,17 @@ jobs:
             hashes-${{ matrix.os }}-${{ matrix.copy }}.txt
             hashes-${{ matrix.os }}-${{ matrix.copy }}.sdk
 
+      # The binaries themselves, so a divergence can be diagnosed (diff the PDB
+      # documents / IL) instead of only detected.
+      - name: Upload assemblies and PDBs
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: binaries-${{ matrix.os }}-${{ matrix.copy }}
+          path: |
+            ${{ matrix.path }}/src/Wolfgang.Hawsey.Engine/bin/Release/*/Wolfgang.Hawsey.Engine.dll
+            ${{ matrix.path }}/src/Wolfgang.Hawsey.Engine/bin/Release/*/Wolfgang.Hawsey.Engine.pdb
+          retention-days: 7
+
   compare:
     name: Compare independent builds
     needs: build
