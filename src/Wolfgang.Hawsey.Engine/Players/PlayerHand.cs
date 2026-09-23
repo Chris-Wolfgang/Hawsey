@@ -1,4 +1,6 @@
-namespace Wolfgang.Hawsey.Engine;
+using Wolfgang.Hawsey.Engine.Cards;
+
+namespace Wolfgang.Hawsey.Engine.Players;
 
 /// <summary>
 /// Represents a player's hand of cards. Cards can be added and removed

@@ -1,4 +1,4 @@
-namespace Wolfgang.Hawsey.Engine;
+namespace Wolfgang.Hawsey.Engine.Players;
 
 /// <summary>
 /// Represents one of the two teams in a Hawsey game.

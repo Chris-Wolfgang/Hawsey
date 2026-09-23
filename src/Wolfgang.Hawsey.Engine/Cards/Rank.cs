@@ -1,4 +1,4 @@
-namespace Wolfgang.Hawsey.Engine;
+namespace Wolfgang.Hawsey.Engine.Cards;
 
 /// <summary>
 /// Represents the ranks in a pinochle deck (9 through Ace).

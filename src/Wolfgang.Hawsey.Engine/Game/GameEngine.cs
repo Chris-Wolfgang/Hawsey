@@ -1,4 +1,11 @@
-namespace Wolfgang.Hawsey.Engine;
+using Wolfgang.Hawsey.Engine.Bidding;
+using Wolfgang.Hawsey.Engine.Cards;
+using Wolfgang.Hawsey.Engine.Players;
+using Wolfgang.Hawsey.Engine.Rules;
+using Wolfgang.Hawsey.Engine.Scoring;
+using Wolfgang.Hawsey.Engine.TrickPlay;
+
+namespace Wolfgang.Hawsey.Engine.Game;
 
 /// <summary>
 /// The core game engine that manages state transitions for a Hawsey game.

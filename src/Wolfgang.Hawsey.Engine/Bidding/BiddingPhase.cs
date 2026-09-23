@@ -1,4 +1,6 @@
-namespace Wolfgang.Hawsey.Engine;
+using Wolfgang.Hawsey.Engine.Players;
+
+namespace Wolfgang.Hawsey.Engine.Bidding;
 
 /// <summary>
 /// Manages a single round of bidding. Players bid clockwise starting from

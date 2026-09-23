@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace Wolfgang.Hawsey.Engine;
+namespace Wolfgang.Hawsey.Engine.Cards;
 
 /// <summary>
 /// Represents a single playing card in a pinochle deck.

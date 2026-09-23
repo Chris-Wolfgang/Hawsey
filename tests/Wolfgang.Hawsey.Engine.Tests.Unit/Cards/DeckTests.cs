@@ -1,4 +1,5 @@
-using Wolfgang.Hawsey.Engine;
+
+using Wolfgang.Hawsey.Engine.Cards;
 
 namespace Wolfgang.Hawsey.Engine.Tests.Unit.Cards;
 

@@ -1,3 +1,6 @@
+using Wolfgang.Hawsey.Engine.Players;
+using Wolfgang.Hawsey.Engine.Scoring;
+
 namespace Wolfgang.Hawsey.Engine.Tests.Unit.Scoring;
 
 public class GameResultTests

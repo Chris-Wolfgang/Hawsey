@@ -1,4 +1,6 @@
-namespace Wolfgang.Hawsey.Engine;
+using Wolfgang.Hawsey.Engine.Players;
+
+namespace Wolfgang.Hawsey.Engine.Scoring;
 
 /// <summary>
 /// Computes the scoring result for a single round of Hawsey.

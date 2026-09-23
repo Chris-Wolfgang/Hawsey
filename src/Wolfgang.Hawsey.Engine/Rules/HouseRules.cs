@@ -1,4 +1,4 @@
-namespace Wolfgang.Hawsey.Engine;
+namespace Wolfgang.Hawsey.Engine.Rules;
 
 /// <summary>
 /// Configurable house rules for a Hawsey game.

@@ -1,4 +1,9 @@
-namespace Wolfgang.Hawsey.Engine;
+using Wolfgang.Hawsey.Engine.Bidding;
+using Wolfgang.Hawsey.Engine.Game;
+using Wolfgang.Hawsey.Engine.Players;
+using Wolfgang.Hawsey.Engine.Rules;
+
+namespace Wolfgang.Hawsey.Engine.Strategy;
 
 /// <summary>
 /// Convenience wrapper that runs a full Hawsey game to completion

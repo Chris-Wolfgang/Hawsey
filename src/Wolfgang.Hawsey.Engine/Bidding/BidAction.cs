@@ -1,4 +1,4 @@
-namespace Wolfgang.Hawsey.Engine;
+namespace Wolfgang.Hawsey.Engine.Bidding;
 
 /// <summary>
 /// Represents an action a player can take during the bidding phase.

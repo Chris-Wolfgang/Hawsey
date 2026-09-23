@@ -1,4 +1,4 @@
-namespace Wolfgang.Hawsey.Engine;
+namespace Wolfgang.Hawsey.Engine.Players;
 
 /// <summary>
 /// Represents a player's position at the table.

@@ -1,4 +1,4 @@
-namespace Wolfgang.Hawsey.Engine;
+namespace Wolfgang.Hawsey.Engine.Game;
 
 /// <summary>
 /// Represents the current phase of a Hawsey game.

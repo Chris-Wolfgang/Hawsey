@@ -1,4 +1,6 @@
-namespace Wolfgang.Hawsey.Engine;
+using Wolfgang.Hawsey.Engine.Players;
+
+namespace Wolfgang.Hawsey.Engine.Bidding;
 
 /// <summary>
 /// Represents the outcome of a bidding phase.
