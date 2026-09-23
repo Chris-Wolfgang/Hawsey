@@ -86,14 +86,23 @@ jobs:
     permissions:
       issues: write
     steps:
-      - name: Open issue
+      - name: Open or update the tracking issue
+        # One open issue per failure stream: a repeat failure comments on it
+        # instead of opening a new issue on every scheduled run.
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          TITLE: "Coyote: a concurrency bug was found in GameService"
         run: |
+          existing=$(gh issue list --repo "$REPO" --state open --limit 100 --json number,title \
+                       --jq '.[] | select(.title == env.TITLE) | .number' | head -1)
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$REPO" --body "Failed again: $RUN_URL (download the \`coyote-results\` artifact for the bug report)."
+            exit 0
+          fi
           gh issue create --repo "$REPO" \
-            --title "Coyote: a concurrency bug was found in GameService" \
+            --title "$TITLE" \
             --label bug \
             --body "The scheduled Coyote run failed: $RUN_URL
 
