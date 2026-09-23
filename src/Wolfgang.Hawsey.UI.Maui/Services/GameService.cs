@@ -222,14 +222,14 @@ public class GameService
 
 
     /// <summary>
-    /// Applies a Hawsey exchange. Returns false, and changes nothing, outside
-    /// the Hawsey exchange phase.
+    /// Applies the human's Hawsey exchange. Returns false, and changes nothing,
+    /// unless the game is in the Hawsey exchange phase with the human as bidder.
     /// </summary>
     public bool PerformHawseyExchange(Card[] discard, Card[] fromPartner)
     {
         lock (_sync)
         {
-            if (_state is not { Phase: GamePhase.HawseyExchange })
+            if (_state is not { Phase: GamePhase.HawseyExchange, HawseyBidder: HumanPosition })
             {
                 return false;
             }
@@ -355,6 +355,13 @@ public class GameService
             {
                 TrickCompleted?.Invoke(this, outcome.TrickCompleted);
                 await Task.Delay(800).ConfigureAwait(false);
+
+                // New Game during the pause: the finished game's round or game end
+                // must not be announced into the new game.
+                if (generation != CurrentGeneration())
+                {
+                    return false;
+                }
             }
 
             if (outcome.RoundCompleted)
