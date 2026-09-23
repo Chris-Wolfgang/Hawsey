@@ -8,6 +8,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Wolfgang.Hawsey.Engine.Tests.Unit/Wolfgang.Hawsey.Engine.Tests.Unit.csproj" />
+    <Project Path="tests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency.csproj" />
     <Project Path="tests/Wolfgang.Hawsey.UI.Maui.Tests.Unit/Wolfgang.Hawsey.UI.Maui.Tests.Unit.csproj" />
   </Folder>
 </Solution>
