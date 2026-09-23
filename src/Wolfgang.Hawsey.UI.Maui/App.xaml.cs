@@ -1,6 +1,6 @@
 namespace Wolfgang.Hawsey.UI.Maui;
 
-public partial class App : Application
+public partial class App
 {
     public App()
     {
