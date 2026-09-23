@@ -23,6 +23,7 @@ public class EngineBenchmarks
     private List<Card> _hand = [];
     private CardComparer _comparer = new(Suit.Hearts, Suit.Spades);
     private Card _currentWinner;
+    private Random _shuffleRandom = new(42);
 
 
 
@@ -33,12 +34,17 @@ public class EngineBenchmarks
         _hand = Deck.Shuffle(_deck, new Random(42)).Take(12).ToList();
         _comparer = new CardComparer(Suit.Hearts, Suit.Spades);
         _currentWinner = new Card(Rank.Ten, Suit.Spades);
+        _shuffleRandom = new Random(42);
     }
 
 
 
+    /// <summary>
+    /// Shuffle only: the RNG lives in benchmark state (seeded once in setup), so
+    /// constructing it is not timed or counted as an allocation.
+    /// </summary>
     [Benchmark]
-    public IReadOnlyList<Card> Shuffle() => Deck.Shuffle(_deck, new Random(42));
+    public IReadOnlyList<Card> Shuffle() => Deck.Shuffle(_deck, _shuffleRandom);
 
 
 
