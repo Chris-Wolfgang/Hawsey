@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Native AOT consumer of the engine (issue #79). `dotnet publish -r <rid>`
+       trims and AOT-compiles the engine with it; running the binary proves the
+       trimmed engine plays whole games. The aot-smoke workflow does both. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <PublishAot>true</PublishAot>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Wolfgang.Hawsey.Engine\Wolfgang.Hawsey.Engine.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/examples/">
+    <Project Path="examples/Wolfgang.Hawsey.Engine.AotSmoke/Wolfgang.Hawsey.Engine.AotSmoke.csproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/Wolfgang.Hawsey.Engine/Wolfgang.Hawsey.Engine.csproj" />
     <Project Path="src/Wolfgang.Hawsey.UI.Maui/Wolfgang.Hawsey.UI.Maui.csproj" />
