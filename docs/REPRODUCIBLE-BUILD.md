@@ -67,8 +67,11 @@ the commit named in the attestation. That commit must match the manifest's
 git clone https://github.com/Chris-Wolfgang/Hawsey.git && cd Hawsey
 git checkout <commit from the manifest>
 
-# Install exactly the manifest's SDK (https://dot.net/v1/dotnet-install.sh or .ps1)
-./dotnet-install.sh --version <sdk from the manifest>
+# Install exactly the manifest's SDK into a private directory and put it first
+# on PATH, so no machine-wide SDK can be picked up instead.
+curl -sSL https://dot.net/v1/dotnet-install.sh -o dotnet-install.sh
+bash dotnet-install.sh --version <sdk from the manifest> --install-dir "$HOME/.dotnet-repro"
+export DOTNET_ROOT="$HOME/.dotnet-repro" PATH="$HOME/.dotnet-repro:$PATH"
 dotnet --version        # must print the manifest's sdk
 
 # CI=true turns on ContinuousIntegrationBuild (deterministic paths).
@@ -77,6 +80,16 @@ CI=true dotnet build src/Wolfgang.Hawsey.Engine -c Release \
 
 sha256sum src/Wolfgang.Hawsey.Engine/bin/Release/netstandard2.0/Wolfgang.Hawsey.Engine.dll \
           src/Wolfgang.Hawsey.Engine/bin/Release/net10.0/Wolfgang.Hawsey.Engine.dll
+```
+
+On Windows (PowerShell) the install step is:
+
+```powershell
+Invoke-WebRequest https://dot.net/v1/dotnet-install.ps1 -OutFile dotnet-install.ps1
+./dotnet-install.ps1 -Version <sdk from the manifest> -InstallDir "$env:USERPROFILE\.dotnet-repro"
+$env:DOTNET_ROOT = "$env:USERPROFILE\.dotnet-repro"; $env:PATH = "$env:DOTNET_ROOT;$env:PATH"
+$env:CI = 'true'; dotnet build src/Wolfgang.Hawsey.Engine -c Release -p:Copyright="<copyright from the manifest>"
+Get-FileHash src/Wolfgang.Hawsey.Engine/bin/Release/*/Wolfgang.Hawsey.Engine.dll -Algorithm SHA256
 ```
 
 Then hash the DLLs inside the published package (a `.nupkg` is a zip file):
