@@ -1,4 +1,3 @@
-using FsCheck.Xunit;
 using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Players;
 using Wolfgang.Hawsey.Engine.Rules;
@@ -29,7 +28,7 @@ public class EnginePropertyTests
 
 
 
-    [Property]
+    [FuzzProperty]
     public void Shuffle_for_any_seed_returns_a_permutation_of_the_deck(int seed)
     {
         var deck = Deck.CreatePinochleDeck();
@@ -45,7 +44,7 @@ public class EnginePropertyTests
 
 
 
-    [Property]
+    [FuzzProperty]
     public void Compare_for_any_two_cards_is_antisymmetric(int seed, int trump, int led, bool noTrump)
     {
         var cards = ShuffledDeck(seed);
@@ -59,7 +58,7 @@ public class EnginePropertyTests
 
 
 
-    [Property]
+    [FuzzProperty]
     public void Compare_for_any_card_against_itself_is_zero(int seed, int trump, int led)
     {
         var card = ShuffledDeck(seed)[0];
@@ -70,7 +69,7 @@ public class EnginePropertyTests
 
 
 
-    [Property]
+    [FuzzProperty]
     public void GetLegalPlays_for_any_hand_is_a_nonempty_subset_of_the_hand
     (
         int seed,
@@ -104,7 +103,7 @@ public class EnginePropertyTests
 
 
 
-    [Property]
+    [FuzzProperty]
     public void GetLegalPlays_when_the_hand_can_follow_suit_only_allows_the_led_suit
     (
         int seed,
@@ -139,7 +138,7 @@ public class EnginePropertyTests
 
 
 
-    [Property]
+    [FuzzProperty]
     public void Left_bower_for_any_trump_is_trump_and_ranks_just_below_the_right_bower(int trump)
     {
         var trumpSuit = SuitFrom(trump);
@@ -151,7 +150,7 @@ public class EnginePropertyTests
 
 
 
-    [Property]
+    [FuzzProperty]
     public void Seat_rotation_for_any_seat_returns_home_after_four_steps(int seat)
     {
         var start = Positions[Math.Abs(seat % Positions.Length)];
@@ -163,7 +162,7 @@ public class EnginePropertyTests
 
 
 
-    [Property]
+    [FuzzProperty]
     public void Partner_for_any_seat_is_on_the_same_team_and_is_its_own_inverse(int seat)
     {
         var position = Positions[Math.Abs(seat % Positions.Length)];
@@ -175,7 +174,7 @@ public class EnginePropertyTests
 
 
 
-    [Property]
+    [FuzzProperty]
     public void RoundScore_for_any_number_bid_scores_tricks_when_made_and_minus_bid_when_set(int bid, int tricks)
     {
         var bidAmount = 6 + Math.Abs(bid % 7);
