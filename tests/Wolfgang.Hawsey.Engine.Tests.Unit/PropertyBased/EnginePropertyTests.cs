@@ -85,9 +85,15 @@ public class EnginePropertyTests
         var hand = deck.Take(1 + Math.Abs(handSize % 12)).ToList();
         var trumpSuit = SuitFrom(trump);
         Suit? ledSuit = leading ? null : SuitFrom(led);
+        // Nullable projection: when no card of the led suit lies outside the hand,
+        // there is no current winner (null), never a zero-valued default(Card).
         var winning = ledSuit is null
-            ? (Card?)null
-            : deck.Skip(12).FirstOrDefault(c => CardRanking.GetEffectiveSuit(c, trumpSuit) == ledSuit);
+            ? null
+            : deck
+                .Skip(12)
+                .Where(c => CardRanking.GetEffectiveSuit(c, trumpSuit) == ledSuit)
+                .Select(c => (Card?)c)
+                .FirstOrDefault();
         var rules = new HouseRules { MustBeat = mustBeat };
 
         var legal = FollowSuitValidator.GetLegalPlays(hand, ledSuit, trumpSuit, rules, winning);
@@ -123,7 +129,11 @@ public class EnginePropertyTests
         }
         else
         {
-            Assert.Equal(hand.Count, legal.Count);
+            Assert.Equal
+            (
+                hand.OrderBy(c => c.Suit).ThenBy(c => c.Rank),
+                legal.OrderBy(c => c.Suit).ThenBy(c => c.Rank)
+            );
         }
     }
 
