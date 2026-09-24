@@ -252,7 +252,10 @@ jobs:
         shell: bash
     needs: detect-projects
     if: github.repository != 'Chris-Wolfgang/repo-template' && needs.detect-projects.outputs.has-projects == 'true'
-    timeout-minutes: 20
+    # 35, not the template's 20: this repo's MAUI app makes the job run `dotnet
+    # workload restore` (4-16 min depending on the runner) before a whole-solution
+    # build; a normal run is ~17 min, so 20 cancelled it on every slow runner.
+    timeout-minutes: 35
     permissions:
       contents: read
 
