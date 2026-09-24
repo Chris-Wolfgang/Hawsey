@@ -1,4 +1,10 @@
-namespace Wolfgang.Hawsey.Engine;
+using Wolfgang.Hawsey.Engine.Bidding;
+using Wolfgang.Hawsey.Engine.Cards;
+using Wolfgang.Hawsey.Engine.Players;
+using Wolfgang.Hawsey.Engine.Rules;
+using Wolfgang.Hawsey.Engine.TrickPlay;
+
+namespace Wolfgang.Hawsey.Engine.Game;
 
 /// <summary>
 /// A snapshot of the entire game state at a point in time. Each method on

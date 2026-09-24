@@ -5,12 +5,21 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using Wolfgang.Hawsey.Engine;
+using Wolfgang.Hawsey.Engine.Bidding;
+using Wolfgang.Hawsey.Engine.Cards;
+using Wolfgang.Hawsey.Engine.Game;
+using Wolfgang.Hawsey.Engine.Players;
+using Wolfgang.Hawsey.Engine.Rules;
 using Wolfgang.Hawsey.UI.Maui.Services;
 
 namespace Wolfgang.Hawsey.UI.Maui.ViewModels;
 
-public class GameViewModel : INotifyPropertyChanged
+// `partial` is required on the Windows TFM: GameViewModel implements WinRT-projected
+// interfaces, and the CsWinRT AOT source generator emits the other part of this
+// class there (without it, CsWinRT1028). InspectCode analyzes a slice where that
+// generator does not run, sees a single part, and reports the modifier as redundant.
+// ReSharper disable once PartialTypeWithSinglePart
+public partial class GameViewModel : INotifyPropertyChanged
 {
     private readonly GameService _gameService;
     private string _statusMessage = "Welcome to Hawsey! Tap New Game to start.";
@@ -173,17 +182,25 @@ public class GameViewModel : INotifyPropertyChanged
 
     private async Task PlaceBidAsync(string bidString)
     {
+        BidAction? bid = null;
+
         if (string.Equals(bidString, "pass", StringComparison.Ordinal))
         {
-            _gameService.PlaceHumanBid(BidAction.PassBid.Instance);
+            bid = BidAction.PassBid.Instance;
         }
         else if (string.Equals(bidString, "hawsey", StringComparison.Ordinal))
         {
-            _gameService.PlaceHumanBid(BidAction.HawseyBid.Instance);
+            bid = BidAction.HawseyBid.Instance;
         }
         else if (int.TryParse(bidString, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out var amount))
         {
-            _gameService.PlaceHumanBid(new BidAction.NumberBid(amount));
+            bid = new BidAction.NumberBid(amount);
+        }
+
+        // A stale tap (not the human's turn to bid any more) is ignored by the service.
+        if (bid == null || !_gameService.PlaceHumanBid(bid))
+        {
+            return;
         }
 
         IsBiddingVisible = false;
@@ -203,8 +220,12 @@ public class GameViewModel : INotifyPropertyChanged
             _ => null
         };
 
+        if (!_gameService.SelectTrump(trump))
+        {
+            return;
+        }
+
         IsTrumpPickerVisible = false;
-        _gameService.SelectTrump(trump);
         await AdvanceGameAsync().ConfigureAwait(true);
     }
 
@@ -217,7 +238,13 @@ public class GameViewModel : INotifyPropertyChanged
             return;
         }
 
-        _gameService.PlayHumanCard(cardVm.Card);
+        // A double-tap, or a tap that lands during an AI turn, is rejected by the
+        // service; only an accepted move advances the game.
+        if (!_gameService.PlayHumanCard(cardVm.Card))
+        {
+            return;
+        }
+
         await AdvanceGameAsync().ConfigureAwait(true);
     }
 
@@ -485,22 +512,21 @@ public class GameViewModel : INotifyPropertyChanged
             for (var i = 0; i < state.CurrentTrick.Plays.Count; i++)
             {
                 var play = state.CurrentTrick.Plays[i];
-                TrickCards.Add(new TrickCardViewModel(play.Card, play.Player));
+                TrickCards.Add(new TrickCardViewModel(play.Card));
             }
         }
     }
 
 
 
-    private bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    private void SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
         if (EqualityComparer<T>.Default.Equals(field, value))
         {
-            return false;
+            return;
         }
 
         field = value;
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        return true;
     }
 }

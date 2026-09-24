@@ -1,4 +1,4 @@
-namespace Wolfgang.Hawsey.Engine;
+namespace Wolfgang.Hawsey.Engine.Cards;
 
 /// <summary>
 /// Factory for creating and shuffling a pinochle deck.

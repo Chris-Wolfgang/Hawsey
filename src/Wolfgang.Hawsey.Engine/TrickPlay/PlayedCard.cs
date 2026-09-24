@@ -1,4 +1,7 @@
-namespace Wolfgang.Hawsey.Engine;
+using Wolfgang.Hawsey.Engine.Cards;
+using Wolfgang.Hawsey.Engine.Players;
+
+namespace Wolfgang.Hawsey.Engine.TrickPlay;
 
 /// <summary>
 /// Represents a card that has been played in a trick, along with

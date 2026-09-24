@@ -1,4 +1,6 @@
-using Wolfgang.Hawsey.Engine;
+
+using Wolfgang.Hawsey.Engine.Players;
+using Wolfgang.Hawsey.Engine.Scoring;
 
 namespace Wolfgang.Hawsey.Engine.Tests.Unit.Scoring;
 

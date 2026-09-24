@@ -1,13 +1,12 @@
-using Wolfgang.Hawsey.Engine;
+
+using Wolfgang.Hawsey.Engine.Cards;
 
 namespace Wolfgang.Hawsey.UI.Maui.ViewModels;
 
 public class TrickCardViewModel
 {
-    public TrickCardViewModel(Card card, PlayerPosition player)
+    public TrickCardViewModel(Card card)
     {
-        Card = card;
-        Player = player;
         RankText = card.Rank switch
         {
             Rank.Nine => "9",
@@ -31,8 +30,6 @@ public class TrickCardViewModel
 
 
 
-    public Card Card { get; }
-    public PlayerPosition Player { get; }
     public string RankText { get; }
     public string SuitSymbol { get; }
     public Color SuitColor { get; }

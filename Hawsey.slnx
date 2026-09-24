@@ -1,10 +1,17 @@
 <Solution>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/Wolfgang.Hawsey.Engine.Benchmarks/Wolfgang.Hawsey.Engine.Benchmarks.csproj" />
+  </Folder>
+  <Folder Name="/examples/">
+    <Project Path="examples/Wolfgang.Hawsey.Engine.AotSmoke/Wolfgang.Hawsey.Engine.AotSmoke.csproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/Wolfgang.Hawsey.Engine/Wolfgang.Hawsey.Engine.csproj" />
     <Project Path="src/Wolfgang.Hawsey.UI.Maui/Wolfgang.Hawsey.UI.Maui.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Wolfgang.Hawsey.Engine.Tests.Unit/Wolfgang.Hawsey.Engine.Tests.Unit.csproj" />
+    <Project Path="tests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency.csproj" />
     <Project Path="tests/Wolfgang.Hawsey.UI.Maui.Tests.Unit/Wolfgang.Hawsey.UI.Maui.Tests.Unit.csproj" />
   </Folder>
 </Solution>

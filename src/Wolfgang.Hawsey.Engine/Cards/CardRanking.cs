@@ -1,4 +1,4 @@
-namespace Wolfgang.Hawsey.Engine;
+namespace Wolfgang.Hawsey.Engine.Cards;
 
 /// <summary>
 /// Provides methods to determine the effective suit and rank of a card

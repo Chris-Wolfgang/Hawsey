@@ -1,4 +1,4 @@
-namespace Wolfgang.Hawsey.Engine;
+namespace Wolfgang.Hawsey.Engine.Bidding;
 
 /// <summary>
 /// Represents an action a player can take during the bidding phase.
@@ -30,7 +30,7 @@ public abstract class BidAction
     public sealed class NumberBid : BidAction
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="NumberBid"/> class.
+        /// Initializes a new instance of the <see cref="BidAction.NumberBid"/> class.
         /// </summary>
         /// <param name="amount">The number of tricks being bid.</param>
         public NumberBid(int amount)

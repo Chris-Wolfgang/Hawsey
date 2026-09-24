@@ -1,4 +1,6 @@
-namespace Wolfgang.Hawsey.Engine;
+using Wolfgang.Hawsey.Engine.Players;
+
+namespace Wolfgang.Hawsey.Engine.Bidding;
 
 /// <summary>
 /// Manages a single round of bidding. Players bid clockwise starting from
@@ -10,7 +12,6 @@ public sealed class BiddingPhase
     private readonly PlayerPosition _dealer;
     private readonly int _minimumBid;
     private readonly PlayerPosition[] _biddingOrder;
-    private readonly BidAction?[] _bids;
     private int _currentBidderIndex;
     private int _highestBid;
     private PlayerPosition? _highestBidder;
@@ -29,7 +30,6 @@ public sealed class BiddingPhase
         _dealer = dealer;
         _minimumBid = minimumBid;
         _biddingOrder = new PlayerPosition[4];
-        _bids = new BidAction?[4];
         _currentBidderIndex = 0;
         _highestBid = 0;
 
@@ -93,7 +93,6 @@ public sealed class BiddingPhase
         switch (action)
         {
             case BidAction.PassBid:
-                _bids[_currentBidderIndex] = action;
                 _currentBidderIndex++;
 
                 if (_currentBidderIndex >= 4)
@@ -105,7 +104,6 @@ public sealed class BiddingPhase
 
             case BidAction.NumberBid numberBid:
                 ValidateNumberBid(numberBid);
-                _bids[_currentBidderIndex] = action;
                 _highestBid = numberBid.Amount;
                 _highestBidder = player;
                 _currentBidderIndex++;
@@ -118,7 +116,6 @@ public sealed class BiddingPhase
                 break;
 
             case BidAction.HawseyBid:
-                _bids[_currentBidderIndex] = action;
                 _isHawsey = true;
                 _highestBidder = player;
                 _isComplete = true;

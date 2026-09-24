@@ -1,4 +1,7 @@
-namespace Wolfgang.Hawsey.Engine;
+using Wolfgang.Hawsey.Engine.Cards;
+using Wolfgang.Hawsey.Engine.Rules;
+
+namespace Wolfgang.Hawsey.Engine.TrickPlay;
 
 /// <summary>
 /// Validates which cards in a player's hand are legal to play in the current trick,

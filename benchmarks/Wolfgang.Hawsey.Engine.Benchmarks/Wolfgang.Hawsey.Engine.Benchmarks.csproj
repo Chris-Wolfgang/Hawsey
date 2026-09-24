@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- BenchmarkDotNet baseline for the engine (#32, #90). benchmarks.yaml runs it
+       after every merge to main and charts the history on gh-pages; the per-PR
+       comparison workflow runs it on the PR head and on its base. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Wolfgang.Hawsey.Engine\Wolfgang.Hawsey.Engine.csproj" />
+  </ItemGroup>
+
+</Project>

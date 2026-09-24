@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Coyote systematic-concurrency tests for the MAUI GameService (#73, #834).
+       GameService is compiled in by link (it only needs the engine and the BCL),
+       and after every build `dotnet coyote rewrite` instruments this assembly so
+       Coyote's TestingEngine can control task scheduling and explore
+       interleavings. The CLI comes from .config/dotnet-tools.json
+       (`dotnet tool restore`).
+
+       No coverlet.collector, on purpose (like Wolfgang.Hawsey.UI.Maui.Tests.Unit):
+       coverage instrumentation on top of Coyote's binary rewrite is unsupported,
+       and the linked GameService is production code, not test code, so it must
+       not be counted against the test-assembly coverage gate. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Coyote.Test" Version="1.7.11" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Wolfgang.Hawsey.Engine\Wolfgang.Hawsey.Engine.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\src\Wolfgang.Hawsey.UI.Maui\AI\SimpleAiStrategy.cs" Link="Linked\SimpleAiStrategy.cs" />
+    <Compile Include="..\..\src\Wolfgang.Hawsey.UI.Maui\Services\GameService.cs" Link="Linked\GameService.cs" />
+    <Compile Include="..\..\src\Wolfgang.Hawsey.UI.Maui\Services\GameOverEventArgs.cs" Link="Linked\GameOverEventArgs.cs" />
+    <Compile Include="..\..\src\Wolfgang.Hawsey.UI.Maui\Services\TrickCompletedEventArgs.cs" Link="Linked\TrickCompletedEventArgs.cs" />
+  </ItemGroup>
+
+  <!-- Restore first: any job that builds the solution (tests, InspectCode, CodeQL,
+       Stryker) reaches this target, and not all of them run `dotnet tool restore`.
+       Restore is idempotent and near-instant once the tool is cached. -->
+  <Target Name="CoyoteRewrite" AfterTargets="Build">
+    <Exec Command="dotnet tool restore" WorkingDirectory="$(MSBuildThisFileDirectory)" StandardOutputImportance="low" />
+    <Exec Command="dotnet coyote rewrite &quot;$(TargetPath)&quot;" WorkingDirectory="$(MSBuildThisFileDirectory)" />
+  </Target>
+
+</Project>

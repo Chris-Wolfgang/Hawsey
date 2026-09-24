@@ -1,4 +1,4 @@
-namespace Wolfgang.Hawsey.Engine;
+namespace Wolfgang.Hawsey.Engine.Cards;
 
 /// <summary>
 /// Compares two cards in the context of a trick, taking into account

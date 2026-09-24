@@ -15,6 +15,21 @@
     <Authors>Chris Wolfgang</Authors>
     <Description>Game engine for the Hawsey card game — a 4-player team trick-taking game played with a pinochle deck.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <!-- The engine is reflection-free, so it can promise trimming and Native AOT
+         to consumers. The ILLink analyzers these switch on only exist for
+         net8.0+; the netstandard2.0 slot is unaffected. -->
+    <IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">true</IsAotCompatible>
+    <IsTrimmable Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">true</IsTrimmable>
+  </PropertyGroup>
+
+  <!-- PolySharp emits its polyfill files in a run-dependent order, and the order of
+       source documents is baked into the PDB (and so the DLL's PDB id): with every
+       polyfill generated, two CI builds of one commit differed (found by
+       reproducible-build.yaml). The engine only needs IsExternalInit (records and
+       init accessors on netstandard2.0), and a single generated file has only one
+       order. Add a type here if a netstandard2.0 build reports it missing. -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PolySharpIncludeGeneratedTypes>System.Runtime.CompilerServices.IsExternalInit</PolySharpIncludeGeneratedTypes>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">

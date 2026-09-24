@@ -1,4 +1,5 @@
-using Wolfgang.Hawsey.Engine;
+
+using Wolfgang.Hawsey.Engine.Rules;
 
 namespace Wolfgang.Hawsey.Engine.Tests.Unit.Rules;
 

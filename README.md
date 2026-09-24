@@ -74,7 +74,9 @@ dotnet test
 ### Use the engine
 
 ```csharp
-using Wolfgang.Hawsey.Engine;
+using Wolfgang.Hawsey.Engine.Game;
+using Wolfgang.Hawsey.Engine.Players;
+using Wolfgang.Hawsey.Engine.Rules;
 
 var engine = new GameEngine();
 var rules = HouseRules.Default;
@@ -109,6 +111,23 @@ The `GameRunner` plus an `IPlayerStrategy` per seat is the easiest way to drive 
 - **Contributing Guide:** [CONTRIBUTING.md](CONTRIBUTING.md)
 - **Code of Conduct:** [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 - **Security Policy:** [SECURITY.md](SECURITY.md)
+- **Threat Model:** [docs/THREAT-MODEL.md](docs/THREAT-MODEL.md)
+- **Architecture Decisions:** [docs/adr/](docs/adr/index.md)
+
+---
+
+## 🔍 Verify the Build
+
+Each release carries a signed SLSA provenance attestation and a
+`<PackageId>.<version>.reproducible-build-manifest.json` listing the expected
+SHA-256 of every assembly in the package. You can rebuild from the tagged commit and confirm the
+published DLLs are byte-identical to the source. The full procedure, including
+how to report a match or mismatch as an independent verifier, is in
+[docs/REPRODUCIBLE-BUILD.md](docs/REPRODUCIBLE-BUILD.md).
+
+```bash
+gh attestation verify Wolfgang.Hawsey.Engine.<version>.nupkg   --repo Chris-Wolfgang/Hawsey   --signer-workflow Chris-Wolfgang/Hawsey/.github/workflows/release.yaml
+```
 
 ---
 

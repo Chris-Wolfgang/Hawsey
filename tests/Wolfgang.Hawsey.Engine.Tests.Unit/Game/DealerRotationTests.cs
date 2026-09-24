@@ -1,4 +1,6 @@
-using Wolfgang.Hawsey.Engine;
+
+using Wolfgang.Hawsey.Engine.Game;
+using Wolfgang.Hawsey.Engine.Players;
 
 namespace Wolfgang.Hawsey.Engine.Tests.Unit.Game;
 

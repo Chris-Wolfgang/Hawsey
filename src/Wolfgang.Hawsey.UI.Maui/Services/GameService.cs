@@ -1,4 +1,9 @@
-using Wolfgang.Hawsey.Engine;
+using System.Diagnostics.CodeAnalysis;
+using Wolfgang.Hawsey.Engine.Bidding;
+using Wolfgang.Hawsey.Engine.Cards;
+using Wolfgang.Hawsey.Engine.Game;
+using Wolfgang.Hawsey.Engine.Players;
+using Wolfgang.Hawsey.Engine.Rules;
 using Wolfgang.Hawsey.UI.Maui.AI;
 
 namespace Wolfgang.Hawsey.UI.Maui.Services;
@@ -7,19 +12,39 @@ namespace Wolfgang.Hawsey.UI.Maui.Services;
 /// Wraps the game engine and manages the game lifecycle for the UI.
 /// Human player is always South. AI controls North, East, and West.
 /// </summary>
+/// <remarks>
+/// Thread safety: the AI loops resume on thread-pool threads after their delays
+/// while human moves arrive on the UI thread, and the engine's
+/// <see cref="GameEngine.PlayCard"/> mutates the trick shared with the incoming
+/// state. So every transition of <c>_state</c> runs under <c>_sync</c>, and
+/// each one re-checks, inside the lock, that it is still the right phase and
+/// player's turn. A stale human move (a double-tap, a tap during an AI turn)
+/// is ignored and reported as <c>false</c>. <c>_generation</c> increments on
+/// every new game, so an AI loop that wakes up after New Game stops instead of
+/// playing into the new game. Events are raised outside the lock.
+/// </remarks>
 public class GameService
 {
     public const PlayerPosition HumanPosition = PlayerPosition.South;
 
     private readonly GameEngine _engine = new();
     private readonly SimpleAiStrategy _aiStrategy = new();
+    // MA0158 (use System.Threading.Lock) does not apply here: the Coyote concurrency tests
+    // (tests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency) control lock ordering by rewriting
+    // Monitor, which `lock (object)` compiles to. Coyote 1.7.11 cannot see
+    // System.Threading.Lock: with it, both tests fail with "Potential deadlock or hang
+    // detected" (verified). Keep the Monitor-based lock while the tests rely on Coyote.
+#pragma warning disable MA0158
+    private readonly object _sync = new();
+#pragma warning restore MA0158
     private GameState? _state;
     private BiddingPhase? _biddingPhase;
     private Random _random = new();
+    private int _generation;
 
 
 
-    public GameState? CurrentState => _state;
+    public GameState? CurrentState => Volatile.Read(ref _state);
 
 
 
@@ -39,21 +64,27 @@ public class GameService
 
 
 
-    public bool IsHumanTurn => _state?.NextToAct == HumanPosition;
+    public bool IsHumanTurn => CurrentState?.NextToAct == HumanPosition;
 
 
 
     public void StartNewGame(HouseRules? rules = null)
     {
-        // S2245: System.Random is fine here — this seeds a card-dealer/PRNG for
-        // gameplay, not anything security-sensitive (no keys, no tokens, no
-        // secrets). Cryptographically strong RNG would add cost and dependency
-        // for zero user-facing benefit in a bridge card game.
+        lock (_sync)
+        {
+            // S2245: System.Random is fine here — this seeds a card-dealer/PRNG for
+            // gameplay, not anything security-sensitive (no keys, no tokens, no
+            // secrets). Cryptographically strong RNG would add cost and dependency
+            // for zero user-facing benefit in a bridge card game.
 #pragma warning disable S2245
-        _random = new Random();
+            _random = new Random();
 #pragma warning restore S2245
-        _state = _engine.StartGame(rules ?? HouseRules.Default, PlayerPosition.North, _random);
-        _biddingPhase = new BiddingPhase(_state.Dealer, _state.Rules.MinimumBid);
+            var state = _engine.StartGame(rules ?? HouseRules.Default, PlayerPosition.North, _random);
+            _biddingPhase = new BiddingPhase(state.Dealer, state.Rules.MinimumBid);
+            _generation++;
+            Volatile.Write(ref _state, state);
+        }
+
         StateChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -64,59 +95,94 @@ public class GameService
     /// </summary>
     public async Task<bool> AdvanceAiBiddingAsync()
     {
-        if (_state == null || _biddingPhase == null)
+        var generation = CurrentGeneration();
+
+        while (true)
         {
-            return false;
-        }
+            PlayerPosition bidder;
 
-        while (_state.Phase == GamePhase.Bidding && !_biddingPhase.IsComplete)
-        {
-            var nextBidder = _biddingPhase.GetNextBidder();
-
-            if (!nextBidder.HasValue)
+            lock (_sync)
             {
-                break;
-            }
+                if (!IsBiddingOpen(generation))
+                {
+                    return false;
+                }
 
-            if (nextBidder.Value == HumanPosition)
-            {
-                return true;
+                var next = _biddingPhase.GetNextBidder();
+
+                if (!next.HasValue)
+                {
+                    return false;
+                }
+
+                if (next.Value == HumanPosition)
+                {
+                    return true;
+                }
+
+                bidder = next.Value;
             }
 
             await Task.Delay(400).ConfigureAwait(false);
 
-            var aiBid = _aiStrategy.DecideBid(_state, nextBidder.Value);
-            _state = _engine.PlaceBid(_state, nextBidder.Value, aiBid, _biddingPhase);
+            lock (_sync)
+            {
+                // Another loop, a new game or a human move may have moved on while we slept.
+                if (!IsBiddingOpen(generation) || _biddingPhase.GetNextBidder() != bidder)
+                {
+                    return false;
+                }
+
+                var aiBid = _aiStrategy.DecideBid(_state, bidder);
+                Volatile.Write(ref _state, _engine.PlaceBid(_state, bidder, aiBid, _biddingPhase));
+            }
+
             StateChanged?.Invoke(this, EventArgs.Empty);
         }
-
-        return false;
     }
 
 
 
-    public void PlaceHumanBid(BidAction action)
+    /// <summary>
+    /// Places the human's bid. Returns false, and changes nothing, when it is
+    /// not the human's turn to bid.
+    /// </summary>
+    public bool PlaceHumanBid(BidAction action)
     {
-        if (_state == null || _biddingPhase == null)
+        lock (_sync)
         {
-            return;
+            if (!IsBiddingOpen(_generation) || _biddingPhase.GetNextBidder() != HumanPosition)
+            {
+                return false;
+            }
+
+            Volatile.Write(ref _state, _engine.PlaceBid(_state, HumanPosition, action, _biddingPhase));
         }
 
-        _state = _engine.PlaceBid(_state, HumanPosition, action, _biddingPhase);
         StateChanged?.Invoke(this, EventArgs.Empty);
+        return true;
     }
 
 
 
-    public void SelectTrump(Suit? trumpSuit)
+    /// <summary>
+    /// Names trump for the human. Returns false, and changes nothing, when the
+    /// human is not the one naming trump.
+    /// </summary>
+    public bool SelectTrump(Suit? trumpSuit)
     {
-        if (_state == null)
+        lock (_sync)
         {
-            return;
+            if (_state is not { Phase: GamePhase.TrumpSelection, NextToAct: HumanPosition })
+            {
+                return false;
+            }
+
+            Volatile.Write(ref _state, _engine.SelectTrump(_state, trumpSuit));
         }
 
-        _state = _engine.SelectTrump(_state, trumpSuit);
         StateChanged?.Invoke(this, EventArgs.Empty);
+        return true;
     }
 
 
@@ -126,35 +192,61 @@ public class GameService
     /// </summary>
     public async Task<bool> HandleTrumpSelectionAsync()
     {
-        if (_state == null || _state.Phase != GamePhase.TrumpSelection)
-        {
-            return false;
-        }
+        var generation = CurrentGeneration();
+        PlayerPosition picker;
 
-        if (_state.NextToAct == HumanPosition)
+        lock (_sync)
         {
-            return true;
+            if (generation != _generation || _state is not { Phase: GamePhase.TrumpSelection, NextToAct: { } next })
+            {
+                return false;
+            }
+
+            if (next == HumanPosition)
+            {
+                return true;
+            }
+
+            picker = next;
         }
 
         await Task.Delay(500).ConfigureAwait(false);
 
-        var trump = _aiStrategy.DecideTrump(_state, _state.NextToAct!.Value);
-        SelectTrump(trump);
+        lock (_sync)
+        {
+            if (generation != _generation || _state is not { Phase: GamePhase.TrumpSelection } || _state.NextToAct != picker)
+            {
+                return false;
+            }
 
+            var trump = _aiStrategy.DecideTrump(_state, picker);
+            Volatile.Write(ref _state, _engine.SelectTrump(_state, trump));
+        }
+
+        StateChanged?.Invoke(this, EventArgs.Empty);
         return false;
     }
 
 
 
-    public void PerformHawseyExchange(Card[] discard, Card[] fromPartner)
+    /// <summary>
+    /// Applies the human's Hawsey exchange. Returns false, and changes nothing,
+    /// unless the game is in the Hawsey exchange phase with the human as bidder.
+    /// </summary>
+    public bool PerformHawseyExchange(Card[] discard, Card[] fromPartner)
     {
-        if (_state == null)
+        lock (_sync)
         {
-            return;
+            if (_state is not { Phase: GamePhase.HawseyExchange, HawseyBidder: HumanPosition })
+            {
+                return false;
+            }
+
+            Volatile.Write(ref _state, _engine.ExchangeHawseyCards(_state, discard, fromPartner));
         }
 
-        _state = _engine.ExchangeHawseyCards(_state, discard, fromPartner);
         StateChanged?.Invoke(this, EventArgs.Empty);
+        return true;
     }
 
 
@@ -164,40 +256,90 @@ public class GameService
     /// </summary>
     public async Task<bool> HandleHawseyExchangeAsync()
     {
-        if (_state == null || _state.Phase != GamePhase.HawseyExchange)
-        {
-            return false;
-        }
+        var generation = CurrentGeneration();
+        PlayerPosition bidder;
 
-        if (_state.HawseyBidder == HumanPosition)
+        lock (_sync)
         {
-            return true;
+            if (generation != _generation || _state is not { Phase: GamePhase.HawseyExchange, HawseyBidder: { } hawseyBidder })
+            {
+                return false;
+            }
+
+            if (hawseyBidder == HumanPosition)
+            {
+                return true;
+            }
+
+            bidder = hawseyBidder;
         }
 
         await Task.Delay(500).ConfigureAwait(false);
 
-        _aiStrategy.DecideHawseyExchange(
-            _state,
-            _state.HawseyBidder!.Value,
-            out var discard,
-            out var fromPartner);
+        lock (_sync)
+        {
+            if (generation != _generation || _state is not { Phase: GamePhase.HawseyExchange } || _state.HawseyBidder != bidder)
+            {
+                return false;
+            }
 
-        PerformHawseyExchange(discard, fromPartner);
+            _aiStrategy.DecideHawseyExchange
+            (
+                _state,
+                bidder,
+                out var discard,
+                out var fromPartner
+            );
 
+            Volatile.Write(ref _state, _engine.ExchangeHawseyCards(_state, discard, fromPartner));
+        }
+
+        StateChanged?.Invoke(this, EventArgs.Empty);
         return false;
     }
 
 
 
-    public void PlayHumanCard(Card card)
+    /// <summary>
+    /// Plays the human's card. Returns false, and changes nothing, when it is
+    /// not the human's turn or the card is not a legal play. When the card
+    /// completes a trick, a round or the game, the matching events are raised,
+    /// exactly as for an AI play.
+    /// </summary>
+    public bool PlayHumanCard(Card card)
     {
-        if (_state == null)
+        PlayOutcome outcome;
+
+        lock (_sync)
         {
-            return;
+            if (_state is not { Phase: GamePhase.TrickPlay, NextToAct: HumanPosition } || !_state.GetLegalPlays().Contains(card))
+            {
+                return false;
+            }
+
+            var state = _engine.PlayCard(_state, HumanPosition, card);
+            Volatile.Write(ref _state, state);
+            outcome = OutcomeOf(state);
         }
 
-        _state = _engine.PlayCard(_state, HumanPosition, card);
         StateChanged?.Invoke(this, EventArgs.Empty);
+
+        if (outcome.TrickCompleted != null)
+        {
+            TrickCompleted?.Invoke(this, outcome.TrickCompleted);
+        }
+
+        if (outcome.RoundCompleted)
+        {
+            RoundCompleted?.Invoke(this, EventArgs.Empty);
+        }
+
+        if (outcome.GameOver != null)
+        {
+            GameOver?.Invoke(this, outcome.GameOver);
+        }
+
+        return true;
     }
 
 
@@ -207,67 +349,147 @@ public class GameService
     /// </summary>
     public async Task<bool> AdvanceAiPlaysAsync()
     {
-        if (_state == null)
-        {
-            return false;
-        }
+        var generation = CurrentGeneration();
 
-        while (_state.Phase == GamePhase.TrickPlay)
+        while (true)
         {
-            if (_state.NextToAct == HumanPosition)
+            PlayerPosition player;
+
+            lock (_sync)
             {
-                return true;
+                if (generation != _generation || _state is not { Phase: GamePhase.TrickPlay, NextToAct: { } next })
+                {
+                    return false;
+                }
+
+                if (next == HumanPosition)
+                {
+                    return true;
+                }
+
+                player = next;
             }
 
             await Task.Delay(400).ConfigureAwait(false);
 
-            var player = _state.NextToAct!.Value;
-            var card = _aiStrategy.DecidePlay(_state, player);
-            _state = _engine.PlayCard(_state, player, card);
+            var outcome = PlayAiCard(generation, player);
+
+            if (outcome == null)
+            {
+                return false;
+            }
+
             StateChanged?.Invoke(this, EventArgs.Empty);
 
-            // Check if trick just completed
-            if (_state.CurrentTrick != null && _state.CurrentTrick.Plays.Count == 0 &&
-                _state.CompletedTricks.Count > 0)
+            if (outcome.TrickCompleted != null)
             {
-                var lastTrick = _state.CompletedTricks[_state.CompletedTricks.Count - 1];
-                TrickCompleted?.Invoke(this, new TrickCompletedEventArgs(lastTrick.Winner));
+                TrickCompleted?.Invoke(this, outcome.TrickCompleted);
                 await Task.Delay(800).ConfigureAwait(false);
+
+                // New Game during the pause: the finished game's round or game end
+                // must not be announced into the new game.
+                if (generation != CurrentGeneration())
+                {
+                    return false;
+                }
+            }
+
+            if (outcome.RoundCompleted)
+            {
+                RoundCompleted?.Invoke(this, EventArgs.Empty);
+                return false;
+            }
+
+            if (outcome.GameOver != null)
+            {
+                GameOver?.Invoke(this, outcome.GameOver);
+                return false;
             }
         }
-
-        if (_state.Phase == GamePhase.RoundScoring)
-        {
-            RoundCompleted?.Invoke(this, EventArgs.Empty);
-            return false;
-        }
-
-        if (_state.Phase == GamePhase.GameOver)
-        {
-            var winner = _state.NorthSouthScore >= _state.Rules.PointsToWin
-                ? Team.NorthSouth
-                : Team.EastWest;
-            GameOver?.Invoke(this, new GameOverEventArgs(winner));
-            return false;
-        }
-
-        return false;
     }
 
 
 
     public void StartNextRound()
     {
-        if (_state == null)
+        lock (_sync)
         {
-            return;
+            if (_state is not { Phase: GamePhase.RoundScoring })
+            {
+                return;
+            }
+
+            var state = _engine.StartNextRound(_state, _random);
+            _biddingPhase = new BiddingPhase(state.Dealer, state.Rules.MinimumBid);
+            Volatile.Write(ref _state, state);
         }
 
-        _state = _engine.StartNextRound(_state, _random);
-        _biddingPhase = new BiddingPhase(_state.Dealer, _state.Rules.MinimumBid);
         StateChanged?.Invoke(this, EventArgs.Empty);
     }
+
+
+
+    /// <summary>
+    /// Plays <paramref name="player"/>'s AI card under the lock. Returns null when
+    /// the game moved on while the AI was "thinking" (new game, or no longer that
+    /// player's turn); otherwise what the move completed, so the caller can raise
+    /// the events outside the lock. Only the loop that made the transition reports
+    /// it, so a round or game end is announced exactly once.
+    /// </summary>
+    private PlayOutcome? PlayAiCard(int generation, PlayerPosition player)
+    {
+        lock (_sync)
+        {
+            if (generation != _generation || _state is not { Phase: GamePhase.TrickPlay } || _state.NextToAct != player)
+            {
+                return null;
+            }
+
+            var card = _aiStrategy.DecidePlay(_state, player);
+            var state = _engine.PlayCard(_state, player, card);
+            Volatile.Write(ref _state, state);
+            return OutcomeOf(state);
+        }
+    }
+
+
+
+    /// <summary>
+    /// What a card play completed, read from the state it produced: the trick
+    /// winner when a trick just closed, whether the round ended, and the winning
+    /// team when the game ended. Shared by the AI and human play paths so both
+    /// raise the same events.
+    /// </summary>
+    private static PlayOutcome OutcomeOf(GameState state)
+    {
+        var trickCompleted = state.CompletedTricks.Count > 0 && (state.CurrentTrick == null || state.CurrentTrick.Plays.Count == 0)
+            ? new TrickCompletedEventArgs(state.CompletedTricks[state.CompletedTricks.Count - 1].Winner)
+            : null;
+        var winner = state.NorthSouthScore >= state.Rules.PointsToWin ? Team.NorthSouth : Team.EastWest;
+        var gameOver = state.Phase == GamePhase.GameOver ? new GameOverEventArgs(winner) : null;
+
+        return new PlayOutcome(trickCompleted, state.Phase == GamePhase.RoundScoring, gameOver);
+    }
+
+
+
+    private int CurrentGeneration()
+    {
+        lock (_sync)
+        {
+            return _generation;
+        }
+    }
+
+
+
+    [MemberNotNullWhen(true, nameof(_state), nameof(_biddingPhase))]
+    private bool IsBiddingOpen(int generation) =>
+        generation == _generation
+        && _state is { Phase: GamePhase.Bidding }
+        && _biddingPhase is { IsComplete: false };
+
+
+
+    private sealed record PlayOutcome(TrickCompletedEventArgs? TrickCompleted, bool RoundCompleted, GameOverEventArgs? GameOver);
 }
-
-
-
