@@ -19,7 +19,9 @@ jobs:
   analyze:
     name: "Security Scan (CodeQL)"
     runs-on: windows-latest
-    timeout-minutes: 30
+    # 45, not the template's 30: the MAUI app's `dotnet workload restore` alone takes
+    # 4-16 min here, and a slow runner pushed the job past 30 during analysis.
+    timeout-minutes: 45
     permissions:
       actions: read
       contents: read
