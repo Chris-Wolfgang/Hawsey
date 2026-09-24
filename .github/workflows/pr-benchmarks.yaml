@@ -73,7 +73,13 @@ jobs:
           set -euo pipefail
           source run_suite.sh
           git worktree add ../base "$BASE_SHA"
-          if run_suite "$(cd ../base && pwd)" base.json; then
+          base_root="$(cd ../base && pwd)"
+          # Decide "no project" by the file alone, and run the suite OUTSIDE any
+          # conditional: a function called as an `if` condition runs with errexit
+          # off, so a failing dotnet run / jq would masquerade as "no base" and let
+          # the PR pass without a comparison.
+          if [ -f "$base_root/$BENCH_PROJECT" ]; then
+            run_suite "$base_root" base.json
             echo "has-base=true" >> "$GITHUB_OUTPUT"
           else
             echo "::notice::The base commit has no benchmark project yet; nothing to compare against."
