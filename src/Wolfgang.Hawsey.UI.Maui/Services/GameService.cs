@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Wolfgang.Hawsey.Engine.Bidding;
 using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Game;
@@ -28,7 +29,14 @@ public class GameService
 
     private readonly GameEngine _engine = new();
     private readonly SimpleAiStrategy _aiStrategy = new();
+    // MA0158 (use System.Threading.Lock) does not apply here: the Coyote concurrency tests
+    // (tests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency) control lock ordering by rewriting
+    // Monitor, which `lock (object)` compiles to. Coyote 1.7.11 cannot see
+    // System.Threading.Lock: with it, both tests fail with "Potential deadlock or hang
+    // detected" (verified). Keep the Monitor-based lock while the tests rely on Coyote.
+#pragma warning disable MA0158
     private readonly object _sync = new();
+#pragma warning restore MA0158
     private GameState? _state;
     private BiddingPhase? _biddingPhase;
     private Random _random = new();
@@ -100,7 +108,7 @@ public class GameService
                     return false;
                 }
 
-                var next = _biddingPhase!.GetNextBidder();
+                var next = _biddingPhase.GetNextBidder();
 
                 if (!next.HasValue)
                 {
@@ -120,13 +128,13 @@ public class GameService
             lock (_sync)
             {
                 // Another loop, a new game or a human move may have moved on while we slept.
-                if (!IsBiddingOpen(generation) || _biddingPhase!.GetNextBidder() != bidder)
+                if (!IsBiddingOpen(generation) || _biddingPhase.GetNextBidder() != bidder)
                 {
                     return false;
                 }
 
-                var aiBid = _aiStrategy.DecideBid(_state!, bidder);
-                Volatile.Write(ref _state, _engine.PlaceBid(_state!, bidder, aiBid, _biddingPhase));
+                var aiBid = _aiStrategy.DecideBid(_state, bidder);
+                Volatile.Write(ref _state, _engine.PlaceBid(_state, bidder, aiBid, _biddingPhase));
             }
 
             StateChanged?.Invoke(this, EventArgs.Empty);
@@ -143,12 +151,12 @@ public class GameService
     {
         lock (_sync)
         {
-            if (!IsBiddingOpen(_generation) || _biddingPhase!.GetNextBidder() != HumanPosition)
+            if (!IsBiddingOpen(_generation) || _biddingPhase.GetNextBidder() != HumanPosition)
             {
                 return false;
             }
 
-            Volatile.Write(ref _state, _engine.PlaceBid(_state!, HumanPosition, action, _biddingPhase));
+            Volatile.Write(ref _state, _engine.PlaceBid(_state, HumanPosition, action, _biddingPhase));
         }
 
         StateChanged?.Invoke(this, EventArgs.Empty);
@@ -441,6 +449,7 @@ public class GameService
 
 
 
+    [MemberNotNullWhen(true, nameof(_state), nameof(_biddingPhase))]
     private bool IsBiddingOpen(int generation) =>
         generation == _generation
         && _state is { Phase: GamePhase.Bidding }

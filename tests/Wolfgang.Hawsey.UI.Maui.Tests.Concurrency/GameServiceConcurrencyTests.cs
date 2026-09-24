@@ -45,6 +45,9 @@ public class GameServiceConcurrencyTests
     /// Drives a fresh game until it is South's (the human's) turn to play a card,
     /// passing every human bid and naming hearts if asked.
     /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the game never reaches South's turn within the step limit.
+    /// </exception>
     private static async Task<GameService> ReachHumanCardTurnAsync()
     {
         var service = new GameService();
@@ -106,7 +109,7 @@ public class GameServiceConcurrencyTests
             var second = Task.Run(() => service.PlayHumanCard(legal[legal.Count - 1]));
             await Task.WhenAll(first, second);
 
-            var handAfter = service.CurrentState!.Hands[GameService.HumanPosition].Count;
+            var handAfter = service.CurrentState.Hands[GameService.HumanPosition].Count;
             Assert.Equal(handBefore - 1, handAfter);
         });
     }
@@ -121,9 +124,9 @@ public class GameServiceConcurrencyTests
             var service = new GameService();
             service.StartNewGame();
 
-            // The first game's AI bidding loop is mid-delay when New Game is pressed;
-            // the new game then starts its own loop. Both loops must not advance the
-            // same bidding round.
+            // Scenario: the first game's AI bidding loop is sleeping when New Game is
+            // pressed, and the new game starts its own loop. The two loops must never
+            // advance the same bidding round.
             var oldLoop = Task.Run(service.AdvanceAiBiddingAsync);
             var restart = Task.Run(async () =>
             {
