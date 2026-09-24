@@ -3,6 +3,7 @@ using Microsoft.Coyote.SystematicTesting;
 using Wolfgang.Hawsey.Engine.Bidding;
 using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Game;
+using Wolfgang.Hawsey.Engine.Players;
 using Wolfgang.Hawsey.UI.Maui.Services;
 
 namespace Wolfgang.Hawsey.UI.Maui.Tests.Concurrency;
@@ -22,11 +23,16 @@ public class GameServiceConcurrencyTests
 
 
 
-    private static void RunSystematicTest(Func<Task> scenario)
+    /// <summary>
+    /// Runs <paramref name="scenario"/> under Coyote. A long scenario (a whole game)
+    /// passes a <paramref name="costFactor"/> so it gets a proportionally smaller share
+    /// of the iteration budget and stays quick on every PR run.
+    /// </summary>
+    private static void RunSystematicTest(Func<Task> scenario, uint costFactor = 1)
     {
         var configuration = Configuration
             .Create()
-            .WithTestingIterations(Iterations)
+            .WithTestingIterations(Math.Max(10u, Iterations / costFactor))
             .WithMaxSchedulingSteps(5000);
         using var engine = TestingEngine.Create(configuration, scenario);
 
@@ -143,5 +149,91 @@ public class GameServiceConcurrencyTests
                 $"Bidding stopped at {state.NextToAct} instead of waiting for the human."
             );
         });
+    }
+
+
+
+    [Fact]
+    public void Full_game_reports_every_trick_winner_and_announces_game_over_exactly_once()
+    {
+        RunSystematicTest(async () =>
+        {
+            var service = new GameService();
+            var wrongTrickWinners = 0;
+            var gameOverWinners = new List<Team>();
+
+            // Each event is raised right after the transition that caused it, so the
+            // reported winner must be the winner of the trick the state just recorded.
+            service.TrickCompleted += (_, e) =>
+            {
+                var tricks = service.CurrentState!.CompletedTricks;
+                if (tricks.Count == 0 || tricks[tricks.Count - 1].Winner != e.Winner)
+                {
+                    wrongTrickWinners++;
+                }
+            };
+            service.GameOver += (_, e) => gameOverWinners.Add(e.Winner);
+
+            service.StartNewGame();
+            await PlayToGameOverAsync(service);
+
+            var state = service.CurrentState!;
+            Assert.Equal(0, wrongTrickWinners);
+            var winner = Assert.Single(gameOverWinners);
+            var winnerScore = winner == Team.NorthSouth ? state.NorthSouthScore : state.EastWestScore;
+            Assert.True(winnerScore >= state.Rules.PointsToWin, $"{winner} was announced with {winnerScore} points.");
+        }, costFactor: 20);
+    }
+
+
+
+    /// <summary>
+    /// Plays the human seat automatically (passes every bid, names hearts, plays the
+    /// first legal card) until the game is over.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the game does not finish within the step limit.
+    /// </exception>
+    private static async Task PlayToGameOverAsync(GameService service)
+    {
+        for (var guard = 0; guard < 5000; guard++)
+        {
+            var state = service.CurrentState!;
+
+            switch (state.Phase)
+            {
+                case GamePhase.GameOver:
+                    return;
+                case GamePhase.Bidding:
+                    if (await service.AdvanceAiBiddingAsync())
+                    {
+                        service.PlaceHumanBid(BidAction.PassBid.Instance);
+                    }
+
+                    break;
+                case GamePhase.TrumpSelection:
+                    if (await service.HandleTrumpSelectionAsync())
+                    {
+                        service.SelectTrump(Suit.Hearts);
+                    }
+
+                    break;
+                case GamePhase.HawseyExchange:
+                    await service.HandleHawseyExchangeAsync();
+                    break;
+                case GamePhase.TrickPlay:
+                    if (await service.AdvanceAiPlaysAsync())
+                    {
+                        service.PlayHumanCard(service.CurrentState!.GetLegalPlays()[0]);
+                    }
+
+                    break;
+                default:
+                    service.StartNextRound();
+                    break;
+            }
+        }
+
+        throw new InvalidOperationException("The game did not finish.");
     }
 }

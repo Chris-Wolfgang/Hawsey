@@ -302,10 +302,14 @@ public class GameService
 
     /// <summary>
     /// Plays the human's card. Returns false, and changes nothing, when it is
-    /// not the human's turn or the card is not a legal play.
+    /// not the human's turn or the card is not a legal play. When the card
+    /// completes a trick, a round or the game, the matching events are raised,
+    /// exactly as for an AI play.
     /// </summary>
     public bool PlayHumanCard(Card card)
     {
+        PlayOutcome outcome;
+
         lock (_sync)
         {
             if (_state is not { Phase: GamePhase.TrickPlay, NextToAct: HumanPosition } || !_state.GetLegalPlays().Contains(card))
@@ -313,10 +317,28 @@ public class GameService
                 return false;
             }
 
-            Volatile.Write(ref _state, _engine.PlayCard(_state, HumanPosition, card));
+            var state = _engine.PlayCard(_state, HumanPosition, card);
+            Volatile.Write(ref _state, state);
+            outcome = OutcomeOf(state);
         }
 
         StateChanged?.Invoke(this, EventArgs.Empty);
+
+        if (outcome.TrickCompleted != null)
+        {
+            TrickCompleted?.Invoke(this, outcome.TrickCompleted);
+        }
+
+        if (outcome.RoundCompleted)
+        {
+            RoundCompleted?.Invoke(this, EventArgs.Empty);
+        }
+
+        if (outcome.GameOver != null)
+        {
+            GameOver?.Invoke(this, outcome.GameOver);
+        }
+
         return true;
     }
 
@@ -414,7 +436,7 @@ public class GameService
     /// the events outside the lock. Only the loop that made the transition reports
     /// it, so a round or game end is announced exactly once.
     /// </summary>
-    private AiPlayOutcome? PlayAiCard(int generation, PlayerPosition player)
+    private PlayOutcome? PlayAiCard(int generation, PlayerPosition player)
     {
         lock (_sync)
         {
@@ -426,15 +448,27 @@ public class GameService
             var card = _aiStrategy.DecidePlay(_state, player);
             var state = _engine.PlayCard(_state, player, card);
             Volatile.Write(ref _state, state);
-
-            var trickCompleted = state.CompletedTricks.Count > 0 && (state.CurrentTrick == null || state.CurrentTrick.Plays.Count == 0)
-                ? new TrickCompletedEventArgs(state.CompletedTricks[state.CompletedTricks.Count - 1].Winner)
-                : null;
-            var winner = state.NorthSouthScore >= state.Rules.PointsToWin ? Team.NorthSouth : Team.EastWest;
-            var gameOver = state.Phase == GamePhase.GameOver ? new GameOverEventArgs(winner) : null;
-
-            return new AiPlayOutcome(trickCompleted, state.Phase == GamePhase.RoundScoring, gameOver);
+            return OutcomeOf(state);
         }
+    }
+
+
+
+    /// <summary>
+    /// What a card play completed, read from the state it produced: the trick
+    /// winner when a trick just closed, whether the round ended, and the winning
+    /// team when the game ended. Shared by the AI and human play paths so both
+    /// raise the same events.
+    /// </summary>
+    private static PlayOutcome OutcomeOf(GameState state)
+    {
+        var trickCompleted = state.CompletedTricks.Count > 0 && (state.CurrentTrick == null || state.CurrentTrick.Plays.Count == 0)
+            ? new TrickCompletedEventArgs(state.CompletedTricks[state.CompletedTricks.Count - 1].Winner)
+            : null;
+        var winner = state.NorthSouthScore >= state.Rules.PointsToWin ? Team.NorthSouth : Team.EastWest;
+        var gameOver = state.Phase == GamePhase.GameOver ? new GameOverEventArgs(winner) : null;
+
+        return new PlayOutcome(trickCompleted, state.Phase == GamePhase.RoundScoring, gameOver);
     }
 
 
@@ -457,5 +491,5 @@ public class GameService
 
 
 
-    private sealed record AiPlayOutcome(TrickCompletedEventArgs? TrickCompleted, bool RoundCompleted, GameOverEventArgs? GameOver);
+    private sealed record PlayOutcome(TrickCompletedEventArgs? TrickCompleted, bool RoundCompleted, GameOverEventArgs? GameOver);
 }
