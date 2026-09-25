@@ -347,42 +347,26 @@ public class GameEngineTests
 
 
     [Fact]
-    public void PlayCard_when_illegal_card_throws()
+    public void PlayCard_when_card_is_held_but_not_legal_throws()
     {
+        // Play first-legal cards until someone holds a card they may not play (they can
+        // follow suit, so an off-suit card is illegal). The loop always reaches such a
+        // player, so the assertion below always runs - it cannot pass vacuously.
         var state = CreateStateAtTrickPlay();
+
+        while (state.GetLegalPlays().Count == state.Hands[state.NextToAct!.Value].Count)
+        {
+            state = _engine.PlayCard(state, state.NextToAct.Value, state.GetLegalPlays()[0]);
+        }
+
         var player = state.NextToAct!.Value;
+        var legal = state.GetLegalPlays();
+        var illegal = state.Hands[player].First(c => !legal.Contains(c));
 
-        // Find a card not in legal plays
-        var legalPlays = state.GetLegalPlays();
-        var hand = state.Hands[player];
-        Card? illegalCard = null;
-
-        foreach (var c in hand)
-        {
-            var found = false;
-            foreach (var l in legalPlays)
-            {
-                if (c.Equals(l))
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)
-            {
-                illegalCard = c;
-                break;
-            }
-        }
-
-        // Only test if there's actually an illegal card (won't always be the case when leading)
-        if (illegalCard.HasValue)
-        {
-            Assert.Throws<InvalidOperationException>
-            (
-                () => _engine.PlayCard(state, player, illegalCard.Value)
-            );
-        }
+        Assert.Throws<InvalidOperationException>
+        (
+            () => _engine.PlayCard(state, player, illegal)
+        );
     }
 
 
