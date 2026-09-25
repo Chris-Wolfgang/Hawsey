@@ -12,7 +12,7 @@ namespace Wolfgang.Hawsey.Engine.Tests.Unit.Helpers;
 /// (unless configured otherwise), picks the first available trump suit,
 /// and plays the first legal card.
 /// </summary>
-public sealed class TestPlayerStrategy : IPlayerStrategy
+internal sealed class TestPlayerStrategy : IPlayerStrategy
 {
     private readonly Queue<BidAction>? _bidQueue;
     private readonly Suit? _preferredTrump;
@@ -58,11 +58,6 @@ public sealed class TestPlayerStrategy : IPlayerStrategy
 
     public Card DecidePlay(GameState state, PlayerPosition player)
     {
-        if (state == null)
-        {
-            throw new ArgumentNullException(nameof(state));
-        }
-
         var legalPlays = state.GetLegalPlays();
         return legalPlays[0];
     }
@@ -75,11 +70,6 @@ public sealed class TestPlayerStrategy : IPlayerStrategy
         out Card[] cardsToDiscard,
         out Card[] cardsFromPartner)
     {
-        if (state == null)
-        {
-            throw new ArgumentNullException(nameof(state));
-        }
-
         var bidderHand = state.Hands[bidder];
         cardsToDiscard = new[] { bidderHand[0], bidderHand[1] };
 
