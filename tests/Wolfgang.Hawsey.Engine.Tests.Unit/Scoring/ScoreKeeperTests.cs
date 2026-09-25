@@ -147,4 +147,15 @@ public class ScoreKeeperTests
         // NS: 9+6=15, EW: 3+6=9 — only NS reached
         Assert.Equal(Team.NorthSouth, keeper.GetWinner(Team.EastWest));
     }
+
+
+
+    [Fact]
+    public void GetWinner_when_both_teams_reach_the_target_in_one_round_returns_the_bidding_team()
+    {
+        var keeper = new ScoreKeeper(5);
+        keeper.RecordRound(new RoundScore(Team.EastWest, 6, 6, 6, isHawsey: false));
+
+        Assert.Equal(Team.EastWest, keeper.GetWinner(Team.EastWest));
+    }
 }

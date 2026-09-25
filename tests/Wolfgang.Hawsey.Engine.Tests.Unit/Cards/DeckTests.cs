@@ -120,4 +120,21 @@ public class DeckTests
 
         Assert.Throws<ArgumentNullException>(() => Deck.Shuffle(deck, null!));
     }
+
+
+
+    [Fact]
+    public void Shuffle_of_two_cards_produces_both_orders_across_seeds()
+    {
+        var first = new Card(Rank.Nine, Suit.Hearts);
+        var second = new Card(Rank.Ace, Suit.Spades);
+
+        var orders = Enumerable
+            .Range(0, 64)
+            .Select(seed => Deck.Shuffle([first, second], new Random(seed))[0])
+            .Distinct()
+            .Count();
+
+        Assert.Equal(2, orders);
+    }
 }
