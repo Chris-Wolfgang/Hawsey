@@ -27,7 +27,9 @@ public class PlayerHandTests
     [Fact]
     public void Constructor_when_null_throws()
     {
-        Assert.Throws<ArgumentNullException>(() => new PlayerHand(null!));
+        var ex = Assert.Throws<ArgumentNullException>(() => new PlayerHand(null!));
+
+        Assert.Equal("cards", ex.ParamName);
     }
 
 
@@ -90,7 +92,9 @@ public class PlayerHandTests
     {
         var hand = new PlayerHand(Array.Empty<Card>());
 
-        Assert.Throws<ArgumentNullException>(() => hand.Add(null!));
+        var ex = Assert.Throws<ArgumentNullException>(() => hand.Add(null!));
+
+        Assert.Equal("cards", ex.ParamName);
     }
 
 

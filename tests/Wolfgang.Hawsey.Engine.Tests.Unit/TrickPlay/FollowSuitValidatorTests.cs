@@ -304,4 +304,60 @@ public class FollowSuitValidatorTests
             () => FollowSuitValidator.GetLegalPlays(Array.Empty<Card>(), Suit.Spades, Suit.Hearts, null!, currentWinningCard: null)
         );
     }
+
+
+
+    [Fact]
+    public void GetLegalPlays_when_must_beat_a_duplicate_of_the_winner_does_not_beat_it()
+    {
+        // A pinochle deck has two of every card: the second King of spades ties the
+        // first, it does not beat it, so only the Ace is legal.
+        var hand = new[]
+        {
+            new Card(Rank.King, Suit.Spades),
+            new Card(Rank.Ace, Suit.Spades),
+            new Card(Rank.Nine, Suit.Clubs)
+        };
+
+        var result = FollowSuitValidator.GetLegalPlays(hand, Suit.Spades, Suit.Hearts, new HouseRules { MustBeat = true }, new Card(Rank.King, Suit.Spades));
+
+        Assert.Equal(new[] { new Card(Rank.Ace, Suit.Spades) }, result);
+    }
+
+
+
+    [Fact]
+    public void GetLegalPlays_when_must_beat_is_off_allows_any_card_of_the_led_suit()
+    {
+        var hand = new[]
+        {
+            new Card(Rank.Ace, Suit.Spades),
+            new Card(Rank.Queen, Suit.Spades),
+            new Card(Rank.Nine, Suit.Clubs)
+        };
+
+        var result = FollowSuitValidator.GetLegalPlays(hand, Suit.Spades, Suit.Hearts, new HouseRules { MustBeat = false }, new Card(Rank.King, Suit.Spades));
+
+        Assert.Equal(new[] { new Card(Rank.Ace, Suit.Spades), new Card(Rank.Queen, Suit.Spades) }, result);
+    }
+
+
+
+    [Fact]
+    public void GetLegalPlays_when_must_trump_without_must_beat_allows_any_trump()
+    {
+        // Void in spades, holding two trumps, and someone has already trumped with the
+        // Queen: without MustBeat either trump may be played.
+        var hand = new[]
+        {
+            new Card(Rank.King, Suit.Hearts),
+            new Card(Rank.Nine, Suit.Hearts),
+            new Card(Rank.Nine, Suit.Clubs)
+        };
+        var rules = new HouseRules { MustTrump = true, MustBeat = false };
+
+        var result = FollowSuitValidator.GetLegalPlays(hand, Suit.Spades, Suit.Hearts, rules, new Card(Rank.Queen, Suit.Hearts));
+
+        Assert.Equal(new[] { new Card(Rank.King, Suit.Hearts), new Card(Rank.Nine, Suit.Hearts) }, result);
+    }
 }
