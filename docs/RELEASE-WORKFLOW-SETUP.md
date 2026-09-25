@@ -15,19 +15,15 @@ The release workflow triggers when you **publish a GitHub Release** and implemen
 
 Complete the following one-time setup so that the workflow can publish releases:
 
-### Add NuGet API Key Secret
+### Configure NuGet Trusted Publishing
 
-**Location:** Settings → Secrets and variables → Actions → New repository secret
+**Location:** NuGet.org → Account Settings → Manage Publishers / Trusted Publishers
 
-1. Click **"New repository secret"**
-2. **Name:** `NUGET_API_KEY`
-3. **Value:** Your NuGet.org API key
-   - Get your key from [NuGet.org Account → API Keys](https://www.nuget.org/account/apikeys)
-   - Recommended scopes: **Push new packages and package versions**
-   - Set expiration date (recommended: 1 year)
-4. Click **"Add secret"**
+1. Create or update a **Trusted Publisher** for this GitHub repository
+2. Point it at the repository and the release workflow (`.github/workflows/release.yaml`)
+3. Save the publisher configuration on NuGet.org
 
-**What this does:** Allows the workflow to authenticate with NuGet.org and publish packages. The workflow validates this secret exists before attempting to publish.
+**What this does:** Allows the workflow to authenticate to NuGet.org via GitHub OIDC. No long-lived `NUGET_API_KEY` repository secret is required.
 
 ### Verify Branch Protection Rules
 
@@ -83,9 +79,9 @@ The workflow triggers automatically when the release is published.
    - ✅ Auto-passes if packages are valid
 
 3. **Job 3: publish-nuget** (1-2 minutes)
-   - Validates NUGET_API_KEY secret
+   - Signs in to NuGet.org using OIDC trusted publishing
    - Publishes packages to NuGet.org automatically
-   - ✅ Auto-completes if secret is valid
+   - ✅ Auto-completes if trusted publishing is configured correctly
 
 ### Monitoring the Workflow
 
@@ -95,13 +91,13 @@ The workflow triggers automatically when the release is published.
 
 ## Troubleshooting
 
-### "NUGET_API_KEY secret not configured" Error
+### "NuGet login (OIDC trusted publishing)" Error
 
-**Problem:** The `publish-nuget` job fails with secret validation error.
+**Problem:** The `publish-nuget` job fails during the NuGet login step.
 
 **Solution:**
-1. Verify the secret name is exactly `NUGET_API_KEY` (case-sensitive)
-2. Re-add the secret in Settings → Secrets → Actions
+1. Verify the NuGet.org trusted publisher points at this repository and `.github/workflows/release.yaml`
+2. Confirm the workflow still has `id-token: write` permission
 3. Re-run the workflow from the Actions tab (do not re-publish the release)
 
 ### Tests Fail on Specific Framework
@@ -189,7 +185,7 @@ Before creating a production GitHub Release (e.g., `v1.0.0`):
 ┌─────────────────────────────────────────────────────────────┐
 │  Job 3: publish-nuget (Windows)                             │
 │  • Download packages                                        │
-│  • Validate NUGET_API_KEY                                   │
+│  • NuGet login via OIDC trusted publishing                  │
 │  • Publish to NuGet.org automatically                       │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -202,7 +198,7 @@ Before creating a production GitHub Release (e.g., `v1.0.0`):
 | **Code Coverage** | Not enforced | 90% threshold enforced |
 | **Package Validation** | None | Smoke test installation |
 | **Deployment** | Incomplete publish script | Automatic publishing after validation |
-| **Secret Validation** | None | Validates before publishing |
+| **Publishing Credentials** | Long-lived manual secret | OIDC trusted publishing |
 | **GitHub Releases** | Not used as trigger | Workflow triggered by published release |
 | **Build Efficiency** | Duplicate builds in each job | Build once per job with dependencies |
 | **Test Logging** | No logger parameter | Console logging with verbosity |
