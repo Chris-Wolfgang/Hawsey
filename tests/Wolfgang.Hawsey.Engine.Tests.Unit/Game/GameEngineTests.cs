@@ -359,7 +359,7 @@ public class GameEngineTests
             state = _engine.PlayCard(state, state.NextToAct.Value, state.GetLegalPlays()[0]);
         }
 
-        var player = state.NextToAct!.Value;
+        var player = state.NextToAct.Value;
         var legal = state.GetLegalPlays();
         var illegal = state.Hands[player].First(c => !legal.Contains(c));
 
