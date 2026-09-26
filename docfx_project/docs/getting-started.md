@@ -1,53 +1,55 @@
 # Getting Started
 
-This guide will help you quickly get up and running with {{PROJECT_NAME}}.
+This guide shows how to start a game with `Wolfgang.Hawsey.Engine`.
 
 ## Prerequisites
 
-<!-- List any prerequisites needed. For example:
-- .NET 8.0 or later
-- Visual Studio 2022 or Visual Studio Code
--->
+- A project targeting a framework that supports `netstandard2.0` (for example .NET Framework 4.6.2 or later, or .NET 8 or later)
 
 ## Installation
 
-### Via NuGet Package Manager
+The package has not been published to NuGet yet. Once it is:
 
 ```bash
-dotnet add package {{PACKAGE_NAME}}
+dotnet add package Wolfgang.Hawsey.Engine
 ```
 
-### Via Package Manager Console
-
-```powershell
-Install-Package {{PACKAGE_NAME}}
-```
+Until then, clone the [repository](https://github.com/Chris-Wolfgang/Hawsey) and reference `src/Wolfgang.Hawsey.Engine/Wolfgang.Hawsey.Engine.csproj` from your project.
 
 ## Quick Start
 
-<!-- Add a quick start example. For example: -->
+```csharp
+using Wolfgang.Hawsey.Engine.Game;
+using Wolfgang.Hawsey.Engine.Players;
+using Wolfgang.Hawsey.Engine.Rules;
+
+var engine = new GameEngine();
+var state = engine.StartGame(HouseRules.Default, PlayerPosition.South, new Random());
+
+// state.Phase == GamePhase.Bidding
+// state.NextToAct is the first player to bid
+```
+
+Move the game forward with `PlaceBid`, `SelectTrump`, `ExchangeHawseyCards` (Hawsey rounds only) and `PlayCard`. Each takes the current `GameState` and returns the next one. `state.GetLegalPlays()` returns the cards the player to act may play.
+
+To play a complete game, implement `IPlayerStrategy` and pass it to `GameRunner.RunGame`:
 
 ```csharp
-// Add your quick start code example here
-// This should show the simplest way to use your library
+using Wolfgang.Hawsey.Engine.Strategy;
 
-using {{PROJECT_NAME}};
+var final = new GameRunner().RunGame(myStrategy, HouseRules.Default, PlayerPosition.South, new Random());
 
-// Example usage
+// final.Phase == GamePhase.GameOver
 ```
 
 ## Next Steps
 
 - Explore the [API Reference](../api/index.md) for detailed documentation
-- Read the [Introduction](introduction.md) to learn more about {{PROJECT_NAME}}
-- Check out example projects in the [GitHub repository]({{GITHUB_REPO_URL}})
-
-## Common Issues
-
-<!-- Add common issues and their solutions here -->
+- Read the [Introduction](introduction.md) for an overview of the engine
+- See `examples/Wolfgang.Hawsey.Engine.AotSmoke` in the [GitHub repository](https://github.com/Chris-Wolfgang/Hawsey) for a program that plays complete games
 
 ## Additional Resources
 
-- [GitHub Repository]({{GITHUB_REPO_URL}})
-- [Contributing Guidelines]({{GITHUB_REPO_URL}}/blob/main/CONTRIBUTING.md)
-- [Report an Issue]({{GITHUB_REPO_URL}}/issues)
+- [GitHub Repository](https://github.com/Chris-Wolfgang/Hawsey)
+- [Contributing Guidelines](https://github.com/Chris-Wolfgang/Hawsey/blob/main/CONTRIBUTING.md)
+- [Report an Issue](https://github.com/Chris-Wolfgang/Hawsey/issues)

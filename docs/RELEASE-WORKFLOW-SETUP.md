@@ -1,208 +1,125 @@
 # Release Workflow Setup Guide
 
-This guide explains how to configure a repository to use the standard `release.yaml` workflow. The same checklist applies whether you are bootstrapping a new repo from `repo-template` or auditing an existing one.
+This guide explains how this repository's `release.yaml` workflow is configured and what it does.
 
 ## Overview
 
-The release workflow triggers when you **publish a GitHub Release** and implements a comprehensive validation and automatic deployment process that:
+The release workflow triggers when you **publish a GitHub Release**. It:
+- ✅ Checks that the release tag matches a `<Version>` in a `src/` csproj
 - ✅ Tests all target frameworks per test project on Windows
-- ✅ Enforces 90% code coverage threshold
-- ✅ Validates NuGet package integrity with smoke tests
-- ✅ Automatically publishes to NuGet.org after validation passes
-- ✅ Eliminates duplicate build work for faster releases
+- ✅ Enforces line coverage: 90% for `src/` assemblies, 100% for test assemblies
+- ✅ Packs the NuGet packages and smoke-tests installing them
+- ✅ Verifies the documentation builds
+- ✅ Attests build provenance and publishes to NuGet.org through Trusted Publishing
+- ✅ Deploys the documentation and attaches the packages, SBOMs, reproducible-build manifests and coverage report to the GitHub Release
 
 ## Required Configuration
 
-Complete the following one-time setup so that the workflow can publish releases:
+### NuGet Trusted Publishing
 
-### Configure NuGet Trusted Publishing
+The workflow does not use a stored NuGet API key. The `publish-nuget` job runs `NuGet/login` with the job's OIDC identity and receives a short-lived API key for that run.
 
-**Location:** NuGet.org → Account Settings → Manage Publishers / Trusted Publishers
+For this to work, nuget.org needs a **Trusted Publishing policy** for this repository:
 
-1. Create or update a **Trusted Publisher** for this GitHub repository
-2. Point it at the repository and the release workflow (`.github/workflows/release.yaml`)
-3. Save the publisher configuration on NuGet.org
+1. Sign in to nuget.org as the package owner (`Chris-Wolfgang`, the `user` passed to `NuGet/login`).
+2. Open **Trusted Publishing** from the account menu and add a policy.
+3. Set the repository owner to `Chris-Wolfgang`, the repository to `Hawsey`, and the workflow file to `release.yaml`.
 
-**What this does:** Allows the workflow to authenticate to NuGet.org via GitHub OIDC. No long-lived `NUGET_API_KEY` repository secret is required.
+### Branch Protection
 
-### Verify Branch Protection Rules
+**Location:** Settings → Rules → Rulesets
 
-**Location:** Settings → Branches → main (or Settings → Rules → Rulesets)
-
-> **Note:** Repos created from `repo-template` ship with `scripts/Setup-BranchRuleset.ps1`, which configures branch protection interactively (option `[1]` for single-developer mode, `[2]` for multi-developer mode). The script may not be present in older repos — if it is missing, configure the equivalent settings manually using the checklist below.
-
-Ensure the following settings are enabled:
+This repository has no setup script for branch protection; the `main` ruleset is configured by hand. It has these rules:
 
 - ✅ **Require a pull request before merging**
-  - **Single developer repos:** 0 approvals (default)
-  - **Multi-developer repos:** 1+ approvals (recommended)
-- ✅ **Require status checks to pass before merging**
-  - Required checks should include the following status check contexts:
-    - "Stage 1: Linux Tests (.NET 5.0-10.0) + Coverage Gate"
-    - "Stage 2: Windows Tests (.NET 5.0-10.0, Framework 4.6.2-4.8.1)"
-    - "Stage 3: macOS Tests (.NET 6.0-10.0)"
-    - "Security Scan (DevSkim)"
-    - "Security Scan (CodeQL)"
-- ✅ **Require branches to be up to date before merging**
-- ✅ **Require conversation resolution before merging**
-- ✅ **Do not allow bypassing the above settings** (recommended, even for admins)
-- ✅ **Restrict deletions**
-- ✅ **Require linear history** (optional but recommended)
+- ✅ **Require status checks to pass before merging**:
+  - "Secrets Scan (gitleaks)"
+  - "Detect .NET Projects"
+  - "Stage 1: Linux Tests (.NET 5.0-10.0) + Coverage Gate"
+  - "Stage 2: Windows Tests (.NET 5.0-10.0, Framework 4.6.2-4.8.1)"
+  - "Stage 3: macOS Tests (.NET 6.0-10.0)"
+  - "Security Scan (DevSkim)"
+  - "Security Scan (CodeQL) (csharp)"
+  - "Protected Files Guard"
+- ✅ **Require code scanning results**
+- ✅ **Restrict deletions** and **block force pushes**
+- ✅ **Require linear history**
 
-**What this does:** Ensures all code merged to `main` has passed comprehensive validation, preventing broken releases.
+## Workflow Jobs
 
-## Testing the Release Workflow
+```
+Trigger: published GitHub Release
+  │
+  ├─ validate-release (Windows)
+  │    • Check the tag matches a src/ csproj <Version>
+  │    • Build, test every framework, collect coverage
+  │    • Enforce the coverage thresholds; upload the coverage report
+  │
+  ├─ pack-and-validate (Windows)          needs: validate-release
+  │    • Pack the NuGet packages
+  │    • Write the reproducible-build manifests
+  │    • Smoke-test installing each package
+  │
+  ├─ verify-docs-build (Windows)          needs: validate-release, pack-and-validate
+  │
+  ├─ publish-nuget (Windows)              needs: pack-and-validate, verify-docs-build
+  │    • Attest build provenance for each .nupkg
+  │    • NuGet/login (OIDC), then push to NuGet.org
+  │
+  ├─ trigger-docs                         needs: validate-release
+  │    • Calls docfx.yaml to build and deploy the docs to GitHub Pages
+  │
+  └─ update-release-artifacts             needs: validate-release, pack-and-validate, publish-nuget
+       • Attach packages, SBOMs, manifests and the coverage report to the release
+```
 
-After completing the setup, test the workflow by creating a GitHub Release:
+## Before a Release
 
-1. Go to your repository's **Releases** page
-2. Click **"Draft a new release"**
-3. Choose or create a tag (e.g., `v0.0.1-test`)
-4. Add a title and description (optional for a test)
-5. Check **"Set as a pre-release"** for test releases
-6. Click **"Publish release"**
-
-The workflow triggers automatically when the release is published.
-
-### Expected Workflow Behavior
-
-1. **Job 1: validate-release** (3-10 minutes)
-   - Runs all framework tests with coverage
-   - Enforces 90% coverage threshold
-   - Uploads coverage report
-   - ✅ Auto-passes if tests succeed
-
-2. **Job 2: pack-and-validate** (2-5 minutes)
-   - Packs NuGet packages
-   - Performs smoke test installation
-   - Uploads packages as artifacts
-   - ✅ Auto-passes if packages are valid
-
-3. **Job 3: publish-nuget** (1-2 minutes)
-   - Signs in to NuGet.org using OIDC trusted publishing
-   - Publishes packages to NuGet.org automatically
-   - ✅ Auto-completes if trusted publishing is configured correctly
-
-### Monitoring the Workflow
-
-- **Actions Tab:** Shows workflow progress in real-time
-- **Artifacts:** Each job uploads artifacts (coverage reports, packages)
-- **Releases:** Check the Releases page after successful completion
-
-## Troubleshooting
-
-### "NuGet login (OIDC trusted publishing)" Error
-
-**Problem:** The `publish-nuget` job fails during the NuGet login step.
-
-**Solution:**
-1. Verify the NuGet.org trusted publisher points at this repository and `.github/workflows/release.yaml`
-2. Confirm the workflow still has `id-token: write` permission
-3. Re-run the workflow from the Actions tab (do not re-publish the release)
-
-### Tests Fail on Specific Framework
-
-**Problem:** Tests pass on some frameworks but fail on others (e.g., net462).
-
-**Solution:**
-1. Check the test logs for framework-specific issues
-2. Fix compatibility issues in your code
-3. Test locally: `dotnet test --framework net462`
-4. Push fix, then re-publish the release (or re-run the workflow from the Actions tab)
-
-### Coverage Below 90% Threshold
-
-**Problem:** Workflow fails at coverage validation step.
-
-**Solution:**
-1. Review `CoverageReport/Summary.txt` artifact
-2. Add tests for uncovered code paths
-3. Ensure tests run on all frameworks
-4. Push fix, then re-publish the release (or re-run the workflow from the Actions tab)
-
-### Smoke Test Fails to Install Package
-
-**Problem:** Package packs successfully but fails smoke test installation.
-
-**Solution:**
-1. Check package dependencies in `.csproj`
-2. Verify framework compatibility in `<TargetFrameworks>`
-3. Test locally: `dotnet pack` then try installing in a test project
-4. Fix packaging issues and re-publish the release (or re-run the workflow from the Actions tab)
-
-## Production Release Checklist
-
-Before creating a production GitHub Release (e.g., `v1.0.0`):
-
-- [ ] All tests pass on all platforms (pr.yaml workflow)
-- [ ] Code coverage meets 90% threshold
-- [ ] Security scan shows no critical issues
-- [ ] Version numbers updated in `.csproj` files
-- [ ] `CHANGELOG.md` updated with release notes (if applicable)
-- [ ] All PRs merged to `main` branch
+- [ ] All PRs for the release are merged to `main`, and `pr.yaml` is green on `main`
+- [ ] The `<Version>` in `src/Wolfgang.Hawsey.Engine/Wolfgang.Hawsey.Engine.csproj` is the version you will tag
+- [ ] `CHANGELOG.md` has the new version section, assembled from the fragments in `changelog/unreleased/` (`pwsh ./scripts/changelog.ps1 assemble`)
 - [ ] Local build succeeds: `dotnet build --configuration Release`
 - [ ] Local tests pass: `dotnet test --configuration Release`
 
-**Create a production release:**
-1. Go to your repository's **Releases** page
+**Create the release:**
+1. Go to the repository's **Releases** page
 2. Click **"Draft a new release"**
-3. Choose or create the version tag (e.g., `v1.0.0`) targeting `main`
+3. Create the version tag (e.g., `v0.1.0`) targeting `main`
 4. Add a title and release notes
 5. Click **"Publish release"**
 
-**After workflow completes:**
-- [ ] Verify packages appear on NuGet.org
-- [ ] Test installing package from NuGet.org in a clean project
-- [ ] Announce release (if applicable)
+**After the workflow completes:**
+- [ ] The package appears on NuGet.org
+- [ ] The docs are live under `versions/<tag>/` and `versions/latest/`
+- [ ] The release has the packages, `*.bom.json`, `*.reproducible-build-manifest.json` and `release-coverage.zip` attached
 
-## Workflow Architecture
+## Troubleshooting
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  Trigger: Published GitHub Release                          │
-└─────────────────────────────────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│  Job 1: validate-release (Windows)                          │
-│  • Restore & Build                                          │
-│  • Test all frameworks (net5.0-10.0, net462-481)           │
-│  • Collect coverage                                         │
-│  • Enforce 90% threshold                                    │
-│  • Upload coverage artifacts                                │
-└─────────────────────────────────────────────────────────────┘
-                            │
-                            ▼ (only if tests pass)
-┌─────────────────────────────────────────────────────────────┐
-│  Job 2: pack-and-validate (Windows)                         │
-│  • Restore & Build (fresh)                                  │
-│  • Pack NuGet packages                                      │
-│  • Smoke test installation                                  │
-│  • Upload package artifacts                                 │
-└─────────────────────────────────────────────────────────────┘
-                            │
-                            ▼ (only if packing succeeds)
-┌─────────────────────────────────────────────────────────────┐
-│  Job 3: publish-nuget (Windows)                             │
-│  • Download packages                                        │
-│  • NuGet login via OIDC trusted publishing                  │
-│  • Publish to NuGet.org automatically                       │
-└─────────────────────────────────────────────────────────────┘
-```
+### "Release tag ... does not match any src csproj version"
 
-## Key Improvements Over Previous Workflow
+Bump the csproj `<Version>` or correct the release tag, then re-run the workflow.
 
-| Issue | Before | After |
-|-------|--------|-------|
-| **Framework Coverage** | Default framework only | All frameworks (net5.0-10.0, net462-481) |
-| **Code Coverage** | Not enforced | 90% threshold enforced |
-| **Package Validation** | None | Smoke test installation |
-| **Deployment** | Incomplete publish script | Automatic publishing after validation |
-| **Publishing Credentials** | Long-lived manual secret | OIDC trusted publishing |
-| **GitHub Releases** | Not used as trigger | Workflow triggered by published release |
-| **Build Efficiency** | Duplicate builds in each job | Build once per job with dependencies |
-| **Test Logging** | No logger parameter | Console logging with verbosity |
-| **Permissions** | Read-only | Write access for releases |
+### NuGet login or push fails
+
+Check that the Trusted Publishing policy on nuget.org names this repository and `release.yaml`, and that the package owner matches the `user` in the `NuGet/login` step. Re-run the failed jobs from the Actions tab; do not re-publish the release.
+
+### Tests fail on a specific framework
+
+1. Check the test logs for framework-specific issues
+2. Reproduce locally: `dotnet test --framework net462`
+3. Merge the fix, then re-run the workflow
+
+### Coverage below the threshold
+
+1. Download the `release-coverage` artifact and read `Summary.txt`
+2. Add tests for the uncovered code
+3. Merge the fix, then re-run the workflow
+
+### Smoke test fails to install the package
+
+1. Check the package dependencies in the `.csproj`
+2. Test locally: `dotnet pack`, then install the package into a test project
+3. Merge the fix, then re-run the workflow
 
 ## Support
 

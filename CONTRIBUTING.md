@@ -117,12 +117,10 @@ await Task.WhenAll(tasks);
 // Banned
 File.ReadAllText(path);
 stream.Read(buffer, 0, count);
-streamReader.ReadLine();
 
 // Required
 await File.ReadAllTextAsync(path);
 await stream.ReadAsync(buffer, 0, count);
-await streamReader.ReadLineAsync();
 ```
 
 #### ❌ Thread Blocking
@@ -157,6 +155,7 @@ var now = DateTimeOffset.UtcNow;
 
 ### Prerequisites
 - .NET 10.0 SDK or later (required for the repo's net10.0 target; older SDKs cannot load the csproj)
+- The .NET MAUI workloads, to build the MAUI app: run `dotnet workload restore` once. Without them, build the engine alone with `dotnet build src/Wolfgang.Hawsey.Engine`.
 - PowerShell Core (optional, for formatting scripts)
 
 ### Build the Project
@@ -238,6 +237,8 @@ View the complete configuration in [.editorconfig](.editorconfig).
 - Reference related issues in your pull request description.
 - Keep changes focused and atomic - one feature/fix per PR.
 - Update documentation if you change public APIs.
+- If your PR changes `src/`, add a changelog fragment under `changelog/unreleased/` (see [changelog/unreleased/README.md](changelog/unreleased/README.md)). The *Changelog Fragment Check* job fails without one.
+- Put changes to protected configuration files (workflows, `.editorconfig`, `Directory.Build.props`, `BannedSymbols.txt`, and the others listed in `.github/workflows/protected-files.yaml`) in their own PR. The *Protected Files Guard* fails a PR that mixes them with other changes.
 
 ---
 
