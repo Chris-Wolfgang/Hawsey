@@ -104,6 +104,7 @@ public class EngineBenchmarks
         /// Never called: every seat passes, so the stuck dealer plays a normal round and
         /// no Hawsey exchange happens.
         /// </summary>
+        /// <exception cref="NotSupportedException">Always.</exception>
         public void DecideHawseyExchange
         (
             GameState state,

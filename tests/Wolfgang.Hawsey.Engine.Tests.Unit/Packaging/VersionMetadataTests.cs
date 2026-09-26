@@ -16,7 +16,10 @@ public class VersionMetadataTests
 
     private static string PackageVersion()
     {
-        var informational = Engine.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
+        var attribute = Engine.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+        Assert.NotNull(attribute);
+
+        var informational = attribute.InformationalVersion;
 
         return informational.Split('+', '-')[0];
     }
@@ -34,7 +37,10 @@ public class VersionMetadataTests
     [Fact]
     public void FileVersion_is_the_package_version_with_a_zero_revision()
     {
-        var fileVersion = Engine.GetCustomAttribute<AssemblyFileVersionAttribute>()!.Version;
+        var attribute = Engine.GetCustomAttribute<AssemblyFileVersionAttribute>();
+        Assert.NotNull(attribute);
+
+        var fileVersion = attribute.Version;
 
         Assert.Equal(PackageVersion() + ".0", fileVersion);
     }
