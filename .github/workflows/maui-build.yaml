@@ -77,18 +77,22 @@ jobs:
         run: dotnet workload restore "$PROJECT"
 
       # Each iOS / Mac Catalyst workload pack is built against one Xcode major.minor
-      # (the suffix of Microsoft.iOS.Sdk.net10.0_<xcode>), and the runner image's
+      # (the suffix of Microsoft.iOS.Ref.net10.0_<xcode>), and the runner image's
       # default or newest Xcode is often a different one. Select the Xcode that
-      # matches the pack the workload restore just installed, and fail loudly
-      # when the image lacks it rather than failing later with an SDK error.
+      # matches the pack the build will use, and fail loudly when the image lacks
+      # it rather than failing later with an SDK error.
+      #
+      # Read the Ref pack, not the Sdk pack: the workload installs Sdk packs for
+      # several Xcode versions side by side, including previews (for example
+      # net10.0_27.0 "-xcode27.0"), but only the Ref pack for the default one.
       - name: Select the Xcode the iOS workload was built for
         if: runner.os == 'macOS'
         shell: bash
         run: |
           shopt -s nullglob
-          packs=("$DOTNET_ROOT"/packs/Microsoft.iOS.Sdk.net10.0_*)
+          packs=("$DOTNET_ROOT"/packs/Microsoft.iOS.Ref.net10.0_*)
           if [ ${#packs[@]} -eq 0 ]; then
-            echo "::error::No Microsoft.iOS.Sdk pack under $DOTNET_ROOT/packs after workload restore."
+            echo "::error::No Microsoft.iOS.Ref pack under $DOTNET_ROOT/packs after workload restore."
             exit 1
           fi
           pack=$(printf '%s\n' "${packs[@]}" | sort -V | tail -1)
