@@ -100,18 +100,17 @@ public class EngineBenchmarks
 
 
 
+        /// <summary>
+        /// Never called: every seat passes, so the stuck dealer plays a normal round and
+        /// no Hawsey exchange happens.
+        /// </summary>
         public void DecideHawseyExchange
         (
             GameState state,
             PlayerPosition bidder,
             out Card[] cardsToDiscard,
             out Card[] cardsFromPartner
-        )
-        {
-            var bidderHand = state.Hands[bidder];
-            var partnerHand = state.Hands[bidder.Partner()];
-            cardsToDiscard = [bidderHand[0], bidderHand[1]];
-            cardsFromPartner = [partnerHand[0], partnerHand[1]];
-        }
+        ) =>
+            throw new NotSupportedException("This strategy never bids Hawsey.");
     }
 }
