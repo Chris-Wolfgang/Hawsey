@@ -298,4 +298,17 @@ public class TrickTests
 
         Assert.Equal(PlayerPosition.East, result.Winner);
     }
+
+
+
+    [Fact]
+    public void Constructor_when_two_expected_plays_completes_after_two_cards()
+    {
+        var trick = new Trick(Suit.Hearts, expectedPlays: 2);
+
+        trick.Play(PlayerPosition.North, new Card(Rank.Ace, Suit.Spades));
+        trick.Play(PlayerPosition.East, new Card(Rank.King, Suit.Spades));
+
+        Assert.True(trick.IsComplete);
+    }
 }

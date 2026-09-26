@@ -251,4 +251,21 @@ public class BiddingPhaseTests
 
         Assert.Null(phase.GetNextBidder());
     }
+
+
+
+    [Fact]
+    public void PlaceBid_when_all_four_have_passed_throws()
+    {
+        var phase = new BiddingPhase(PlayerPosition.North, 6);
+        phase.PlaceBid(PlayerPosition.East, BidAction.PassBid.Instance);
+        phase.PlaceBid(PlayerPosition.South, BidAction.PassBid.Instance);
+        phase.PlaceBid(PlayerPosition.West, BidAction.PassBid.Instance);
+        phase.PlaceBid(PlayerPosition.North, BidAction.PassBid.Instance);
+
+        Assert.Throws<InvalidOperationException>
+        (
+            () => phase.PlaceBid(PlayerPosition.East, BidAction.PassBid.Instance)
+        );
+    }
 }

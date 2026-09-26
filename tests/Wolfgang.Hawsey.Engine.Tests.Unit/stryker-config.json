@@ -1,11 +1,11 @@
 {
-  "_comment": "Mutation-testing gate (#71). Measured 82.30% at Standard level locally (net10.0, 2026-09-22). 'break' fails the run below this score; it sits a few points under the measured score so CI timeout-mutant variance cannot flake it. Ratchet it up, never down. Run from this directory: `dotnet tool restore && dotnet stryker`.",
+  "_comment": "Mutation-testing gate (#71, ratcheted in #36). Measured 92.42% at Standard level locally (net10.0, 2026-09-25; was 82.30% on 2026-09-22). Surviving mutants are triaged in docs/MUTATION-TESTING.md. 'break' fails the run below this score; it sits a few points under the measured score so CI timeout-mutant variance cannot flake it. Ratchet it up, never down. Run from this directory: `dotnet tool restore && dotnet stryker`.",
   "stryker-config": {
     "project": "Wolfgang.Hawsey.Engine.csproj",
     "target-framework": "net10.0",
     "concurrency": 4,
     "mutation-level": "Standard",
-    "thresholds": { "high": 90, "low": 80, "break": 75 },
+    "thresholds": { "high": 95, "low": 90, "break": 88 },
     "reporters": ["html", "json", "cleartext"]
   }
 }
