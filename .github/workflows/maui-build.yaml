@@ -69,29 +69,42 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      # The .NET 10 iOS and Mac Catalyst workloads need Xcode 26. The runner image's
-      # default Xcode can lag, so select the newest Xcode 26 it has, and fail loudly
-      # when there is none rather than failing later with a confusing SDK error.
-      - name: Select Xcode
-        if: runner.os == 'macOS'
-        shell: bash
-        run: |
-          xcode=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
-          if [ -z "$xcode" ]; then
-            echo "::error::No Xcode 26 on this runner image. Installed:"
-            ls -d /Applications/Xcode*.app
-            exit 1
-          fi
-          echo "Selecting $xcode"
-          sudo xcode-select -s "$xcode/Contents/Developer"
-          xcodebuild -version
-
       # The project's TargetFrameworks depend on the OS (android everywhere, plus
       # windows on Windows and ios / maccatalyst on macOS), and restore evaluates all
       # of them, so let the SDK work out this OS's workloads from the project itself.
       - name: Restore MAUI workloads
         shell: bash
         run: dotnet workload restore "$PROJECT"
+
+      # Each iOS / Mac Catalyst workload pack is built against one Xcode major.minor
+      # (the suffix of Microsoft.iOS.Sdk.net10.0_<xcode>), and the runner image's
+      # default or newest Xcode is often a different one. Select the Xcode that
+      # matches the pack the workload restore just installed, and fail loudly
+      # when the image lacks it rather than failing later with an SDK error.
+      - name: Select the Xcode the iOS workload was built for
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          shopt -s nullglob
+          packs=("$DOTNET_ROOT"/packs/Microsoft.iOS.Sdk.net10.0_*)
+          if [ ${#packs[@]} -eq 0 ]; then
+            echo "::error::No Microsoft.iOS.Sdk pack under $DOTNET_ROOT/packs after workload restore."
+            exit 1
+          fi
+          pack=$(printf '%s\n' "${packs[@]}" | sort -V | tail -1)
+          want=${pack##*_}
+          echo "iOS workload pack: $pack (Xcode $want)"
+          # Xcode_26.5.app or a point release such as Xcode_26.5.1.app.
+          candidates=(/Applications/Xcode_"$want"*.app)
+          if [ ${#candidates[@]} -eq 0 ]; then
+            echo "::error::The runner image has no Xcode $want. Installed:"
+            printf '%s\n' /Applications/Xcode*.app
+            exit 1
+          fi
+          xcode=$(printf '%s\n' "${candidates[@]}" | sort -V | tail -1)
+          echo "Selecting $xcode"
+          sudo xcode-select -s "$xcode/Contents/Developer"
+          xcodebuild -version
 
       - name: Build
         shell: bash
