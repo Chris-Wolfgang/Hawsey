@@ -76,38 +76,18 @@ jobs:
         shell: bash
         run: dotnet workload restore "$PROJECT"
 
-      # Each iOS / Mac Catalyst workload pack is built against one Xcode major.minor
-      # (the suffix of Microsoft.iOS.Ref.net10.0_<xcode>), and the runner image's
-      # default or newest Xcode is often a different one. Select the Xcode that
-      # matches the pack the build will use, and fail loudly when the image lacks
-      # it rather than failing later with an SDK error.
-      #
-      # Read the Ref pack, not the Sdk pack: the workload installs Sdk packs for
-      # several Xcode versions side by side, including previews (for example
-      # net10.0_27.0 "-xcode27.0"), but only the Ref pack for the default one.
-      - name: Select the Xcode the iOS workload was built for
+      # Use the runner image's default Xcode. The image moves its default to the
+      # Xcode the current .NET iOS workload requires (26.6 alongside iOS workload
+      # 26.5.10318), and the workload's own check fails the build with a clear
+      # message ("requires Xcode X") when they drift apart. Two earlier attempts
+      # to choose one here both went wrong: the Microsoft.iOS.* pack suffix is
+      # the iOS SDK level, not the Xcode version, and xcode-select on a symlink
+      # such as Xcode_26.6.0.app breaks xcrun's SDK lookup. This step only
+      # records which Xcode ran.
+      - name: Show the Xcode in use
         if: runner.os == 'macOS'
-        shell: bash
         run: |
-          shopt -s nullglob
-          packs=("$DOTNET_ROOT"/packs/Microsoft.iOS.Ref.net10.0_*)
-          if [ ${#packs[@]} -eq 0 ]; then
-            echo "::error::No Microsoft.iOS.Ref pack under $DOTNET_ROOT/packs after workload restore."
-            exit 1
-          fi
-          pack=$(printf '%s\n' "${packs[@]}" | sort -V | tail -1)
-          want=${pack##*_}
-          echo "iOS workload pack: $pack (Xcode $want)"
-          # Xcode_26.5.app or a point release such as Xcode_26.5.1.app.
-          candidates=(/Applications/Xcode_"$want"*.app)
-          if [ ${#candidates[@]} -eq 0 ]; then
-            echo "::error::The runner image has no Xcode $want. Installed:"
-            printf '%s\n' /Applications/Xcode*.app
-            exit 1
-          fi
-          xcode=$(printf '%s\n' "${candidates[@]}" | sort -V | tail -1)
-          echo "Selecting $xcode"
-          sudo xcode-select -s "$xcode/Contents/Developer"
+          xcode-select -p
           xcodebuild -version
 
       - name: Build
