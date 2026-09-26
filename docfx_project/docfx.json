@@ -5,14 +5,14 @@
       "src": [
         {
           "files": [
-            "src/**/*.csproj"
+            "src/Wolfgang.Hawsey.Engine/Wolfgang.Hawsey.Engine.csproj"
           ],
           "src": "../"
         }
       ],
       "dest": "api",
       "properties": {
-        "TargetFramework": "net8.0"
+        "TargetFramework": "net10.0"
       },
       "disableGitFeatures": false,
       "disableDefaultFilter": false
@@ -25,7 +25,8 @@
           "**/*.{md,yml}"
         ],
         "exclude": [
-          "_site/**"
+          "_site/**",
+          "api/README.md"
         ]
       }
     ],
@@ -33,23 +34,24 @@
       {
         "files": [
           "logo.svg",
-          "apple-touch-icon.png",
-          "favicon.ico",
           "favicon.svg",
+          "favicon.ico",
+          "apple-touch-icon.png",
           "images/**",
           "public/**",
           "versions.json"
         ]
       }
     ],
+
     "output": "_site",
     "template": [
       "default",
       "modern"
     ],
     "globalMetadata": {
-      "_appName": "{{PROJECT_NAME}}",
-      "_appTitle": "{{PROJECT_NAME}} Documentation",
+      "_appName": "Wolfgang.Hawsey.Engine",
+      "_appTitle": "Wolfgang.Hawsey.Engine Documentation",
       "_appLogoPath": "logo.svg",
       "_appFaviconPath": "favicon.svg",
       "_enableSearch": true,
@@ -58,7 +60,7 @@
       "_disableTocFilter": false,
       "_enableDarkMode": true,
       "colorMode": "dark",
-      "_baseUrl": "{{DOCS_URL}}",
+      "_baseUrl": "https://chris-wolfgang.github.io/Hawsey/versions/latest/",
       "pdf": true
     }
   }
