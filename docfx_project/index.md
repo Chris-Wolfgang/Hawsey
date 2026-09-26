@@ -2,39 +2,41 @@
 _layout: landing
 ---
 
-# {{PROJECT_NAME}} Documentation
+# Hawsey Documentation
 
-Welcome to the {{PROJECT_NAME}} documentation. This site contains comprehensive guides, API reference, and examples to help you get started.
+Documentation for `Wolfgang.Hawsey.Engine`, the game engine for Hawsey: a four-player team trick-taking card game played with a pinochle deck.
 
 ## Quick Links
 
-- [Getting Started](docs/getting-started.md) - Learn the basics
-- [API Reference](xref:{{PROJECT_NAME}}) - Complete API documentation
-- [GitHub Repository]({{GITHUB_REPO_URL}}) - View source code
+- [Getting Started](docs/getting-started.md) - Start a game with the engine
+- [API Reference](api/index.md) - API documentation generated from the XML comments
+- [GitHub Repository](https://github.com/Chris-Wolfgang/Hawsey) - Source code
 
-## About {{PROJECT_NAME}}
+## About Hawsey
 
-{{PROJECT_DESCRIPTION}}
+The engine is a UI-agnostic .NET library. It models the pinochle deck, bidding, trump selection, the Hawsey exchange, trick play and scoring. Each `GameEngine` method takes the current `GameState` and returns the next one. It targets `netstandard2.0` and `net10.0`.
 
 ## Installation
 
 ```bash
-dotnet add package {{PACKAGE_NAME}}
+dotnet add package Wolfgang.Hawsey.Engine
 ```
+
+The package has not been published to NuGet yet. Until the first release, build it from source.
 
 ## Documentation Sections
 
 ### 📖 [Documentation](docs/getting-started.md)
-Step-by-step guides and tutorials to help you use {{PROJECT_NAME}} effectively.
+Guides for using the engine.
 
-### 📚 [API Reference](xref:{{PROJECT_NAME}})
-Complete API documentation automatically generated from source code XML comments.
+### 📚 [API Reference](api/index.md)
+API documentation generated from the source code's XML comments.
 
 ## Additional Resources
 
-- [Contributing Guidelines]({{GITHUB_REPO_URL}}/blob/main/CONTRIBUTING.md)
-- [Code of Conduct]({{GITHUB_REPO_URL}}/blob/main/CODE_OF_CONDUCT.md)
-- [License]({{GITHUB_REPO_URL}}/blob/main/LICENSE)
+- [Contributing Guidelines](https://github.com/Chris-Wolfgang/Hawsey/blob/main/CONTRIBUTING.md)
+- [Code of Conduct](https://github.com/Chris-Wolfgang/Hawsey/blob/main/CODE_OF_CONDUCT.md)
+- [License](https://github.com/Chris-Wolfgang/Hawsey/blob/main/LICENSE)
 
 ---
 
