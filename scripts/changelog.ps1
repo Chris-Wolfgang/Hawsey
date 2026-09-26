@@ -161,17 +161,40 @@ function Invoke-Check
 
     $changed = @(& git diff --name-only "$BaseRef...HEAD")
     if ($LASTEXITCODE -ne 0) { throw "git diff against $BaseRef failed" }
-    $srcChanged = @($changed | Where-Object { $_ -match '^src/' })
+    # Files under src/ that cannot change what the library does for a consumer, so they cannot
+    # need a release note: analyzer configuration (a nested .editorconfig / .globalconfig /
+    # .ruleset / .DotSettings) and the PublicAPI baselines, whose content is the mechanical
+    # record of a surface change that its own PR already describes. Excluding them matters
+    # because such a PR usually CANNOT carry a fragment: the protected-file guard fails a PR
+    # that mixes a protected file (a nested .editorconfig is one) with anything else, so the
+    # only way through was the 'no-changelog' label on a PR that never needed a note.
+    $configOnlyUnderSrc = '(^|/)\.editorconfig$|\.(globalconfig|ruleset|DotSettings)$|(^|/)PublicAPI\.(Shipped|Unshipped)\.txt$'
+    $srcChanged = @($changed | Where-Object { $_ -match '^src/' -and $_ -notmatch $configOnlyUnderSrc })
     # Only files ADDED by this PR count as its fragment; editing or deleting an existing fragment does not.
     $added = @(& git diff --name-only --diff-filter=A "$BaseRef...HEAD")
     if ($LASTEXITCODE -ne 0) { throw "git diff --diff-filter=A against $BaseRef failed" }
     $addedFragments = @($added | Where-Object { $_ -match "^$([regex]::Escape($FragmentDir))/" -and $_ -notmatch '/README\.md$' })
     $waived = ($Labels -split ',' | ForEach-Object { $_.Trim() }) -contains 'no-changelog'
 
-    Write-Host "src/ files changed: $($srcChanged.Count); fragments added: $($addedFragments.Count); no-changelog label: $waived"
+    # A release PR assembles the fragments rather than adding one: it deletes every file
+    # under the fragment directory and writes them into CHANGELOG.md. It also necessarily
+    # touches src/ (the csproj <Version>), so without this it fails the gate and the only
+    # way through is the 'no-changelog' label - which exists for changes that never needed
+    # a note, not for the one PR that carries all of them.
+    $deleted = @(& git diff --name-only --diff-filter=D "$BaseRef...HEAD")
+    if ($LASTEXITCODE -ne 0) { throw "git diff --diff-filter=D against $BaseRef failed" }
+    $deletedFragments = @($deleted | Where-Object { $_ -match "^$([regex]::Escape($FragmentDir))/" -and $_ -notmatch '/README\.md$' })
+    # -ChangelogPath may point somewhere other than the repo root, and git reports paths
+    # repo-relative with forward slashes, so normalise before comparing.
+    $changelogRel = $ChangelogPath.Replace('\', '/')
+    if ($changelogRel.StartsWith('./')) { $changelogRel = $changelogRel.Substring(2) }
+    $assembled = ($changed -contains $changelogRel) -and $deletedFragments.Count -gt 0
+
+    $srcConfigChanged = @($changed | Where-Object { $_ -match '^src/' -and $_ -match $configOnlyUnderSrc })
+    Write-Host "src/ files changed: $($srcChanged.Count) (plus $($srcConfigChanged.Count) analyzer-config/PublicAPI file(s), which never need a fragment); fragments added: $($addedFragments.Count); fragments deleted: $($deletedFragments.Count) (assembles $changelogRel : $assembled); no-changelog label: $waived"
 
     $failed = $bad.Count -gt 0
-    if ($srcChanged.Count -gt 0 -and $addedFragments.Count -eq 0 -and -not $waived)
+    if ($srcChanged.Count -gt 0 -and $addedFragments.Count -eq 0 -and -not $waived -and -not $assembled)
     {
         Write-Host "::error::This PR changes src/ but adds no changelog fragment. Add $FragmentDir/<change-name>.md (see $FragmentDir/README.md) or apply the 'no-changelog' label."
         $failed = $true
