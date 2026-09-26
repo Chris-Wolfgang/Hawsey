@@ -102,7 +102,7 @@ $managedFiles = @('.editorconfig', '.globalconfig', 'BannedSymbols.txt', 'coverl
 if ($IncludeDocs) { $managedPrefixes += 'docs/' }
 # Template-only files that never belong in a generated repository, plus the one-time setup
 # scripts that delete themselves after a successful run (their absence is expected).
-$templateOnly = @('scripts/setup.ps1', 'scripts/audit-repos.ps1', 'scripts/upgrade.ps1', 'scripts/templates/', 'docs/repository-baseline.md',
+$templateOnly = @('scripts/setup.ps1', 'scripts/upgrade.ps1', 'scripts/templates/', 'docs/repository-baseline.md',
                   'scripts/Setup-GitHubPages.ps1', 'scripts/Setup-Maintenance.ps1')
 # Setup-BranchRuleset.ps1 self-deletes after its first run, but Fix-BranchRuleset.ps1 calls it
 # again later, so a repository that still has it needs the current version: managed while
@@ -323,10 +323,17 @@ foreach ($r in $review)
             [System.IO.File]::WriteAllText($ours, ([System.IO.File]::ReadAllText($r.Path) -replace "`r`n", "`n"))
             [System.IO.File]::WriteAllText($baseFile, $r.Base + "`n")
             [System.IO.File]::WriteAllText($theirs, $r.Content + "`n")
-            $merged = & git merge-file -p -L "this repository" -L "template $($base.Substring(0, 7))" -L "template $($head.Substring(0, 7))" $ours $baseFile $theirs 2>&1
+            # In-place (no -p): git writes the result into $ours and the bytes are read back
+            # as UTF-8. Capturing stdout into a variable instead would decode it with
+            # [Console]::OutputEncoding - the console code page (CP437 on a stock Windows
+            # host), which turns every emoji, arrow and en-dash in a workflow into mojibake
+            # (repo-template#625). stderr goes to a file for the same reason.
+            $errFile = Join-Path $tmp 'stderr'
+            & git merge-file -L "this repository" -L "template $($base.Substring(0, 7))" -L "template $($head.Substring(0, 7))" $ours $baseFile $theirs 2> $errFile
             $conflicts = $LASTEXITCODE
-            if ($conflicts -lt 0) { throw "git merge-file failed for $($r.Path): $($merged -join ' ')" }
-            $text = ($merged -join "`n") + "`n"
+            if ($conflicts -lt 0) { throw "git merge-file failed for $($r.Path): $([System.IO.File]::ReadAllText($errFile))" }
+            $text = [System.IO.File]::ReadAllText($ours)
+            if (-not $text.EndsWith("`n")) { $text += "`n" }
             if ($conflicts -eq 0)
             {
                 Set-Content -Path $r.Path -Value $text -Encoding utf8NoBOM -NoNewline
