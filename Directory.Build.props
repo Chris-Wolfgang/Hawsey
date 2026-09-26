@@ -131,7 +131,10 @@
 
   <ItemGroup>
     <!-- SourceLink: embed source provenance into PDBs so debuggers can step
-         into NuGet package code from GitHub. -->
+         into NuGet package code from GitHub. Dependabot does not bump this
+         file, so check https://www.nuget.org/packages/Microsoft.SourceLink.GitHub
+         when a NuGetAudit advisory names Microsoft.Build.Tasks.Git
+         (CVE-2026-62900 covered 8.0.0 and 10.0.300-10.0.301). -->
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.401">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
