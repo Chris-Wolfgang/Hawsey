@@ -1,0 +1,46 @@
+<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<!--
+	  ReSharper InspectCode noise-floor (#103), the fleet profile first proven on
+	  Extensions-Logging-Data (#136, repo-template#431).
+
+	  The pr.yaml `inspectcode` job passes no profile, so InspectCode loads this
+	  solution-shared layer (<solution file>.DotSettings) automatically. Each entry
+	  silences an inspection that the build's Roslyn analyzer stack already gates,
+	  so InspectCode doesn't double-report it, or a known false positive. The goal
+	  is 0 findings on a clean main, so any new finding is actionable. Keep
+	  additions justified and grouped.
+	-->
+
+	<!-- Redundant-code style rules — covered in-build by Roslynator / IDE00xx and
+	     .editorconfig. InspectCode analyses a single TFM, so RedundantUsingDirective
+	     also misfires on usings that only the engine's netstandard2.0 slice needs. -->
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantUsingDirective/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantNameQualifier/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantCast/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+
+	<!-- Nullability — owned by the Roslyn nullable reference-type analysis, not R#.
+	     The *AccordingTo(Nullable)APIContract rules flag defensive null-checks on
+	     non-null-annotated parameters; those checks are INTENTIONAL in a library that
+	     is called from nullable-oblivious / older-TFM code where callers can still
+	     pass null despite the annotation. -->
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ReturnTypeCanBeNotNullable/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantNullableFlowAttribute/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=NullnessAnnotationConflictWithJetBrainsAnnotations/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ConditionalAccessQualifierIsNonNullableAccordingToAPIContract/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+
+	<!-- Public-API false positive: R# cannot see external consumers of a library's
+	     public auto-properties, so it reports them as unused (.Global variant). -->
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=UnusedAutoPropertyAccessor_002EGlobal/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+
+	<!-- Roslyn / Sonar analyzer diagnostics re-run by InspectCode. These are already
+	     enforced (or intentionally dormant, e.g. PublicApiAnalyzers RS0016/RS0037)
+	     by the in-build analyzer stack; suppress the InspectCode double-report. -->
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=MA0009/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RS0016/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RS0037/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=S3267/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=S3220/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=S2068/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+</wpf:ResourceDictionary>
