@@ -29,6 +29,11 @@ public class GameSession
     /// </summary>
     public const PlayerPosition HumanPosition = PlayerPosition.South;
 
+    /// <summary>
+    /// The highest number bid: all twelve tricks.
+    /// </summary>
+    public const int MaximumBid = 12;
+
     private readonly GameEngine _engine = new();
     private readonly bool _aiPacing;
     private readonly Func<Random> _randomFactory;
@@ -196,13 +201,20 @@ public class GameSession
 
     /// <summary>
     /// Places the human's bid. Returns false, and changes nothing, when it is
-    /// not the human's turn to bid.
+    /// not the human's turn to bid, or a number bid is below
+    /// <see cref="GameState.MinimumLegalBid"/> or above <see cref="MaximumBid"/>.
     /// </summary>
     public bool PlaceHumanBid(BidAction action)
     {
         lock (_sync)
         {
             if (!TryGetOpenBidding(_generation, out var state, out var biddingPhase) || biddingPhase.GetNextBidder() != HumanPosition)
+            {
+                return false;
+            }
+
+            // A number bid must beat the high bid, and at least meet the minimum (#867).
+            if (action is BidAction.NumberBid { Amount: var amount } && (amount < state.MinimumLegalBid || amount > MaximumBid))
             {
                 return false;
             }

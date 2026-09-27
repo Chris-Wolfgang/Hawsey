@@ -226,6 +226,22 @@ public sealed class GameState
 
 
     /// <summary>
+    /// Gets the lowest number bid the next bidder may make: the house minimum, or one
+    /// more than <see cref="HighBid"/>.
+    /// </summary>
+    public int MinimumLegalBid => Math.Max(Rules.MinimumBid, HighBid + 1);
+
+
+
+    /// <summary>
+    /// Gets a value indicating whether the next bidder is the stuck dealer: bidding is
+    /// open, the dealer is next (the dealer bids last), and nobody has bid.
+    /// </summary>
+    public bool IsNextBidderStuck => Phase == GamePhase.Bidding && NextToAct == Dealer && HighBid == 0;
+
+
+
+    /// <summary>
     /// Gets the legal cards the current player can play, or an empty list if not in trick play.
     /// </summary>
     /// <returns>A list of legal card plays.</returns>
