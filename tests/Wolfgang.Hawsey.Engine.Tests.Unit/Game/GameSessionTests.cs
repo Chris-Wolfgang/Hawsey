@@ -266,8 +266,8 @@ public class GameSessionTests
         await PlayToGameOverAsync();
 
         var state = _session.CurrentState!;
-        // GameState decides the winner (GameStateWinnerTests covers its rule, #862);
-        // the session must announce exactly that team.
+        // The winner comes from GameState, and GameStateWinnerTests covers its rule
+        // (#862). The session must announce exactly that team.
         Assert.Single(gameOvers);
         Assert.NotNull(state.Winner);
         Assert.Equal(state.Winner, gameOvers[0].Winner);
