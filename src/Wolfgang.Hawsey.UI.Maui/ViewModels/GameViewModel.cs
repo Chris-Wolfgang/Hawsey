@@ -353,6 +353,13 @@ public partial class GameViewModel : INotifyPropertyChanged
         {
             StatusMessage = "Your turn to play";
         }
+        else if (_gameService.CurrentState?.Phase == GamePhase.RoundScoring)
+        {
+            // An AI card finished the round: go on to the next deal, as a human
+            // card that finishes it does. Game over and a New Game in the meantime
+            // (a different phase) stop here.
+            await AdvanceGameAsync().ConfigureAwait(true);
+        }
     }
 
 
@@ -435,6 +442,12 @@ public partial class GameViewModel : INotifyPropertyChanged
 
     private static string GetTrumpDisplayText(GameState state)
     {
+        // Until trump is named, the engine's TrumpMode is a placeholder (AceHigh).
+        if (state.Phase is GamePhase.Bidding or GamePhase.TrumpSelection)
+        {
+            return "";
+        }
+
         if (state.TrumpSuit.HasValue)
         {
             var symbol = state.TrumpSuit.Value switch
