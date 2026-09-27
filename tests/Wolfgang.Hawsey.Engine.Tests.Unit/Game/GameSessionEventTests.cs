@@ -204,6 +204,70 @@ public class GameSessionEventTests
 
 
     [Fact]
+    public async Task Whole_games_against_the_real_AI_see_competitive_bids_and_finish()
+    {
+        // The real SimpleAiStrategy bids on hand strength. The human passes every bid and
+        // names hearts when stuck, so each hand's bidding is the AI's. Across these
+        // seeded games the AI makes number bids, and every game reaches game over.
+        var aiBids = 0;
+
+        for (var seed = 1; seed <= 3; seed++)
+        {
+            var session = TestGameSessions.Unpaced(seed, ai: new SimpleAiStrategy());
+            session.StateChanged += (_, _) =>
+            {
+                if (session.CurrentState is { Phase: GamePhase.Bidding, HighBid: > 0 })
+                {
+                    aiBids++;
+                }
+            };
+            session.StartNewGame();
+            var steps = 0;
+
+            while (session.CurrentState!.Phase != GamePhase.GameOver)
+            {
+                Assert.True(++steps < 20_000, "The game did not finish.");
+
+                switch (session.CurrentState.Phase)
+                {
+                    case GamePhase.Bidding:
+                        if (await session.AdvanceAiBiddingAsync())
+                        {
+                            Assert.True(session.PlaceHumanBid(BidAction.PassBid.Instance));
+                        }
+
+                        break;
+
+                    case GamePhase.TrumpSelection:
+                        // In these seeded games the human is never the stuck dealer (an
+                        // AI always bids), and the AI never calls Hawsey, so an AI always
+                        // names trump.
+                        Assert.False(await session.HandleTrumpSelectionAsync());
+                        break;
+
+                    case GamePhase.RoundScoring:
+                        session.StartNextRound();
+                        break;
+
+                    default:
+                        if (await session.AdvanceAiPlaysAsync())
+                        {
+                            Assert.True(session.PlayHumanCard(session.CurrentState.GetLegalPlays()[0]));
+                        }
+
+                        break;
+                }
+            }
+
+            Assert.NotNull(session.CurrentState.Winner);
+        }
+
+        Assert.True(aiBids > 0, "The AI never made a number bid.");
+    }
+
+
+
+    [Fact]
     public async Task A_game_can_end_on_an_AI_card_and_the_session_announces_it()
     {
         // Seed 1, a target of 12, the human passing and playing its first legal card:

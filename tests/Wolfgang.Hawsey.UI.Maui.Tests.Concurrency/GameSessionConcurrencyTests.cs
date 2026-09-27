@@ -47,8 +47,11 @@ public class GameSessionConcurrencyTests
 
 
     /// <summary>
-    /// Drives a fresh game until it is South's (the human's) turn to play a card,
-    /// passing every human bid and naming hearts if asked.
+    /// Drives a fresh game until it is South's (the human's) turn to play a card and
+    /// South's card will not complete the trick, passing every human bid and naming
+    /// hearts if asked. The AI bids, so the leader varies: when South plays last and
+    /// wins, South leads again, and a second tap would be a legitimate move rather than
+    /// a stale one. Such turns are played (first legal card) and skipped.
     /// </summary>
     /// <exception cref="InvalidOperationException">
     /// Thrown when the game never reaches South's turn within the step limit.
@@ -84,7 +87,13 @@ public class GameSessionConcurrencyTests
                 case GamePhase.TrickPlay:
                     if (await service.AdvanceAiPlaysAsync())
                     {
-                        return service;
+                        // Four-card tricks: the AI never calls Hawsey.
+                        if (service.CurrentState!.CurrentTrick!.Plays.Count < 3)
+                        {
+                            return service;
+                        }
+
+                        service.PlayHumanCard(service.CurrentState.GetLegalPlays()[0]);
                     }
 
                     break;

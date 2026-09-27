@@ -14,20 +14,6 @@ public class SimpleAiStrategyTests
 
 
     [Fact]
-    public void DecideBid_when_weak_hand_passes()
-    {
-        var engine = new GameEngine();
-        var state = engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
-
-        // Most random hands should result in a pass
-        var bid = _strategy.DecideBid(state, PlayerPosition.East);
-
-        Assert.IsType<BidAction.PassBid>(bid);
-    }
-
-
-
-    [Fact]
     public void DecideTrump_returns_suit_with_most_cards()
     {
         var engine = new GameEngine();
@@ -130,6 +116,7 @@ public class SimpleAiStrategyTests
     [Fact]
     public void Each_decision_that_reads_the_state_rejects_a_null_state()
     {
+        Assert.Equal("state", Assert.Throws<ArgumentNullException>(() => _strategy.DecideBid(null!, PlayerPosition.North)).ParamName);
         Assert.Equal("state", Assert.Throws<ArgumentNullException>(() => _strategy.DecideTrump(null!, PlayerPosition.North)).ParamName);
         Assert.Equal("state", Assert.Throws<ArgumentNullException>(() => _strategy.DecidePlay(null!, PlayerPosition.North)).ParamName);
         Assert.Equal
