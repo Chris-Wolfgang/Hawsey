@@ -60,15 +60,15 @@ public partial class GameViewModel : INotifyPropertyChanged
         _gameService.GameOver += OnGameOver;
 
         // Command takes Action/Action<T>; an `async () => await ...` lambda would be
-        // async-void (MA0147). Discard the Task instead — MAUI's Command pattern is
-        // already fire-and-forget for the caller.
-        NewGameCommand = new Command(() => _ = StartNewGameAsync());
-        PlaceBidCommand = new Command<string>(s => _ = PlaceBidAsync(s));
-        SelectTrumpCommand = new Command<string>(s => _ = SelectTrumpAsync(s));
-        PlayCardCommand = new Command<CardViewModel>(c => _ = PlayCardAsync(c));
+        // async-void (MA0147). Each command starts its move through Run, which reports
+        // a failure instead of letting the discarded task lose it.
+        NewGameCommand = new Command(() => Run(StartNewGameAsync));
+        PlaceBidCommand = new Command<string>(s => Run(() => PlaceBidAsync(s)));
+        SelectTrumpCommand = new Command<string>(s => Run(() => SelectTrumpAsync(s)));
+        PlayCardCommand = new Command<CardViewModel>(c => Run(() => PlayCardAsync(c)));
         _confirmHawseyExchangeCommand = new Command
         (
-            () => _ = ConfirmHawseyExchangeAsync(),
+            () => Run(ConfirmHawseyExchangeAsync),
             () => _discardIndexes.Count == HawseyDiscardCount
         );
     }
@@ -253,6 +253,30 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+
+
+    /// <summary>
+    /// Runs a command's move. MAUI commands can't await it, so an exception thrown
+    /// inside would vanish with the discarded task and the game would just stop. It is
+    /// reported in the status line instead, where the player can see it.
+    /// </summary>
+    private void Run(Func<Task> move) => _ = RunAsync(move);
+
+
+
+    private async Task RunAsync(Func<Task> move)
+    {
+        try
+        {
+            await move().ConfigureAwait(true);
+        }
+        // The top of a UI command: every failure is reported, none rethrown.
+        catch (Exception ex)
+        {
+            StatusMessage = $"Something went wrong: {ex.Message}";
+        }
+    }
 
 
 
