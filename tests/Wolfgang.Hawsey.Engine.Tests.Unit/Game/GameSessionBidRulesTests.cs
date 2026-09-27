@@ -64,10 +64,10 @@ public class GameSessionBidRulesTests
 
         Assert.False(session.PlaceHumanBid(new BidAction.NumberBid(8)));
         Assert.False(session.PlaceHumanBid(new BidAction.NumberBid(5)));
-        Assert.False(session.PlaceHumanBid(new BidAction.NumberBid(GameSession.MaximumBid + 1)));
+        Assert.False(session.PlaceHumanBid(new BidAction.NumberBid(BiddingPhase.MaximumBid + 1)));
 
         Assert.Same(before, session.CurrentState);
-        Assert.True(session.PlaceHumanBid(new BidAction.NumberBid(GameSession.MaximumBid)));
+        Assert.True(session.PlaceHumanBid(new BidAction.NumberBid(BiddingPhase.MaximumBid)));
     }
 
 

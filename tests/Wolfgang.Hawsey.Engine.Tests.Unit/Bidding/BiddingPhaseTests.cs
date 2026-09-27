@@ -268,4 +268,52 @@ public class BiddingPhaseTests
             () => phase.PlaceBid(PlayerPosition.East, BidAction.PassBid.Instance)
         );
     }
+
+
+
+    [Fact]
+    public void PlaceBid_when_the_bid_is_above_the_maximum_throws()
+    {
+        var phase = new BiddingPhase(PlayerPosition.North, 6);
+
+        Assert.Throws<InvalidOperationException>(() => phase.PlaceBid(PlayerPosition.East, new BidAction.NumberBid(BiddingPhase.MaximumBid + 1)));
+        Assert.Equal(PlayerPosition.East, phase.GetNextBidder());
+    }
+
+
+
+    [Fact]
+    public void PlaceBid_when_the_bid_is_the_maximum_is_accepted()
+    {
+        var phase = new BiddingPhase(PlayerPosition.North, 6);
+
+        phase.PlaceBid(PlayerPosition.East, new BidAction.NumberBid(BiddingPhase.MaximumBid));
+
+        Assert.Equal(BiddingPhase.MaximumBid, phase.HighestBid);
+    }
+
+
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(13)]
+    public void Constructor_when_the_minimum_bid_is_out_of_range_throws(int minimumBid)
+    {
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new BiddingPhase(PlayerPosition.North, minimumBid));
+
+        Assert.Equal("minimumBid", ex.ParamName);
+    }
+
+
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(12)]
+    public void Constructor_when_the_minimum_bid_is_at_a_bound_is_accepted(int minimumBid)
+    {
+        var phase = new BiddingPhase(PlayerPosition.North, minimumBid);
+
+        Assert.Equal(PlayerPosition.East, phase.GetNextBidder());
+    }
 }

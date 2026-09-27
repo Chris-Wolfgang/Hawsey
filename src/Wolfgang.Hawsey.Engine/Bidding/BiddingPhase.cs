@@ -9,6 +9,11 @@ namespace Wolfgang.Hawsey.Engine.Bidding;
 /// </summary>
 public sealed class BiddingPhase
 {
+    /// <summary>
+    /// The highest number bid: all twelve tricks.
+    /// </summary>
+    public const int MaximumBid = 12;
+
     private readonly PlayerPosition _dealer;
     private readonly int _minimumBid;
     private readonly PlayerPosition[] _biddingOrder;
@@ -24,9 +29,22 @@ public sealed class BiddingPhase
     /// Initializes a new instance of the <see cref="BiddingPhase"/> class.
     /// </summary>
     /// <param name="dealer">The dealer's position.</param>
-    /// <param name="minimumBid">The minimum bid allowed.</param>
+    /// <param name="minimumBid">The minimum bid allowed, from 1 to <see cref="MaximumBid"/>.</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="minimumBid"/> is below 1 or above <see cref="MaximumBid"/>.
+    /// </exception>
     public BiddingPhase(PlayerPosition dealer, int minimumBid)
     {
+        if (minimumBid < 1 || minimumBid > MaximumBid)
+        {
+            throw new ArgumentOutOfRangeException
+            (
+                nameof(minimumBid),
+                minimumBid,
+                $"The minimum bid must be from 1 to {MaximumBid}."
+            );
+        }
+
         _dealer = dealer;
         _minimumBid = minimumBid;
         _biddingOrder = new PlayerPosition[4];
@@ -185,6 +203,14 @@ public sealed class BiddingPhase
             throw new InvalidOperationException
             (
                 $"Bid of {bid.Amount} is below the minimum bid of {_minimumBid}."
+            );
+        }
+
+        if (bid.Amount > MaximumBid)
+        {
+            throw new InvalidOperationException
+            (
+                $"Bid of {bid.Amount} is above the maximum bid of {MaximumBid}."
             );
         }
 

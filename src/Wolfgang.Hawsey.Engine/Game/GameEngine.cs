@@ -148,9 +148,18 @@ public sealed class GameEngine
     /// <param name="state">The current game state.</param>
     /// <param name="trumpSuit">The trump suit, or <c>null</c> for Ace high.</param>
     /// <returns>The updated game state.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="trumpSuit"/> is not a defined <see cref="Suit"/>.
+    /// </exception>
     public GameState SelectTrump(GameState state, Suit? trumpSuit)
     {
         ValidatePhase(state, GamePhase.TrumpSelection);
+
+        // An undefined suit would otherwise only fail later, inside trick play.
+        if (trumpSuit is { } suit && (suit < Suit.Hearts || suit > Suit.Spades))
+        {
+            throw new ArgumentOutOfRangeException(nameof(trumpSuit), suit, "Not a defined suit.");
+        }
 
         var trumpMode = trumpSuit.HasValue ? TrumpMode.Suited : TrumpMode.AceHigh;
 
