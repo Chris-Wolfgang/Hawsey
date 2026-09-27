@@ -3,9 +3,9 @@ using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Game;
 using Wolfgang.Hawsey.Engine.Players;
 using Wolfgang.Hawsey.Engine.Rules;
-using Wolfgang.Hawsey.UI.Maui.AI;
+using Wolfgang.Hawsey.Engine.Strategy;
 
-namespace Wolfgang.Hawsey.UI.Maui.Tests.Unit.AI;
+namespace Wolfgang.Hawsey.Engine.Tests.Unit.Strategy;
 
 public class SimpleAiStrategyTests
 {
@@ -123,5 +123,19 @@ public class SimpleAiStrategyTests
 
         Assert.All(discard, d => Assert.Contains(d, bidderHand));
         Assert.All(fromPartner, p => Assert.Contains(p, partnerHand));
+    }
+
+
+
+    [Fact]
+    public void Each_decision_that_reads_the_state_rejects_a_null_state()
+    {
+        Assert.Equal("state", Assert.Throws<ArgumentNullException>(() => _strategy.DecideTrump(null!, PlayerPosition.North)).ParamName);
+        Assert.Equal("state", Assert.Throws<ArgumentNullException>(() => _strategy.DecidePlay(null!, PlayerPosition.North)).ParamName);
+        Assert.Equal
+        (
+            "state",
+            Assert.Throws<ArgumentNullException>(() => _strategy.DecideHawseyExchange(null!, PlayerPosition.North, out _, out _)).ParamName
+        );
     }
 }

@@ -10,7 +10,7 @@ Hawsey is a C# implementation of a four-player team trick-taking card game playe
 | Project | Target frameworks |
 |---|---|
 | `src/Wolfgang.Hawsey.Engine` | `netstandard2.0;net10.0` |
-| `src/Wolfgang.Hawsey.UI.Maui` | `net10.0-android`, plus `net10.0-windows10.0.19041.0` on Windows and `net10.0-ios;net10.0-maccatalyst` on macOS |
+| `src/Wolfgang.Hawsey.UI.Maui` | `net10.0` (unit-test target, no platform head) and `net10.0-android`, plus `net10.0-windows10.0.19041.0` on Windows and `net10.0-ios;net10.0-maccatalyst` on macOS |
 | `tests/Wolfgang.Hawsey.Engine.Tests.Unit` | `net462` through `net10.0` (13 TFMs) |
 | `tests/Wolfgang.Hawsey.UI.Maui.Tests.Unit` | `net10.0` |
 | `tests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency` | `net10.0` (Coyote) |
@@ -52,7 +52,7 @@ pwsh ./scripts/build-pr.ps1
 
 - The engine (`src/Wolfgang.Hawsey.Engine`) is UI-agnostic and does no I/O. Each `GameEngine` method takes the current `GameState` and returns the next one. Namespaces follow folders: `Bidding`, `Cards`, `Game`, `Players`, `Rules`, `Scoring`, `Strategy`, `TrickPlay` under `Wolfgang.Hawsey.Engine`.
 - Card comparisons go through `CardRanking` (bowers change a card's effective suit and rank). See `docs/adr/` for the design decisions.
-- The MAUI app (`src/Wolfgang.Hawsey.UI.Maui`) uses the engine by project reference.
+- The MAUI app (`src/Wolfgang.Hawsey.UI.Maui`) uses the engine by project reference. Game logic that needs no UI framework (the AI, the human-vs-AI `GameSession`) belongs in the engine, not in a UI (ADR 0007).
 
 ### Key Configuration Files
 - `.editorconfig`: code style and analyzer severities

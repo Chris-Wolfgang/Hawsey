@@ -17,6 +17,7 @@ dotnet tool restore && dotnet stryker
 |---|---:|---:|---|
 | 2026-09-22 | 82.30% | 75 | Gate introduced (#71) |
 | 2026-09-25 | 92.42% | 88 | Survivors triaged and killed (#36) |
+| 2026-09-27 | 90.06% | 88 | `GameSession` and `SimpleAiStrategy` moved into the engine; their behaviour tests added (#859) |
 
 ## Triage of the surviving mutants (2026-09-25)
 
@@ -43,3 +44,20 @@ Stryker replaces a message such as `"Bidding is already complete."` with `""`. T
 assert the exception **type** and, where it matters, the **parameter name**, not the
 message text. The wording isn't part of the engine's contract, and pinning it would
 make every rewording a test change. These are accepted by policy.
+
+## `GameSession` and `SimpleAiStrategy` (2026-09-27)
+
+Moving the session and the AI into the engine (#859, ADR 0007) added their mutants to
+the run. It dropped the score to 80.85%, because their tests only checked that the AI's
+moves were legal. The behaviour tests (`SimpleAiStrategyBehaviourTests`,
+`GameSessionEventTests`, and the paced checks in `GameSessionNewGameDuringPauseTests`)
+brought it back to 90.06%. The remaining survivors in these two files are accepted:
+
+| Mutation | Why it survives |
+|---|---|
+| `ConfigureAwait(false)` becomes `true` | Equivalent: the engine and its tests run without a synchronization context. |
+| `_generation++` becomes `--` | Equivalent: any change to the counter invalidates a stale AI loop. |
+| `\|\|` and `&&` variants of the "the game moved on during the pause" guards | Equivalent in every reachable state: a New Game's state is always in the Bidding phase, so each guard's first two terms can't disagree. The Coyote tests cover these races. |
+| `CompletedTricks.Count > 0` becomes `>= 0` | Equivalent: after any play, either the current trick holds a card or a trick has just completed. |
+| `>` becomes `>=` and `<` becomes `<=` in the AI's rank comparisons | Equivalent: the only equal ranks are the two copies of one card. |
+| The game-over winner expression | Replaced by the engine's own `GameState.Winner` (#862). |

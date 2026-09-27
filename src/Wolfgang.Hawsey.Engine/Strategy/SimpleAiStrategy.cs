@@ -3,15 +3,16 @@ using Wolfgang.Hawsey.Engine.Bidding;
 using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Game;
 using Wolfgang.Hawsey.Engine.Players;
-using Wolfgang.Hawsey.Engine.Strategy;
 
-namespace Wolfgang.Hawsey.UI.Maui.AI;
+namespace Wolfgang.Hawsey.Engine.Strategy;
 
 /// <summary>
-/// A basic AI player strategy for Hawsey.
+/// A basic AI player: it always passes when bidding, names its longest suit as trump,
+/// and plays by simple heuristics. <see cref="Game.GameSession"/> uses it for the three AI seats.
 /// </summary>
 public class SimpleAiStrategy : IPlayerStrategy
 {
+    /// <inheritdoc/>
     public BidAction DecideBid(GameState state, PlayerPosition player)
     {
         // Simple AI: always pass. The stuck dealer mechanic ensures the game progresses.
@@ -21,9 +22,13 @@ public class SimpleAiStrategy : IPlayerStrategy
 
 
 
+    /// <inheritdoc/>
     public Suit? DecideTrump(GameState state, PlayerPosition player)
     {
-        ArgumentNullException.ThrowIfNull(state);
+        if (state == null)
+        {
+            throw new ArgumentNullException(nameof(state));
+        }
 
         var hand = state.Hands[player];
         var suitCounts = new int[4];
@@ -51,9 +56,13 @@ public class SimpleAiStrategy : IPlayerStrategy
 
 
 
+    /// <inheritdoc/>
     public Card DecidePlay(GameState state, PlayerPosition player)
     {
-        ArgumentNullException.ThrowIfNull(state);
+        if (state == null)
+        {
+            throw new ArgumentNullException(nameof(state));
+        }
 
         var legalPlays = state.GetLegalPlays();
 
@@ -98,13 +107,17 @@ public class SimpleAiStrategy : IPlayerStrategy
 
 
 
+    /// <inheritdoc/>
     public void DecideHawseyExchange(
         GameState state,
         PlayerPosition bidder,
         out Card[] cardsToDiscard,
         out Card[] cardsFromPartner)
     {
-        ArgumentNullException.ThrowIfNull(state);
+        if (state == null)
+        {
+            throw new ArgumentNullException(nameof(state));
+        }
 
         var bidderHand = state.Hands[bidder];
 

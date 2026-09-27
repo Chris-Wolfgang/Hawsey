@@ -122,10 +122,10 @@ The game's namesake bid: the bidder plays alone to take all 12 tricks. The bidde
 | Project | Purpose |
 |---------|---------|
 | `src/Wolfgang.Hawsey.Engine` | Game-logic library (cards, bidding, trick play, scoring, rules). The NuGet package. |
-| `src/Wolfgang.Hawsey.UI.Maui` | .NET MAUI app with AI opponents. Not published as a package. |
+| `src/Wolfgang.Hawsey.UI.Maui` | .NET MAUI app with AI opponents, built on the engine's `GameSession`. Also targets plain `net10.0` for its unit tests ([ADR 0007](docs/adr/0007-game-session-in-the-engine-and-testable-uis.md)). Not published as a package. |
 | `tests/Wolfgang.Hawsey.Engine.Tests.Unit` | Engine unit tests, run on every target framework from `net462` to `net10.0`. |
-| `tests/Wolfgang.Hawsey.UI.Maui.Tests.Unit` | Unit tests for the MAUI app's AI and services. |
-| `tests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency` | Coyote concurrency tests for the MAUI app's `GameService`. |
+| `tests/Wolfgang.Hawsey.UI.Maui.Tests.Unit` | Unit tests for the MAUI app: view models, converters and the app host (XAML and DI). |
+| `tests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency` | Coyote concurrency tests for the engine's `GameSession`. |
 | `benchmarks/Wolfgang.Hawsey.Engine.Benchmarks` | BenchmarkDotNet benchmarks for the engine. |
 | `examples/Wolfgang.Hawsey.Engine.AotSmoke` | Native AOT smoke test that plays complete games through the engine. |
 

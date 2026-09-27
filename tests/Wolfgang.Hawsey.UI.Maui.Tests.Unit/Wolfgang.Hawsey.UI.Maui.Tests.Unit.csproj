@@ -1,5 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <!-- Unit tests for the MAUI app's view models. They reference the app's plain
+       net10.0 target (docs/adr/0007), which builds as a library with no platform
+       head, so they run like any other net10.0 test project. The game logic they
+       drive (GameSession, SimpleAiStrategy) is the engine's and is tested in
+       Wolfgang.Hawsey.Engine.Tests.Unit. -->
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -9,7 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -22,10 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Wolfgang.Hawsey.Engine\Wolfgang.Hawsey.Engine.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\..\src\Wolfgang.Hawsey.UI.Maui\AI\SimpleAiStrategy.cs" Link="AI\SimpleAiStrategy.cs" />
+    <ProjectReference Include="..\..\src\Wolfgang.Hawsey.UI.Maui\Wolfgang.Hawsey.UI.Maui.csproj" />
   </ItemGroup>
 
 </Project>

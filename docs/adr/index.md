@@ -17,3 +17,4 @@ write a *new* ADR. The only edit allowed on the old one is its **Status** line
 | [0004](0004-house-rules-as-an-options-object.md) | House rules are an options object, not forks of the engine | Accepted |
 | [0005](0005-namespaces-follow-folders.md) | Engine namespaces follow the folder layout | Accepted |
 | [0006](0006-pin-assemblyversion.md) | Pin the engine's `<AssemblyVersion>` at `1.0.0.0` | Accepted |
+| [0007](0007-game-session-in-the-engine-and-testable-uis.md) | The game session and AI live in the engine; each UI is unit-tested on a plain `net10.0` target | Accepted |

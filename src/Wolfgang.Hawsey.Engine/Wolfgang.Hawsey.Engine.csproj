@@ -27,7 +27,9 @@
        polyfill generated, two CI builds of one commit differed (found by
        reproducible-build.yaml). The engine only needs IsExternalInit (records and
        init accessors on netstandard2.0), and a single generated file has only one
-       order. Add a type here if a netstandard2.0 build reports it missing. -->
+       order. Add a type here if a netstandard2.0 build reports it missing, but know
+       that a SECOND generated type brings the order problem back (#859 hit it with
+       MemberNotNullWhenAttribute); prefer code that needs no polyfill. -->
   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PolySharpIncludeGeneratedTypes>System.Runtime.CompilerServices.IsExternalInit</PolySharpIncludeGeneratedTypes>
   </PropertyGroup>

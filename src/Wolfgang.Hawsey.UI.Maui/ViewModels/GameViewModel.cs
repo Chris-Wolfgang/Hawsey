@@ -10,7 +10,7 @@ using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Game;
 using Wolfgang.Hawsey.Engine.Players;
 using Wolfgang.Hawsey.Engine.Rules;
-using Wolfgang.Hawsey.UI.Maui.Services;
+using Wolfgang.Hawsey.UI.Maui.Threading;
 
 namespace Wolfgang.Hawsey.UI.Maui.ViewModels;
 
@@ -21,7 +21,8 @@ namespace Wolfgang.Hawsey.UI.Maui.ViewModels;
 // ReSharper disable once PartialTypeWithSinglePart
 public partial class GameViewModel : INotifyPropertyChanged
 {
-    private readonly GameService _gameService;
+    private readonly GameSession _gameService;
+    private readonly IUiDispatcher _dispatcher;
     private string _statusMessage = "Welcome to Hawsey! Tap New Game to start.";
     private bool _isBiddingVisible;
     private bool _isTrumpPickerVisible;
@@ -37,9 +38,13 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
-    public GameViewModel(GameService gameService)
+    public GameViewModel(GameSession gameService, IUiDispatcher dispatcher)
     {
+        ArgumentNullException.ThrowIfNull(gameService);
+        ArgumentNullException.ThrowIfNull(dispatcher);
+
         _gameService = gameService;
+        _dispatcher = dispatcher;
         _gameService.StateChanged += OnStateChanged;
         _gameService.TrickCompleted += OnTrickCompleted;
         _gameService.RoundCompleted += OnRoundCompleted;
@@ -278,7 +283,7 @@ public partial class GameViewModel : INotifyPropertyChanged
                 break;
 
             case GamePhase.RoundScoring:
-                await Task.Delay(1500).ConfigureAwait(true);
+                await _gameService.PauseBeforeNextRoundAsync().ConfigureAwait(true);
                 _gameService.StartNextRound();
                 await AdvanceGameAsync().ConfigureAwait(true);
                 break;
@@ -348,20 +353,27 @@ public partial class GameViewModel : INotifyPropertyChanged
         {
             StatusMessage = "Your turn to play";
         }
+        else if (_gameService.CurrentState?.Phase == GamePhase.RoundScoring)
+        {
+            // An AI card finished the round: go on to the next deal, as a human
+            // card that finishes it does. Game over and a New Game in the meantime
+            // (a different phase) stop here.
+            await AdvanceGameAsync().ConfigureAwait(true);
+        }
     }
 
 
 
     private void OnStateChanged(object? sender, EventArgs e)
     {
-        MainThread.BeginInvokeOnMainThread(UpdateFromState);
+        _dispatcher.Post(UpdateFromState);
     }
 
 
 
     private void OnTrickCompleted(object? sender, TrickCompletedEventArgs e)
     {
-        MainThread.BeginInvokeOnMainThread(() =>
+        _dispatcher.Post(() =>
         {
             StatusMessage = $"{e.Winner} wins the trick!";
         });
@@ -371,7 +383,7 @@ public partial class GameViewModel : INotifyPropertyChanged
 
     private void OnRoundCompleted(object? sender, EventArgs e)
     {
-        MainThread.BeginInvokeOnMainThread(() =>
+        _dispatcher.Post(() =>
         {
             var state = _gameService.CurrentState;
 
@@ -386,7 +398,7 @@ public partial class GameViewModel : INotifyPropertyChanged
 
     private void OnGameOver(object? sender, GameOverEventArgs e)
     {
-        MainThread.BeginInvokeOnMainThread(() =>
+        _dispatcher.Post(() =>
         {
             var state = _gameService.CurrentState;
             var winnerText = e.Winner == Team.NorthSouth ? "North/South (Your team)" : "East/West";
@@ -430,6 +442,12 @@ public partial class GameViewModel : INotifyPropertyChanged
 
     private static string GetTrumpDisplayText(GameState state)
     {
+        // Until trump is named, the engine's TrumpMode is a placeholder (AceHigh).
+        if (state.Phase is GamePhase.Bidding or GamePhase.TrumpSelection)
+        {
+            return "";
+        }
+
         if (state.TrumpSuit.HasValue)
         {
             var symbol = state.TrumpSuit.Value switch
@@ -475,13 +493,13 @@ public partial class GameViewModel : INotifyPropertyChanged
 
     private void UpdateHumanHand(GameState state)
     {
-        var legalPlays = state.Phase == GamePhase.TrickPlay && state.NextToAct == GameService.HumanPosition
+        var legalPlays = state.Phase == GamePhase.TrickPlay && state.NextToAct == GameSession.HumanPosition
             ? state.GetLegalPlays()
             : Array.Empty<Card>();
 
         HumanCards.Clear();
 
-        var humanHand = state.Hands[GameService.HumanPosition];
+        var humanHand = state.Hands[GameSession.HumanPosition];
 
         for (var i = 0; i < humanHand.Count; i++)
         {

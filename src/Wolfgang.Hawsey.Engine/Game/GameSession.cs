@@ -1,16 +1,16 @@
-using System.Diagnostics.CodeAnalysis;
 using Wolfgang.Hawsey.Engine.Bidding;
 using Wolfgang.Hawsey.Engine.Cards;
-using Wolfgang.Hawsey.Engine.Game;
 using Wolfgang.Hawsey.Engine.Players;
 using Wolfgang.Hawsey.Engine.Rules;
-using Wolfgang.Hawsey.UI.Maui.AI;
+using Wolfgang.Hawsey.Engine.Strategy;
 
-namespace Wolfgang.Hawsey.UI.Maui.Services;
+namespace Wolfgang.Hawsey.Engine.Game;
 
 /// <summary>
-/// Wraps the game engine and manages the game lifecycle for the UI.
-/// Human player is always South. AI controls North, East, and West.
+/// A live game between one human, always South, and three <see cref="SimpleAiStrategy"/>
+/// seats. It is what every Hawsey UI drives: the UI calls the human's moves and the
+/// AI-advance methods, and redraws on <see cref="StateChanged"/>. The AI moves are
+/// paced so a person can follow them.
 /// </summary>
 /// <remarks>
 /// Thread safety: the AI loops resume on thread-pool threads after their delays
@@ -23,12 +23,17 @@ namespace Wolfgang.Hawsey.UI.Maui.Services;
 /// every new game, so an AI loop that wakes up after New Game stops instead of
 /// playing into the new game. Events are raised outside the lock.
 /// </remarks>
-public class GameService
+public class GameSession
 {
+    /// <summary>
+    /// The seat the human plays. The AI plays the other three.
+    /// </summary>
     public const PlayerPosition HumanPosition = PlayerPosition.South;
 
     private readonly GameEngine _engine = new();
-    private readonly SimpleAiStrategy _aiStrategy = new();
+    private readonly bool _aiPacing;
+    private readonly Func<Random> _randomFactory;
+    private readonly IPlayerStrategy _aiStrategy;
     // MA0158 (use System.Threading.Lock) does not apply here: the Coyote concurrency tests
     // (tests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency) control lock ordering by rewriting
     // Monitor, which `lock (object)` compiles to. Coyote 1.7.11 cannot see
@@ -39,46 +44,93 @@ public class GameService
 #pragma warning restore MA0158
     private GameState? _state;
     private BiddingPhase? _biddingPhase;
-    private Random _random = new();
+    private Random _random;
     private int _generation;
 
 
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GameSession"/> class, with the AI
+    /// seats paced so a person can follow their moves, and a fresh random deal for
+    /// each game.
+    /// </summary>
+    public GameSession()
+        : this(aiPacing: true, randomFactory: NewRandom, aiStrategy: new SimpleAiStrategy())
+    {
+    }
+
+
+
+    /// <summary>
+    /// Test seam: <paramref name="aiPacing"/> <see langword="false"/> removes the pauses
+    /// between AI moves, <paramref name="randomFactory"/> supplies each game's
+    /// <see cref="Random"/>, and <paramref name="aiStrategy"/> plays the three AI seats,
+    /// so a test can play whole games quickly and repeatably, including lines
+    /// <see cref="SimpleAiStrategy"/> never chooses (an AI Hawsey bid).
+    /// </summary>
+    internal GameSession(bool aiPacing, Func<Random> randomFactory, IPlayerStrategy aiStrategy)
+    {
+        _aiPacing = aiPacing;
+        _randomFactory = randomFactory;
+        _aiStrategy = aiStrategy;
+        _random = randomFactory();
+    }
+
+
+
+    /// <summary>
+    /// Gets the current game state, or <see langword="null"/> before the first game.
+    /// </summary>
     public GameState? CurrentState => Volatile.Read(ref _state);
 
 
 
+    /// <summary>
+    /// Raised after every change to <see cref="CurrentState"/>. May be raised on a
+    /// background thread.
+    /// </summary>
     public event EventHandler? StateChanged;
 
 
 
+    /// <summary>
+    /// Raised when a trick is complete, with the player who won it.
+    /// </summary>
     public event EventHandler<TrickCompletedEventArgs>? TrickCompleted;
 
 
 
+    /// <summary>
+    /// Raised when a round has been scored and the game goes on.
+    /// </summary>
     public event EventHandler? RoundCompleted;
 
 
 
+    /// <summary>
+    /// Raised when a team reaches the points needed to win.
+    /// </summary>
     public event EventHandler<GameOverEventArgs>? GameOver;
 
 
 
+    /// <summary>
+    /// Gets a value indicating whether the human is the next to act.
+    /// </summary>
     public bool IsHumanTurn => CurrentState?.NextToAct == HumanPosition;
 
 
 
+    /// <summary>
+    /// Deals a new game with North dealing. Any AI loop still running for the
+    /// previous game stops at its next step.
+    /// </summary>
+    /// <param name="rules">The house rules, or <see langword="null"/> for <see cref="HouseRules.Default"/>.</param>
     public void StartNewGame(HouseRules? rules = null)
     {
         lock (_sync)
         {
-            // S2245: System.Random is fine here — this seeds a card-dealer/PRNG for
-            // gameplay, not anything security-sensitive (no keys, no tokens, no
-            // secrets). Cryptographically strong RNG would add cost and dependency
-            // for zero user-facing benefit in a bridge card game.
-#pragma warning disable S2245
-            _random = new Random();
-#pragma warning restore S2245
+            _random = _randomFactory();
             var state = _engine.StartGame(rules ?? HouseRules.Default, PlayerPosition.North, _random);
             _biddingPhase = new BiddingPhase(state.Dealer, state.Rules.MinimumBid);
             _generation++;
@@ -103,12 +155,12 @@ public class GameService
 
             lock (_sync)
             {
-                if (!IsBiddingOpen(generation))
+                if (!TryGetOpenBidding(generation, out _, out var biddingPhase))
                 {
                     return false;
                 }
 
-                var next = _biddingPhase.GetNextBidder();
+                var next = biddingPhase.GetNextBidder();
 
                 if (!next.HasValue)
                 {
@@ -123,18 +175,18 @@ public class GameService
                 bidder = next.Value;
             }
 
-            await Task.Delay(400).ConfigureAwait(false);
+            await PauseAsync(400).ConfigureAwait(false);
 
             lock (_sync)
             {
                 // Another loop, a new game or a human move may have moved on while we slept.
-                if (!IsBiddingOpen(generation) || _biddingPhase.GetNextBidder() != bidder)
+                if (!TryGetOpenBidding(generation, out var state, out var biddingPhase) || biddingPhase.GetNextBidder() != bidder)
                 {
                     return false;
                 }
 
-                var aiBid = _aiStrategy.DecideBid(_state, bidder);
-                Volatile.Write(ref _state, _engine.PlaceBid(_state, bidder, aiBid, _biddingPhase));
+                var aiBid = _aiStrategy.DecideBid(state, bidder);
+                Volatile.Write(ref _state, _engine.PlaceBid(state, bidder, aiBid, biddingPhase));
             }
 
             StateChanged?.Invoke(this, EventArgs.Empty);
@@ -151,12 +203,12 @@ public class GameService
     {
         lock (_sync)
         {
-            if (!IsBiddingOpen(_generation) || _biddingPhase.GetNextBidder() != HumanPosition)
+            if (!TryGetOpenBidding(_generation, out var state, out var biddingPhase) || biddingPhase.GetNextBidder() != HumanPosition)
             {
                 return false;
             }
 
-            Volatile.Write(ref _state, _engine.PlaceBid(_state, HumanPosition, action, _biddingPhase));
+            Volatile.Write(ref _state, _engine.PlaceBid(state, HumanPosition, action, biddingPhase));
         }
 
         StateChanged?.Invoke(this, EventArgs.Empty);
@@ -210,7 +262,7 @@ public class GameService
             picker = next;
         }
 
-        await Task.Delay(500).ConfigureAwait(false);
+        await PauseAsync(500).ConfigureAwait(false);
 
         lock (_sync)
         {
@@ -274,7 +326,7 @@ public class GameService
             bidder = hawseyBidder;
         }
 
-        await Task.Delay(500).ConfigureAwait(false);
+        await PauseAsync(500).ConfigureAwait(false);
 
         lock (_sync)
         {
@@ -370,7 +422,7 @@ public class GameService
                 player = next;
             }
 
-            await Task.Delay(400).ConfigureAwait(false);
+            await PauseAsync(400).ConfigureAwait(false);
 
             var outcome = PlayAiCard(generation, player);
 
@@ -384,7 +436,7 @@ public class GameService
             if (outcome.TrickCompleted != null)
             {
                 TrickCompleted?.Invoke(this, outcome.TrickCompleted);
-                await Task.Delay(800).ConfigureAwait(false);
+                await PauseAsync(800).ConfigureAwait(false);
 
                 // New Game during the pause: the finished game's round or game end
                 // must not be announced into the new game.
@@ -410,6 +462,10 @@ public class GameService
 
 
 
+    /// <summary>
+    /// Deals the next round after a round has been scored. Does nothing in any
+    /// other phase.
+    /// </summary>
     public void StartNextRound()
     {
         lock (_sync)
@@ -473,6 +529,32 @@ public class GameService
 
 
 
+    /// <summary>
+    /// Pauses between a scored round and the next deal, so the player can read the
+    /// result. Returns at once when pacing is off.
+    /// </summary>
+    /// <returns>A task that completes when the pause is over.</returns>
+    public Task PauseBeforeNextRoundAsync() => PauseAsync(1500);
+
+
+
+    // S2245: System.Random is fine here. It deals cards for a game, which is not
+    // security-sensitive (no keys, tokens or secrets).
+#pragma warning disable S2245
+    private static Random NewRandom() => new();
+#pragma warning restore S2245
+
+
+
+    /// <summary>
+    /// The pause before an AI move, so a person can follow the play. Skipped when
+    /// pacing is off (tests).
+    /// </summary>
+    private Task PauseAsync(int milliseconds) =>
+        _aiPacing ? Task.Delay(milliseconds) : Task.CompletedTask;
+
+
+
     private int CurrentGeneration()
     {
         lock (_sync)
@@ -483,11 +565,28 @@ public class GameService
 
 
 
-    [MemberNotNullWhen(true, nameof(_state), nameof(_biddingPhase))]
-    private bool IsBiddingOpen(int generation) =>
-        generation == _generation
-        && _state is { Phase: GamePhase.Bidding }
-        && _biddingPhase is { IsComplete: false };
+    /// <summary>
+    /// Whether bidding is still open in game <paramref name="generation"/>, and if so
+    /// the state and bidding phase to act on. A Try-method rather than
+    /// <c>[MemberNotNullWhen]</c>: that attribute is not in netstandard2.0, and a second
+    /// PolySharp polyfill makes the engine build non-reproducible (see the engine's
+    /// .csproj).
+    /// </summary>
+    private bool TryGetOpenBidding(int generation, out GameState state, out BiddingPhase biddingPhase)
+    {
+        if (generation == _generation
+            && _state is { Phase: GamePhase.Bidding } openState
+            && _biddingPhase is { IsComplete: false } openPhase)
+        {
+            state = openState;
+            biddingPhase = openPhase;
+            return true;
+        }
+
+        state = null!;
+        biddingPhase = null!;
+        return false;
+    }
 
 
 
