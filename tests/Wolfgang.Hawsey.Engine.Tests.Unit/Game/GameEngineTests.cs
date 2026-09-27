@@ -530,4 +530,50 @@ public class GameEngineTests
 
         Assert.Equal("trumpSuit", ex.ParamName);
     }
+
+
+
+    [Fact]
+    public void TryPlayCard_plays_a_legal_card_like_PlayCard()
+    {
+        var state = _engine.SelectTrump(CreateStateAtTrumpSelection(), Suit.Hearts);
+        var player = state.NextToAct!.Value;
+        var card = state.GetLegalPlays()[0];
+
+        var next = _engine.TryPlayCard(state, player, card);
+
+        Assert.NotNull(next);
+        Assert.Equal(card, next.CurrentTrick!.Plays[0].Card);
+        Assert.DoesNotContain(card, next.Hands[player]);
+    }
+
+
+
+    [Fact]
+    public void TryPlayCard_refuses_an_illegal_card_the_wrong_player_or_the_wrong_phase()
+    {
+        var trumpSelection = CreateStateAtTrumpSelection();
+        var state = _engine.SelectTrump(trumpSelection, Suit.Hearts);
+        var leader = state.NextToAct!.Value;
+        var lead = state.GetLegalPlays()[0];
+        var notHeld = Deck.CreatePinochleDeck().First(c => !state.Hands[leader].Contains(c));
+        var other = leader.NextClockwise();
+
+        Assert.Null(_engine.TryPlayCard(trumpSelection, leader, lead));
+        Assert.Null(_engine.TryPlayCard(state, other, state.Hands[other][0]));
+        Assert.Null(_engine.TryPlayCard(state, leader, notHeld));
+
+        // Play on until the player to act holds a card they may not play (the leader
+        // never does, so this plays at least one card).
+        while (state.GetLegalPlays().Count == state.Hands[state.NextToAct!.Value].Count)
+        {
+            state = _engine.PlayCard(state, state.NextToAct!.Value, state.GetLegalPlays()[0]);
+        }
+
+        var player = state.NextToAct!.Value;
+        var legal = state.GetLegalPlays();
+        var illegal = state.Hands[player].First(c => !legal.Contains(c));
+
+        Assert.Null(_engine.TryPlayCard(state, player, illegal));
+    }
 }
