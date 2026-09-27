@@ -18,6 +18,7 @@ dotnet tool restore && dotnet stryker
 | 2026-09-22 | 82.30% | 75 | Gate introduced (#71) |
 | 2026-09-25 | 92.42% | 88 | Survivors triaged and killed (#36) |
 | 2026-09-27 | 90.06% | 88 | `GameSession` and `SimpleAiStrategy` moved into the engine; their behaviour tests added (#859) |
+| 2026-09-27 | 90.43% | 88 | The Blazor UI's AI becomes the engine's (#879); bidding progress on `GameState` (#878); session bids and the human Hawsey exchange (#882) |
 
 ## Triage of the surviving mutants (2026-09-25)
 
@@ -61,3 +62,27 @@ brought it back to 90.06%. The remaining survivors in these two files are accept
 | `CompletedTricks.Count > 0` becomes `>= 0` | Equivalent: after any play, either the current trick holds a card or a trick has just completed. |
 | `>` becomes `>=` and `<` becomes `<=` in the AI's rank comparisons | Equivalent: the only equal ranks are the two copies of one card. |
 | The game-over winner expression | Replaced by the engine's own `GameState.Winner` (#862). |
+
+## The engine AI from the Blazor UI (2026-09-27)
+
+Run on `main` at 699e064, after #878, #879, #880, #882 and #883: **90.43%**, with 579 killed,
+59 survived, 4 without coverage and 16 timeouts. #879's four behaviour tests had
+already been added. Most survivors fall into the categories above: exception-message
+strings, the `GameSession` pause guards, generation and `ConfigureAwait` variants, the
+removed null guards in `GameEngine` and `GameRunner`, and the `Trick.GetCurrentWinner`
+tie. Two groups are **genuine gaps**, tracked in #875 for killing tests:
+
+| Location | Mutation | Why it survives |
+|---|---|---|
+| `GameState.Winner`: `EastWestScore >= Rules.PointsToWin` | `>=` becomes `>` | No test has East/West finish exactly on the target. |
+| `GameState.Winner`: the "not game over" early return | Block removed | No test asks a hand-built, not-yet-over state with a winning score. |
+| `SimpleAiStrategy` sure-winner check: copies left of a higher card, trumps still out, `CountInHand` | Arithmetic, equality and increment mutations | The tests check which card the AI leads, but no position makes the counting decide it. |
+
+Equivalent, and accepted:
+
+| Location | Mutation | Why it is equivalent |
+|---|---|---|
+| `GameState.Winner`: the final `eastWestReached ? EastWest : null` | Always `EastWest` | At game over one team has always reached the target. |
+| `SimpleAiStrategy`: the rank comparisons that pick the highest or lowest card | `>` / `<` become `>=` / `<=` | The only equal ranks are the two copies of one card. |
+| `GameSession`: the `CompletedTricks.Count > 0` check | `>=` | As in the `GameSession` table above. |
+
