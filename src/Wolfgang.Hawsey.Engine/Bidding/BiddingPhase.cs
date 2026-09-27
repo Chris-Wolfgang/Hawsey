@@ -163,6 +163,21 @@ public sealed class BiddingPhase
 
 
 
+    /// <summary>
+    /// Gets the highest number bid so far, or <c>0</c> when nobody has bid.
+    /// </summary>
+    public int HighestBid => _highestBid;
+
+
+
+    /// <summary>
+    /// Gets the player holding the highest bid, or <c>null</c> when nobody has bid.
+    /// After a Hawsey bid, the Hawsey bidder.
+    /// </summary>
+    public PlayerPosition? HighestBidder => _highestBidder;
+
+
+
     private void ValidateNumberBid(BidAction.NumberBid bid)
     {
         if (bid.Amount < _minimumBid)
