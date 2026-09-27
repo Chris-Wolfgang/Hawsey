@@ -35,6 +35,8 @@ public partial class GameViewModel : INotifyPropertyChanged
     private int _northCardCount;
     private int _eastCardCount;
     private int _westCardCount;
+    private string _bidPrompt = "";
+    private bool _canPass = true;
 
 
 
@@ -161,6 +163,38 @@ public partial class GameViewModel : INotifyPropertyChanged
     {
         get => _westCardCount;
         set => SetProperty(ref _westCardCount, value);
+    }
+
+
+
+    /// <summary>
+    /// The number bids the human may make now, as command parameters: from the
+    /// minimum legal bid up to 11 (12 tricks is a Hawsey bid), or only the minimum
+    /// when the human is the stuck dealer.
+    /// </summary>
+    public ObservableCollection<string> BidOptions { get; } = new();
+
+
+
+    /// <summary>
+    /// The line above the bid buttons: the high bid and who holds it, the minimum when
+    /// nobody has bid, or that the human is stuck.
+    /// </summary>
+    public string BidPrompt
+    {
+        get => _bidPrompt;
+        set => SetProperty(ref _bidPrompt, value);
+    }
+
+
+
+    /// <summary>
+    /// Whether the human may pass. The stuck dealer must bid (the minimum, or Hawsey).
+    /// </summary>
+    public bool CanPass
+    {
+        get => _canPass;
+        set => SetProperty(ref _canPass, value);
     }
 
 
@@ -436,7 +470,61 @@ public partial class GameViewModel : INotifyPropertyChanged
 
         TrumpDisplay = GetTrumpDisplayText(state);
         BidInfoDisplay = GetBidInfoText(state);
+
+        if (state.Phase == GamePhase.Bidding)
+        {
+            UpdateBidChoices(state);
+        }
     }
+
+
+
+    /// <summary>
+    /// The bid overlay's prompt and buttons, from the engine's bidding progress. Same
+    /// rules as the Blazor UI: the minimum legal bid up to 11; the stuck dealer may only
+    /// bid the minimum or call Hawsey.
+    /// </summary>
+    private void UpdateBidChoices(GameState state)
+    {
+        const int HighestNumberBid = 11;
+
+        var stuck = state.IsNextBidderStuck;
+        var highest = stuck ? state.MinimumLegalBid : HighestNumberBid;
+
+        BidOptions.Clear();
+
+        for (var amount = state.MinimumLegalBid; amount <= highest; amount++)
+        {
+            BidOptions.Add(amount.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        }
+
+        CanPass = !stuck;
+        BidPrompt = GetBidPrompt(state, stuck);
+    }
+
+
+
+    private static string GetBidPrompt(GameState state, bool stuck)
+    {
+        if (stuck)
+        {
+            return $"You're stuck as dealer: bid {state.MinimumLegalBid} or call Hawsey.";
+        }
+
+        if (state.HighBidder is { } holder)
+        {
+            return $"Current high bid: {state.HighBid} by {BidderName(holder)}";
+        }
+
+        return $"No bids yet. Minimum: {state.MinimumLegalBid}";
+    }
+
+
+
+    // The human never faces its own bid (bidding goes round once), so the holder is
+    // the partner or an opponent.
+    private static string BidderName(PlayerPosition player) =>
+        player == PlayerPosition.North ? "North (your partner)" : $"{player} (opponents)";
 
 
 

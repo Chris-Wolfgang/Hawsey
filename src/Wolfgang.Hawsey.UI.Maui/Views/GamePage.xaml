@@ -132,24 +132,24 @@
                            TextColor="White" FontSize="22"
                            FontAttributes="Bold"
                            HorizontalOptions="Center" />
-                    <FlexLayout Wrap="Wrap" JustifyContent="Center" AlignItems="Center">
-                        <Button Text="6" Command="{Binding PlaceBidCommand}" CommandParameter="6"
-                                BackgroundColor="#2196F3" TextColor="White" Margin="4" MinimumWidthRequest="50" />
-                        <Button Text="7" Command="{Binding PlaceBidCommand}" CommandParameter="7"
-                                BackgroundColor="#2196F3" TextColor="White" Margin="4" MinimumWidthRequest="50" />
-                        <Button Text="8" Command="{Binding PlaceBidCommand}" CommandParameter="8"
-                                BackgroundColor="#2196F3" TextColor="White" Margin="4" MinimumWidthRequest="50" />
-                        <Button Text="9" Command="{Binding PlaceBidCommand}" CommandParameter="9"
-                                BackgroundColor="#2196F3" TextColor="White" Margin="4" MinimumWidthRequest="50" />
-                        <Button Text="10" Command="{Binding PlaceBidCommand}" CommandParameter="10"
-                                BackgroundColor="#2196F3" TextColor="White" Margin="4" MinimumWidthRequest="50" />
-                        <Button Text="11" Command="{Binding PlaceBidCommand}" CommandParameter="11"
-                                BackgroundColor="#2196F3" TextColor="White" Margin="4" MinimumWidthRequest="50" />
-                        <Button Text="12" Command="{Binding PlaceBidCommand}" CommandParameter="12"
-                                BackgroundColor="#2196F3" TextColor="White" Margin="4" MinimumWidthRequest="50" />
+                    <Label Text="{Binding BidPrompt}"
+                           TextColor="White" FontSize="14"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center" />
+                    <FlexLayout Wrap="Wrap" JustifyContent="Center" AlignItems="Center"
+                                BindableLayout.ItemsSource="{Binding BidOptions}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Button Text="{Binding .}"
+                                        Command="{Binding PlaceBidCommand, Source={RelativeSource AncestorType={x:Type vm:GameViewModel}}, x:DataType=vm:GameViewModel}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="#2196F3" TextColor="White" Margin="4" MinimumWidthRequest="50" />
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
                     </FlexLayout>
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                         <Button Grid.Column="0" Text="Pass"
+                                IsVisible="{Binding CanPass}"
                                 Command="{Binding PlaceBidCommand}" CommandParameter="pass"
                                 BackgroundColor="#757575" TextColor="White" />
                         <Button Grid.Column="1" Text="Hawsey!"

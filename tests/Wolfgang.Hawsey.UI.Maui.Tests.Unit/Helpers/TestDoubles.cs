@@ -44,13 +44,13 @@ internal static class TestGameSessions
 /// AI's. For tests whose scenario needs the human's bid to stand, or everyone to pass
 /// so the dealer is stuck.
 /// </summary>
-internal sealed class PassingAi : IPlayerStrategy
+internal class PassingAi : IPlayerStrategy
 {
     private readonly SimpleAiStrategy _ai = new();
 
 
 
-    public BidAction DecideBid(GameState state, PlayerPosition player) => BidAction.PassBid.Instance;
+    public virtual BidAction DecideBid(GameState state, PlayerPosition player) => BidAction.PassBid.Instance;
 
 
 
