@@ -45,7 +45,8 @@ public class HouseRulesTests
     {
         var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new HouseRules { MinimumBid = minimumBid });
 
-        Assert.Equal(nameof(HouseRules.MinimumBid), ex.ParamName);
+        // An init accessor's parameter is "value", as for any .NET property setter.
+        Assert.Equal("value", ex.ParamName);
     }
 
 
@@ -67,7 +68,7 @@ public class HouseRulesTests
     {
         var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new HouseRules { PointsToWin = pointsToWin });
 
-        Assert.Equal(nameof(HouseRules.PointsToWin), ex.ParamName);
+        Assert.Equal("value", ex.ParamName);
     }
 
 

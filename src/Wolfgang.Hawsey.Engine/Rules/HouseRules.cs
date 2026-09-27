@@ -52,7 +52,7 @@ public sealed class HouseRules
             {
                 throw new ArgumentOutOfRangeException
                 (
-                    nameof(MinimumBid),
+                    nameof(value),
                     value,
                     $"The minimum bid must be from 1 to {BiddingPhase.MaximumBid}."
                 );
@@ -77,7 +77,7 @@ public sealed class HouseRules
             {
                 throw new ArgumentOutOfRangeException
                 (
-                    nameof(PointsToWin),
+                    nameof(value),
                     value,
                     "The points to win must be at least 1."
                 );
