@@ -1,0 +1,894 @@
+@page "/"
+@inject GameSession Game
+@implements IDisposable
+
+<PageTitle>Hawsey</PageTitle>
+
+<div class="table">
+
+    @if (State?.TrumpSuit is { } trump)
+    {
+        var sym = SuitSymbol(trump);
+        var color = trump is Suit.Hearts or Suit.Diamonds ? "red" : "black";
+        <div class="trump-corner top-left @color">@sym</div>
+        <div class="trump-corner top-right @color">@sym</div>
+        <div class="trump-corner bottom-left @color">@sym</div>
+        <div class="trump-corner bottom-right @color">@sym</div>
+    }
+
+    <div class="panel tricks">
+        <div class="label">Tricks (Total)</div>
+        <div class="pair">
+            <div class="col-us"><span class="heading">US</span><span class="value">@UsTricks</span></div>
+            <div class="col-them"><span class="heading">THEM</span><span class="value">@ThemTricks</span></div>
+        </div>
+        <div class="trump">
+            Trump: <span class="suit-mark @TrumpColorClass">@TrumpSymbol</span>
+            @if (TrumpSetterTeam is not null)
+            {
+                <span class="who @(TrumpSetterTeam == "US" ? "us" : "them")">@TrumpSetterTeam</span>
+                @if (BidAmountText is { } amt)
+                {
+                    <span class="bid-amount">· @amt</span>
+                }
+            }
+        </div>
+    </div>
+
+    <div class="panel score">
+        <div class="label">Score</div>
+        <div class="pair">
+            <div class="col-us"><span class="heading">US</span><span class="value">@UsScore</span></div>
+            <div class="col-them"><span class="heading">THEM</span><span class="value">@ThemScore</span></div>
+        </div>
+    </div>
+
+    <div class="seat partner @SeatActiveClass(PlayerPosition.North)">
+        <div class="nameplate">
+            <div class="avatar"></div>
+            <span class="name">PARTNER</span>
+            <span>Tricks: @TricksWon(PlayerPosition.North)</span>
+        </div>
+        @if (BidBadge(PlayerPosition.North) is { } pb) { <span class="bid-badge @pb.Class">@pb.Text</span> }
+        @if (IsDealer(PlayerPosition.North)) { <div class="dealer-puck">D</div> }
+        <div class="opponent-hand">
+            @for (var i = 0; i < HandCount(PlayerPosition.North); i++)
+            {
+                <div class="card-back"></div>
+            }
+        </div>
+    </div>
+
+    <div class="seat left @SeatActiveClass(PlayerPosition.West)">
+        <div class="opponent-hand vertical">
+            @for (var i = 0; i < HandCount(PlayerPosition.West); i++)
+            {
+                <div class="card-back"></div>
+            }
+        </div>
+        <div class="nameplate">
+            <div class="avatar"></div>
+            <span class="name">OPPONENT LEFT</span>
+            <span>Tricks: @TricksWon(PlayerPosition.West)</span>
+        </div>
+        @if (BidBadge(PlayerPosition.West) is { } wb) { <span class="bid-badge @wb.Class">@wb.Text</span> }
+        @if (IsDealer(PlayerPosition.West)) { <div class="dealer-puck">D</div> }
+    </div>
+
+    <div class="seat right @SeatActiveClass(PlayerPosition.East)">
+        <div class="opponent-hand vertical">
+            @for (var i = 0; i < HandCount(PlayerPosition.East); i++)
+            {
+                <div class="card-back"></div>
+            }
+        </div>
+        <div class="nameplate">
+            <div class="avatar"></div>
+            <span class="name">OPPONENT RIGHT</span>
+            <span>Tricks: @TricksWon(PlayerPosition.East)</span>
+        </div>
+        @if (BidBadge(PlayerPosition.East) is { } eb) { <span class="bid-badge @eb.Class">@eb.Text</span> }
+        @if (IsDealer(PlayerPosition.East)) { <div class="dealer-puck">D</div> }
+    </div>
+
+    <div class="trick-area">
+        <div class="trick-slot north">
+            @{ var north = PlayInTrick(PlayerPosition.North); }
+            @if (north is not null) { @RenderPlayedCard(north) }
+        </div>
+        <div class="trick-slot west">
+            @{ var west = PlayInTrick(PlayerPosition.West); }
+            @if (west is not null) { @RenderPlayedCard(west) }
+        </div>
+
+        <div class="trick-info">
+            <div class="heading">CURRENT TRICK</div>
+            <div class="led">@LedByText</div>
+            <div class="winner-label">Winning Card</div>
+            <div class="winner-card">@WinningCardText</div>
+        </div>
+
+        <div class="trick-slot east">
+            @{ var east = PlayInTrick(PlayerPosition.East); }
+            @if (east is not null) { @RenderPlayedCard(east) }
+        </div>
+        <div class="trick-slot south">
+            @{ var south = PlayInTrick(PlayerPosition.South); }
+            @if (south is not null) { @RenderPlayedCard(south) }
+        </div>
+    </div>
+
+    <div class="seat you @SeatActiveClass(PlayerPosition.South)">
+        @if (IsDealer(PlayerPosition.South)) { <div class="dealer-puck">D</div> }
+        <div class="nameplate">
+            <div class="avatar"></div>
+            <span class="name">YOU</span>
+            <span>Tricks: @TricksWon(PlayerPosition.South)</span>
+        </div>
+        @if (BidBadge(PlayerPosition.South) is { } sb) { <span class="bid-badge @sb.Class">@sb.Text</span> }
+    </div>
+
+    <div class="hand">
+        @for (var i = 0; i < HumanHand.Count; i++)
+        {
+            var index = i;
+            var card = HumanHand[i];
+            var legal = LegalPlays.Contains(card);
+            var canPlay = IsHumanPlayTurn && legal;
+            var isDragging = _dragIndex == index;
+            var isSelectedForDiscard = HawseyExchangeVisible && _hawseyDiscardSelection.Contains(card);
+            var interactive = HawseyExchangeVisible || canPlay;
+            <div class="card @(IsRed(card) ? "red" : "") @(canPlay ? "playable" : "") @(!interactive ? "disabled" : "") @(isDragging ? "dragging" : "") @(isSelectedForDiscard ? "selected-discard" : "")"
+                 draggable="true"
+                 @ondragstart="@(() => OnDragStart(index))"
+                 @ondragover:preventDefault="true"
+                 @ondragover="@(() => { })"
+                 @ondragend="OnDragEnd"
+                 @ondrop="@(() => OnDrop(index))"
+                 @onclick="() => OnCardClickAsync(card)">
+                <span class="rank">@RankText(card.Rank)</span>
+                <span class="suit">@SuitSymbol(card.Suit)</span>
+            </div>
+        }
+    </div>
+
+    <div class="statusbar">@StatusMessage</div>
+
+    <div class="controls left">
+        <button class="btn" @onclick="StartNewGameAsync">&#9776; NEW GAME</button>
+        <button class="btn" @onclick="() => LogVisible = !LogVisible">Game log</button>
+    </div>
+
+    @if (LogVisible)
+    {
+        <div class="ai-log">
+            <div class="ai-log-header">
+                <span>Game log</span>
+                <button class="btn small" @onclick="() => LogVisible = false">close</button>
+            </div>
+            <div class="ai-log-entries">
+                @foreach (var entry in GameLog)
+                {
+                    <div class="ai-log-entry">@entry</div>
+                }
+            </div>
+        </div>
+    }
+
+    @if (TrumpPickerVisible)
+    {
+        <div class="modal-backdrop">
+            <div class="modal-card">
+                <h2>Pick trump</h2>
+                <div class="trump-buttons">
+                    <button class="btn red"   @onclick="@(() => SelectTrumpAsync(Suit.Hearts))">♥ Hearts</button>
+                    <button class="btn red"   @onclick="@(() => SelectTrumpAsync(Suit.Diamonds))">♦ Diamonds</button>
+                    <button class="btn black" @onclick="@(() => SelectTrumpAsync(Suit.Clubs))">♣ Clubs</button>
+                    <button class="btn black" @onclick="@(() => SelectTrumpAsync(Suit.Spades))">♠ Spades</button>
+                </div>
+                <button class="btn" @onclick="@(() => SelectTrumpAsync(null))">Ace High (no trump)</button>
+            </div>
+        </div>
+    }
+
+    @if (RoundSummary is { } rs)
+    {
+        <div class="modal-backdrop">
+            <div class="modal-card round-summary">
+                @if (rs.IsGameOver)
+                {
+                    var winClass = rs.GameWinnerLabel == "US" ? "us" : "them";
+                    <h2 class="@winClass"><span class="@winClass">@rs.GameWinnerLabel</span> wins the game!</h2>
+                }
+                else
+                {
+                    <h2>Round complete</h2>
+                }
+
+                <div class="rs-bid">
+                    <span class="@(rs.BidTeamLabel == "US" ? "us" : "them")">@rs.BidTeamLabel</span>
+                    bid <strong>@rs.BidText</strong>
+                    @(rs.Made
+                        ? (MarkupString)"<span class=\"made\">made it</span>"
+                        : (MarkupString)"<span class=\"set\">went set</span>")
+                </div>
+
+                <div class="rs-grid">
+                    <div></div>
+                    <div class="us">US</div>
+                    <div class="them">THEM</div>
+
+                    <div>Tricks</div>
+                    <div>@rs.UsTricks</div>
+                    <div>@rs.ThemTricks</div>
+
+                    <div>This round</div>
+                    <div class="@(rs.UsDelta < 0 ? "neg" : "pos")">@FormatDelta(rs.UsDelta)</div>
+                    <div class="@(rs.ThemDelta < 0 ? "neg" : "pos")">@FormatDelta(rs.ThemDelta)</div>
+
+                    <div>Total</div>
+                    <div>@rs.UsTotal</div>
+                    <div>@rs.ThemTotal</div>
+                </div>
+
+                @if (rs.IsGameOver)
+                {
+                    <button class="btn primary" @onclick="StartNewGameAsync">Play again</button>
+                }
+                else
+                {
+                    <button class="btn primary" @onclick="OnNextRoundAsync">Next round</button>
+                }
+            </div>
+        </div>
+    }
+
+    @if (HawseyExchangeVisible)
+    {
+        <div class="modal-backdrop bid-mode">
+            <div class="modal-card">
+                <h2>Hawsey exchange</h2>
+                <p class="modal-sub">
+                    Click <strong>2 cards</strong> in your hand to discard.
+                    Your partner gives you their <strong>2 best</strong> for the chosen trump.
+                </p>
+                <p class="modal-sub">
+                    Selected: <strong>@_hawseyDiscardSelection.Count / 2</strong>
+                </p>
+                <button class="btn primary" disabled="@(_hawseyDiscardSelection.Count != 2)"
+                        @onclick="ConfirmHawseyDiscardAsync">Discard &amp; receive</button>
+            </div>
+        </div>
+    }
+
+    @if (BidPickerVisible)
+    {
+        <div class="modal-backdrop bid-mode">
+            <div class="modal-card">
+                <h2>Your bid</h2>
+                <p class="modal-sub">
+                    @if (IsHumanStuck)
+                    {
+                        <span>You're <strong>stuck</strong> as dealer — bid <strong>@MinimumLegalBid</strong> or call Hawsey.</span>
+                    }
+                    else if (State?.HighBidder is { } highBidder)
+                    {
+                        <span>Current high bid: <strong>@State.HighBid</strong> by <strong>@BidderName(highBidder)</strong></span>
+                    }
+                    else
+                    {
+                        <span>No bids yet. Minimum: <strong>@MinimumLegalBid</strong></span>
+                    }
+                </p>
+                <div class="bid-buttons">
+                    @if (IsHumanStuck)
+                    {
+                        var stuckAmount = MinimumLegalBid;
+                        <button class="btn" @onclick="@(() => PlaceHumanBidAsync(new BidAction.NumberBid(stuckAmount)))">Bid @stuckAmount</button>
+                    }
+                    else
+                    {
+                        @for (var n = MinimumLegalBid; n <= 11; n++)
+                        {
+                            var amount = n;
+                            <button class="btn" @onclick="@(() => PlaceHumanBidAsync(new BidAction.NumberBid(amount)))">Bid @amount</button>
+                        }
+                    }
+                </div>
+                <button class="btn red" @onclick="@(() => PlaceHumanBidAsync(BidAction.HawseyBid.Instance))">Hawsey (24)</button>
+                @if (!IsHumanStuck)
+                {
+                    <button class="btn" @onclick="@(() => PlaceHumanBidAsync(BidAction.PassBid.Instance))">Pass</button>
+                }
+            </div>
+        </div>
+    }
+
+</div>
+
+@code {
+    private GameState? State => Game.CurrentState;
+    private bool BidPickerVisible;
+    private bool TrumpPickerVisible;
+    private bool HawseyExchangeVisible;
+    private readonly List<Card> _hawseyDiscardSelection = new();
+    private bool LogVisible;
+    private RoundSummarySnapshot? RoundSummary;
+    private string StatusMessage = "Welcome to Hawsey. Click NEW GAME to start.";
+
+    private sealed record RoundSummarySnapshot
+    (
+        string BidTeamLabel,
+        string BidText,
+        bool Made,
+        int UsTricks,
+        int ThemTricks,
+        int UsDelta,
+        int ThemDelta,
+        int UsTotal,
+        int ThemTotal,
+        bool IsGameOver,
+        string GameWinnerLabel
+    );
+
+    private static string FormatDelta(int n) => n > 0 ? $"+{n}" : n.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+    private string SeatActiveClass(PlayerPosition p) =>
+        State?.Phase == GamePhase.Bidding && State.NextToAct == p ? "active" : "";
+
+    private bool IsDealer(PlayerPosition p) => State?.Dealer == p;
+
+    private (string Text, string Class)? BidBadge(PlayerPosition p)
+    {
+        if (State?.Phase is GamePhase.TrickPlay or GamePhase.RoundScoring or GamePhase.GameOver)
+        {
+            return null;
+        }
+
+        var bids = Game.Bids;
+
+        for (var i = bids.Count - 1; i >= 0; i--)
+        {
+            if (bids[i].Player == p)
+            {
+                return bids[i].Action switch
+                {
+                    BidAction.PassBid => ("Pass", "pass"),
+                    BidAction.NumberBid n => ($"Bid {n.Amount}", "number"),
+                    BidAction.HawseyBid => ("Hawsey", "hawsey"),
+                    _ => default((string, string)?)
+                };
+            }
+        }
+        return null;
+    }
+
+    // The engine decides the bidding rules; the page only reads them.
+    private bool IsHumanStuck => State is { IsNextBidderStuck: true, NextToAct: PlayerPosition.South };
+
+    private int MinimumLegalBid => State?.MinimumLegalBid ?? 6;
+
+    private static string BidderName(PlayerPosition p) => p switch
+    {
+        PlayerPosition.North => "your partner",
+        PlayerPosition.South => "you",
+        _ => $"{p} (opponents)"
+    };
+
+    /// <summary>
+    /// The trick just won, shown until the next card is led: while the current trick is
+    /// empty (or gone, after the last trick), the last completed trick.
+    /// </summary>
+    private TrickResult? LastCompletedTrick =>
+        State is { CompletedTricks.Count: > 0 } s && (s.CurrentTrick is null || s.CurrentTrick.Plays.Count == 0)
+            ? s.CompletedTricks[^1]
+            : null;
+
+    /// <summary>This round so far: each bid, then each trick's winner.</summary>
+    private IEnumerable<string> GameLog
+    {
+        get
+        {
+            foreach (var bid in Game.Bids)
+            {
+                var what = bid.Action switch
+                {
+                    BidAction.NumberBid n => $"bids {n.Amount}",
+                    BidAction.HawseyBid => "calls Hawsey",
+                    _ => "passes"
+                };
+                yield return $"{bid.Player} {what}.";
+            }
+
+            var tricks = State?.CompletedTricks;
+            for (var i = 0; tricks is not null && i < tricks.Count; i++)
+            {
+                yield return $"Trick {i + 1}: {tricks[i].Winner} wins.";
+            }
+        }
+    }
+
+    private List<Card>? _customOrder;
+    private int? _dragIndex;
+
+    private IReadOnlyList<Card> HumanHand
+    {
+        get
+        {
+            if (State is null) return Array.Empty<Card>();
+            if (!State.Hands.TryGetValue(PlayerPosition.South, out var hand) || hand is null)
+            {
+                return Array.Empty<Card>();
+            }
+            SyncCustomOrder(hand);
+            return _customOrder ?? hand;
+        }
+    }
+
+    private void SyncCustomOrder(List<Card> hand)
+    {
+        if (_customOrder is null)
+        {
+            // Initial deal: sort.
+            _customOrder = new List<Card>(hand);
+            _customOrder.Sort(CompareForDisplay);
+            return;
+        }
+
+        // Reconcile against the actual hand by multiset comparison. Handles every
+        // case the same way: card played (count down), Hawsey exchange (count same
+        // but contents change), or a fresh deal (count up).
+        //   1. Drop any card from _customOrder that isn't in hand any more.
+        //   2. Append any card in hand that isn't already in _customOrder.
+        // Order is preserved for cards the player has dragged into place.
+        var handBag = new Dictionary<Card, int>();
+        for (var i = 0; i < hand.Count; i++)
+        {
+            handBag.TryGetValue(hand[i], out var n);
+            handBag[hand[i]] = n + 1;
+        }
+
+        var newOrder = new List<Card>(hand.Count);
+        for (var i = 0; i < _customOrder.Count; i++)
+        {
+            var c = _customOrder[i];
+            if (handBag.TryGetValue(c, out var n) && n > 0)
+            {
+                newOrder.Add(c);
+                handBag[c] = n - 1;
+            }
+        }
+
+        // Whatever's left in handBag is new (e.g. just received from partner via
+        // a Hawsey exchange). Append in display order so they sit with their suit.
+        var newcomers = new List<Card>();
+        foreach (var kv in handBag)
+        {
+            for (var i = 0; i < kv.Value; i++) newcomers.Add(kv.Key);
+        }
+        if (newcomers.Count > 0)
+        {
+            newcomers.Sort(CompareForDisplay);
+            newOrder.AddRange(newcomers);
+        }
+
+        _customOrder = newOrder;
+    }
+
+    private static int CompareForDisplay(Card a, Card b)
+    {
+        var sa = SuitDisplayOrder(a.Suit);
+        var sb = SuitDisplayOrder(b.Suit);
+        if (sa != sb) return sa - sb;
+        return (int)b.Rank - (int)a.Rank;
+    }
+
+    private static int SuitDisplayOrder(Suit s) => s switch
+    {
+        Suit.Spades   => 0,
+        Suit.Hearts   => 1,
+        Suit.Clubs    => 2,
+        Suit.Diamonds => 3,
+        _ => 99
+    };
+
+    private void OnDragStart(int index) => _dragIndex = index;
+    private void OnDragEnd() => _dragIndex = null;
+
+    private void OnDrop(int dropIndex)
+    {
+        if (_dragIndex is not int from || _customOrder is null)
+        {
+            _dragIndex = null;
+            return;
+        }
+        _dragIndex = null;
+        if (from == dropIndex) return;
+
+        var card = _customOrder[from];
+        _customOrder.RemoveAt(from);
+        var insertAt = dropIndex > from ? dropIndex - 1 : dropIndex;
+        if (insertAt < 0) insertAt = 0;
+        if (insertAt > _customOrder.Count) insertAt = _customOrder.Count;
+        _customOrder.Insert(insertAt, card);
+    }
+
+    private IReadOnlyList<Card> LegalPlays =>
+        IsHumanPlayTurn ? State!.GetLegalPlays() : Array.Empty<Card>();
+
+    private bool IsHumanPlayTurn =>
+        State?.Phase == GamePhase.TrickPlay && State.NextToAct == PlayerPosition.South;
+
+    private int UsScore => State?.NorthSouthScore ?? 0;
+    private int ThemScore => State?.EastWestScore ?? 0;
+
+    private int UsTricks => CountTricks(t => t == PlayerPosition.North || t == PlayerPosition.South);
+    private int ThemTricks => CountTricks(t => t == PlayerPosition.East || t == PlayerPosition.West);
+
+    private int CountTricks(Func<PlayerPosition, bool> match)
+    {
+        var tricks = State?.CompletedTricks;
+        if (tricks is null) return 0;
+        var count = 0;
+        for (var i = 0; i < tricks.Count; i++) if (match(tricks[i].Winner)) count++;
+        return count;
+    }
+
+    private int TricksWon(PlayerPosition p) =>
+        State is null ? 0 : CountTricks(w => w == p);
+
+    private int HandCount(PlayerPosition p) =>
+        State?.Hands.TryGetValue(p, out var h) == true ? h.Count : 0;
+
+    private string TrumpSymbol => State?.TrumpSuit is { } s ? SuitSymbol(s) : "—";
+    private string TrumpColorClass => State?.TrumpSuit is Suit.Hearts or Suit.Diamonds ? "red" : "black";
+
+    private string? TrumpSetterTeam
+    {
+        get
+        {
+            var winner = State?.BiddingResult?.Winner;
+            if (winner is null) return null;
+            return winner is PlayerPosition.North or PlayerPosition.South ? "US" : "THEM";
+        }
+    }
+
+    private string? BidAmountText
+    {
+        get
+        {
+            var br = State?.BiddingResult;
+            if (br is null) return null;
+            return br.IsHawsey ? "Hawsey (24)" : br.BidAmount.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        }
+    }
+
+    private string LedByText
+    {
+        get
+        {
+            if (LastCompletedTrick is { } recent && recent.Cards.Count > 0)
+            {
+                return $"Led by {LeaderName(recent.Cards[0].Player)}";
+            }
+            var trick = State?.CurrentTrick;
+            if (trick is null || trick.Plays.Count == 0) return "";
+            return $"Led by {LeaderName(trick.Plays[0].Player)}";
+        }
+    }
+
+    private string WinningCardText
+    {
+        get
+        {
+            if (LastCompletedTrick is { } recent)
+            {
+                for (var i = 0; i < recent.Cards.Count; i++)
+                {
+                    if (recent.Cards[i].Player == recent.Winner)
+                    {
+                        var c = recent.Cards[i].Card;
+                        return $"{RankText(c.Rank)} {SuitSymbol(c.Suit)}";
+                    }
+                }
+            }
+            var winner = State?.CurrentTrick?.GetCurrentWinner();
+            return winner is null ? "—" : $"{RankText(winner.Value.Rank)} {SuitSymbol(winner.Value.Suit)}";
+        }
+    }
+
+    private static string LeaderName(PlayerPosition p) => p switch
+    {
+        PlayerPosition.North => "Partner",
+        PlayerPosition.East  => "Right",
+        PlayerPosition.South => "You",
+        PlayerPosition.West  => "Left",
+        _ => p.ToString()
+    };
+
+    private PlayedCard? PlayInTrick(PlayerPosition p)
+    {
+        var plays = LastCompletedTrick is { } recent
+            ? recent.Cards
+            : State?.CurrentTrick?.Plays;
+
+        if (plays is null) return null;
+        for (var i = 0; i < plays.Count; i++)
+        {
+            if (plays[i].Player == p) return plays[i];
+        }
+        return null;
+    }
+
+    private static bool IsRed(Card c) => c.Suit is Suit.Hearts or Suit.Diamonds;
+
+    private static string SuitSymbol(Suit s) => s switch
+    {
+        Suit.Hearts   => "♥",
+        Suit.Diamonds => "♦",
+        Suit.Clubs    => "♣",
+        Suit.Spades   => "♠",
+        _ => "?"
+    };
+
+    private static string RankText(Rank r) => r switch
+    {
+        Rank.Nine  => "9",
+        Rank.Ten   => "10",
+        Rank.Jack  => "J",
+        Rank.Queen => "Q",
+        Rank.King  => "K",
+        Rank.Ace   => "A",
+        _ => "?"
+    };
+
+    private static RenderFragment RenderPlayedCard(PlayedCard play) => builder =>
+    {
+        var card = play.Card;
+        builder.OpenElement(0, "div");
+        builder.AddAttribute(1, "class", "trick-card" + (IsRed(card) ? " red" : ""));
+        builder.OpenElement(2, "span");
+        builder.AddAttribute(3, "class", "rank");
+        builder.AddContent(4, RankText(card.Rank));
+        builder.CloseElement();
+        builder.OpenElement(5, "span");
+        builder.AddAttribute(6, "class", "suit");
+        builder.AddContent(7, SuitSymbol(card.Suit));
+        builder.CloseElement();
+        builder.CloseElement();
+    };
+
+    protected override void OnInitialized()
+    {
+        Game.StateChanged += OnStateChanged;
+    }
+
+    public void Dispose()
+    {
+        Game.StateChanged -= OnStateChanged;
+    }
+
+    // GameSession raises StateChanged from background continuations; hop to the
+    // renderer's context.
+    private void OnStateChanged(object? sender, EventArgs e) => _ = InvokeAsync(StateHasChanged);
+
+    private async Task StartNewGameAsync()
+    {
+        BidPickerVisible = false;
+        TrumpPickerVisible = false;
+        HawseyExchangeVisible = false;
+        _hawseyDiscardSelection.Clear();
+        RoundSummary = null;
+        _customOrder = null;
+        _dragIndex = null;
+        Game.StartNewGame();
+        await DriveLoopAsync();
+    }
+
+    private async Task PlaceHumanBidAsync(BidAction action)
+    {
+        BidPickerVisible = false;
+        Game.PlaceHumanBid(action);
+        await DriveLoopAsync();
+    }
+
+    private async Task SelectTrumpAsync(Suit? trump)
+    {
+        TrumpPickerVisible = false;
+        Game.SelectTrump(trump);
+        await DriveLoopAsync();
+    }
+
+    private void ToggleHawseyDiscard(Card card)
+    {
+        if (!HawseyExchangeVisible) return;
+        var idx = _hawseyDiscardSelection.IndexOf(card);
+        if (idx >= 0)
+        {
+            _hawseyDiscardSelection.RemoveAt(idx);
+        }
+        else if (_hawseyDiscardSelection.Count < 2)
+        {
+            _hawseyDiscardSelection.Add(card);
+        }
+    }
+
+    private async Task ConfirmHawseyDiscardAsync()
+    {
+        if (_hawseyDiscardSelection.Count != 2) return;
+        var discard = _hawseyDiscardSelection.ToArray();
+        _hawseyDiscardSelection.Clear();
+        HawseyExchangeVisible = false;
+        Game.PerformHumanHawseyExchange(discard);
+        await DriveLoopAsync();
+    }
+
+    private async Task OnNextRoundAsync()
+    {
+        RoundSummary = null;
+        Game.StartNextRound();
+        await DriveLoopAsync();
+    }
+
+    private RoundSummarySnapshot CaptureRoundSummary(bool isGameOver)
+    {
+        var s = State;
+        var br = s?.BiddingResult;
+
+        var usTricks = 0;
+        var themTricks = 0;
+        if (s is not null)
+        {
+            for (var i = 0; i < s.CompletedTricks.Count; i++)
+            {
+                var w = s.CompletedTricks[i].Winner;
+                if (w is PlayerPosition.North or PlayerPosition.South) usTricks++;
+                else themTricks++;
+            }
+        }
+
+        var bidTeam = br?.Winner.GetTeam() ?? Team.NorthSouth;
+        var biddingTeamTricks = bidTeam == Team.NorthSouth ? usTricks : themTricks;
+        var bidAmount = br?.BidAmount ?? 0;
+        var isHawsey = br?.IsHawsey ?? false;
+
+        // The engine's scoring, not a copy of it.
+        var score = new RoundScore(bidTeam, bidAmount, biddingTeamTricks, 12 - biddingTeamTricks, isHawsey);
+        var (usDelta, themDelta) = bidTeam == Team.NorthSouth
+            ? (score.BiddingTeamDelta, score.DefendingTeamDelta)
+            : (score.DefendingTeamDelta, score.BiddingTeamDelta);
+
+        var made = score.BiddingTeamDelta > 0;
+        var bidText = isHawsey ? "Hawsey (24)" : bidAmount.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        var bidTeamLabel = bidTeam == Team.NorthSouth ? "US" : "THEM";
+
+        // The engine names the winner, including the bidding-team rule when both
+        // teams reach the target in the same round.
+        var winnerLabel = "";
+        if (isGameOver && s?.Winner is { } winner)
+        {
+            winnerLabel = winner == Team.NorthSouth ? "US" : "THEM";
+        }
+
+        return new RoundSummarySnapshot
+        (
+            BidTeamLabel: bidTeamLabel,
+            BidText: bidText,
+            Made: made,
+            UsTricks: usTricks,
+            ThemTricks: themTricks,
+            UsDelta: usDelta,
+            ThemDelta: themDelta,
+            UsTotal: s?.NorthSouthScore ?? 0,
+            ThemTotal: s?.EastWestScore ?? 0,
+            IsGameOver: isGameOver,
+            GameWinnerLabel: winnerLabel
+        );
+    }
+
+    private async Task DriveLoopAsync()
+    {
+        while (true)
+        {
+            var s = Game.CurrentState;
+            if (s is null) return;
+
+            switch (s.Phase)
+            {
+                case GamePhase.Bidding:
+                    StatusMessage = "Bidding...";
+                    var humanBids = await Game.AdvanceAiBiddingAsync();
+                    if (humanBids)
+                    {
+                        BidPickerVisible = true;
+                        StatusMessage = "Your turn to bid.";
+                        await InvokeAsync(StateHasChanged);
+                        return;
+                    }
+                    break;
+
+                case GamePhase.TrumpSelection:
+                    var humanPicksTrump = await Game.HandleTrumpSelectionAsync();
+                    if (humanPicksTrump)
+                    {
+                        TrumpPickerVisible = true;
+                        StatusMessage = "Pick trump.";
+                        await InvokeAsync(StateHasChanged);
+                        return;
+                    }
+                    break;
+
+                case GamePhase.HawseyExchange:
+                    var humanExchanges = await Game.HandleHawseyExchangeAsync();
+                    if (humanExchanges)
+                    {
+                        HawseyExchangeVisible = true;
+                        _hawseyDiscardSelection.Clear();
+                        StatusMessage = "Hawsey! Pick 2 cards to discard.";
+                        await InvokeAsync(StateHasChanged);
+                        return;
+                    }
+                    break;
+
+                case GamePhase.TrickPlay:
+                    var humanPlays = await Game.AdvanceAiPlaysAsync();
+                    if (humanPlays)
+                    {
+                        // Auto-play when there's only one card left in hand
+                        // (12th trick) — no decision for the player to make.
+                        if (HumanHand.Count == 1)
+                        {
+                            Game.PlayHumanCard(HumanHand[0]);
+                            break;
+                        }
+                        StatusMessage = "Your turn. Play a card.";
+                        await InvokeAsync(StateHasChanged);
+                        return;
+                    }
+                    break;
+
+                case GamePhase.RoundScoring:
+                    StatusMessage = "Round complete.";
+                    RoundSummary = CaptureRoundSummary(isGameOver: false);
+                    await InvokeAsync(StateHasChanged);
+                    return;
+
+                case GamePhase.GameOver:
+                    StatusMessage = "Game over.";
+                    if (RoundSummary is null)
+                    {
+                        RoundSummary = CaptureRoundSummary(isGameOver: true);
+                        await InvokeAsync(StateHasChanged);
+                    }
+                    return;
+
+                default:
+                    return;
+            }
+        }
+    }
+
+    private async Task OnCardClickAsync(Card card)
+    {
+        // Hawsey discard-selection mode steals clicks from trick play.
+        if (HawseyExchangeVisible)
+        {
+            ToggleHawseyDiscard(card);
+            return;
+        }
+
+        if (!IsHumanPlayTurn) return;
+        var legal = State!.GetLegalPlays();
+        var found = false;
+        for (var i = 0; i < legal.Count; i++)
+        {
+            if (legal[i].Equals(card)) { found = true; break; }
+        }
+        if (!found) return;
+
+        if (Game.PlayHumanCard(card))
+        {
+            await DriveLoopAsync();
+        }
+    }
+}
