@@ -12,7 +12,7 @@ The engine holds the rules and nothing else. It does no I/O and has no UI. A cal
 - Bidding: `BidAction` (`PassBid`, `NumberBid`, `HawseyBid`), `BiddingResult`, `PlacedBid`
 - Trick play: `Trick`, `PlayedCard`, `FollowSuitValidator`, `TrickResult`
 - House rules: `HouseRules` (`MustBeat`, `MustTrump`, `MinimumBid`, `PointsToWin`) and `TrumpMode` (`Suited` or `AceHigh`)
-- Scoring: `ScoreKeeper`, `RoundScore`, `GameResult`
+- Scoring: `RoundScore`
 - Targets `netstandard2.0` and `net10.0`; trim- and Native AOT-compatible on `net10.0`
 
 ## Getting Help

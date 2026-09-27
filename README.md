@@ -86,8 +86,8 @@ One strategy instance makes the decisions for every seat; each method receives t
 | Bidding | `BidAction` (`PassBid`, `NumberBid`, `HawseyBid`), `BiddingResult`, `PlacedBid` |
 | Trick play | `Trick`, `PlayedCard`, `FollowSuitValidator`, `TrickResult` |
 | House rules | `HouseRules` (`MustBeat`, `MustTrump`, `MinimumBid`, `PointsToWin`), `TrumpMode` (`Suited` or `AceHigh`) |
-| Players and teams | `PlayerHand`, `PlayerPosition`, `Team`, `DealerRotation` |
-| Scoring | `ScoreKeeper`, `RoundScore`, `GameResult` |
+| Players and teams | `PlayerPosition`, `Team` |
+| Scoring | `RoundScore` |
 | Game flow | `GameEngine`, `GameState`, `GamePhase` |
 | Strategy hooks | `IPlayerStrategy`, `GameRunner` |
 
