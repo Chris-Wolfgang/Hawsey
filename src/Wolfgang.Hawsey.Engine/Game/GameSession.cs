@@ -48,6 +48,7 @@ public class GameSession
 #pragma warning restore MA0158
     private GameState? _state;
     private BiddingPhase? _biddingPhase;
+    private readonly List<PlacedBid> _bids = new();
     private Random _random;
     private int _generation;
 
@@ -119,6 +120,23 @@ public class GameSession
 
 
     /// <summary>
+    /// Gets the bids made so far in the current round, in bidding order: a snapshot, so
+    /// a UI can show each seat's bid. Empty before the first bid of each deal.
+    /// </summary>
+    public IReadOnlyList<PlacedBid> Bids
+    {
+        get
+        {
+            lock (_sync)
+            {
+                return _bids.ToArray();
+            }
+        }
+    }
+
+
+
+    /// <summary>
     /// Gets a value indicating whether the human is the next to act.
     /// </summary>
     public bool IsHumanTurn => CurrentState?.NextToAct == HumanPosition;
@@ -137,6 +155,7 @@ public class GameSession
             _random = _randomFactory();
             var state = _engine.StartGame(rules ?? HouseRules.Default, PlayerPosition.North, _random);
             _biddingPhase = new BiddingPhase(state.Dealer, state.Rules.MinimumBid);
+            _bids.Clear();
             _generation++;
             Volatile.Write(ref _state, state);
         }
@@ -191,6 +210,7 @@ public class GameSession
 
                 var aiBid = _aiStrategy.DecideBid(state, bidder);
                 Volatile.Write(ref _state, _engine.PlaceBid(state, bidder, aiBid, biddingPhase));
+                _bids.Add(new PlacedBid(bidder, aiBid));
             }
 
             StateChanged?.Invoke(this, EventArgs.Empty);
@@ -220,6 +240,7 @@ public class GameSession
             }
 
             Volatile.Write(ref _state, _engine.PlaceBid(state, HumanPosition, action, biddingPhase));
+            _bids.Add(new PlacedBid(HumanPosition, action));
         }
 
         StateChanged?.Invoke(this, EventArgs.Empty);
@@ -305,6 +326,42 @@ public class GameSession
                 return false;
             }
 
+            Volatile.Write(ref _state, _engine.ExchangeHawseyCards(_state, discard, fromPartner));
+        }
+
+        StateChanged?.Invoke(this, EventArgs.Empty);
+        return true;
+    }
+
+
+
+    /// <summary>
+    /// Applies the human's Hawsey exchange from the two cards the human discards. The
+    /// partner gives their two best cards for the trump named, chosen by the same rule
+    /// the AI uses. Returns false, and changes nothing, unless the game is in the Hawsey
+    /// exchange phase with the human as bidder and <paramref name="discard"/> is two
+    /// cards the human holds.
+    /// </summary>
+    /// <param name="discard">The two cards the human discards.</param>
+    /// <returns><see langword="true"/> when the exchange was made.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="discard"/> is <see langword="null"/>.</exception>
+    public bool PerformHumanHawseyExchange(Card[] discard)
+    {
+        if (discard == null)
+        {
+            throw new ArgumentNullException(nameof(discard));
+        }
+
+        lock (_sync)
+        {
+            if (_state is not { Phase: GamePhase.HawseyExchange, HawseyBidder: HumanPosition }
+                || discard.Length != 2
+                || !Holds(_state.Hands[HumanPosition], discard))
+            {
+                return false;
+            }
+
+            _aiStrategy.DecideHawseyExchange(_state, HumanPosition, out _, out var fromPartner);
             Volatile.Write(ref _state, _engine.ExchangeHawseyCards(_state, discard, fromPartner));
         }
 
@@ -488,6 +545,7 @@ public class GameSession
 
             var state = _engine.StartNextRound(_state, _random);
             _biddingPhase = new BiddingPhase(state.Dealer, state.Rules.MinimumBid);
+            _bids.Clear();
             Volatile.Write(ref _state, state);
         }
 
@@ -564,6 +622,27 @@ public class GameSession
     /// </summary>
     private Task PauseAsync(int milliseconds) =>
         _aiPacing ? Task.Delay(milliseconds) : Task.CompletedTask;
+
+
+
+    /// <summary>
+    /// Whether <paramref name="hand"/> holds every card in <paramref name="cards"/>,
+    /// counting copies (a pinochle deck has two of each card).
+    /// </summary>
+    private static bool Holds(IReadOnlyList<Card> hand, Card[] cards)
+    {
+        var remaining = hand.ToList();
+
+        foreach (var card in cards)
+        {
+            if (!remaining.Remove(card))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
 
 
