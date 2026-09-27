@@ -151,12 +151,13 @@ public class SimpleAiStrategyBehaviourTests
     [Fact]
     public void DecidePlay_when_it_can_win_plays_the_lowest_winning_card()
     {
-        // West led the queen of spades; East holds three spades, two of which win.
+        // North (an opponent) led the queen of spades; East holds three spades, two of
+        // which win.
         var hand = new[] { C(Rank.Ace, Suit.Spades), C(Rank.Nine, Suit.Spades), C(Rank.King, Suit.Spades) };
 
         var play = _ai.DecidePlay
         (
-            Playing(Suit.Hearts, PlayerPosition.East, hand, (PlayerPosition.West, C(Rank.Queen, Suit.Spades))),
+            Playing(Suit.Hearts, PlayerPosition.East, hand, (PlayerPosition.North, C(Rank.Queen, Suit.Spades))),
             PlayerPosition.East
         );
 
