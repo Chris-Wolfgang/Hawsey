@@ -41,6 +41,26 @@ public sealed class Trick
 
 
 
+    private Trick(Trick source)
+    {
+        _trumpSuit = source._trumpSuit;
+        _expectedPlays = source._expectedPlays;
+        _ledSuit = source._ledSuit;
+        _plays = new List<PlayedCard>(source._expectedPlays);
+        _plays.AddRange(source._plays);
+    }
+
+
+
+    /// <summary>
+    /// Returns a trick with the same plays that shares no state with this one, so
+    /// the engine can add a card without changing the trick an earlier
+    /// <see cref="Game.GameState"/> holds.
+    /// </summary>
+    internal Trick Copy() => new(this);
+
+
+
     /// <summary>
     /// Gets the effective suit of the card that was led, or <c>null</c> if no cards have been played.
     /// </summary>

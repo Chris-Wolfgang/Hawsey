@@ -136,6 +136,40 @@ public sealed class GameState
 
 
     /// <summary>
+    /// Gets the team that won, once <see cref="Phase"/> is <see cref="GamePhase.GameOver"/>;
+    /// <c>null</c> while the game continues. A team wins by reaching
+    /// <see cref="HouseRules.PointsToWin"/>. When both teams reach it in the same round,
+    /// the team that held the bid in that round wins.
+    /// </summary>
+    public Team? Winner
+    {
+        get
+        {
+            if (Phase != GamePhase.GameOver)
+            {
+                return null;
+            }
+
+            var northSouthReached = NorthSouthScore >= Rules.PointsToWin;
+            var eastWestReached = EastWestScore >= Rules.PointsToWin;
+
+            if (northSouthReached && eastWestReached)
+            {
+                return BiddingResult?.Winner.GetTeam();
+            }
+
+            if (northSouthReached)
+            {
+                return Team.NorthSouth;
+            }
+
+            return eastWestReached ? Team.EastWest : null;
+        }
+    }
+
+
+
+    /// <summary>
     /// Gets the house rules in effect.
     /// </summary>
     public HouseRules Rules { get; }
