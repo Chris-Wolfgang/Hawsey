@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Wolfgang.Hawsey.Engine.Bidding;
 using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Players;
@@ -156,12 +155,12 @@ public class GameSession
 
             lock (_sync)
             {
-                if (!IsBiddingOpen(generation))
+                if (!TryGetOpenBidding(generation, out _, out var biddingPhase))
                 {
                     return false;
                 }
 
-                var next = _biddingPhase.GetNextBidder();
+                var next = biddingPhase.GetNextBidder();
 
                 if (!next.HasValue)
                 {
@@ -181,13 +180,13 @@ public class GameSession
             lock (_sync)
             {
                 // Another loop, a new game or a human move may have moved on while we slept.
-                if (!IsBiddingOpen(generation) || _biddingPhase.GetNextBidder() != bidder)
+                if (!TryGetOpenBidding(generation, out var state, out var biddingPhase) || biddingPhase.GetNextBidder() != bidder)
                 {
                     return false;
                 }
 
-                var aiBid = _aiStrategy.DecideBid(_state, bidder);
-                Volatile.Write(ref _state, _engine.PlaceBid(_state, bidder, aiBid, _biddingPhase));
+                var aiBid = _aiStrategy.DecideBid(state, bidder);
+                Volatile.Write(ref _state, _engine.PlaceBid(state, bidder, aiBid, biddingPhase));
             }
 
             StateChanged?.Invoke(this, EventArgs.Empty);
@@ -204,12 +203,12 @@ public class GameSession
     {
         lock (_sync)
         {
-            if (!IsBiddingOpen(_generation) || _biddingPhase.GetNextBidder() != HumanPosition)
+            if (!TryGetOpenBidding(_generation, out var state, out var biddingPhase) || biddingPhase.GetNextBidder() != HumanPosition)
             {
                 return false;
             }
 
-            Volatile.Write(ref _state, _engine.PlaceBid(_state, HumanPosition, action, _biddingPhase));
+            Volatile.Write(ref _state, _engine.PlaceBid(state, HumanPosition, action, biddingPhase));
         }
 
         StateChanged?.Invoke(this, EventArgs.Empty);
@@ -566,11 +565,28 @@ public class GameSession
 
 
 
-    [MemberNotNullWhen(true, nameof(_state), nameof(_biddingPhase))]
-    private bool IsBiddingOpen(int generation) =>
-        generation == _generation
-        && _state is { Phase: GamePhase.Bidding }
-        && _biddingPhase is { IsComplete: false };
+    /// <summary>
+    /// Whether bidding is still open in game <paramref name="generation"/>, and if so
+    /// the state and bidding phase to act on. A Try-method rather than
+    /// <c>[MemberNotNullWhen]</c>: that attribute is not in netstandard2.0, and a second
+    /// PolySharp polyfill makes the engine build non-reproducible (see the engine's
+    /// .csproj).
+    /// </summary>
+    private bool TryGetOpenBidding(int generation, out GameState state, out BiddingPhase biddingPhase)
+    {
+        if (generation == _generation
+            && _state is { Phase: GamePhase.Bidding } openState
+            && _biddingPhase is { IsComplete: false } openPhase)
+        {
+            state = openState;
+            biddingPhase = openPhase;
+            return true;
+        }
+
+        state = null!;
+        biddingPhase = null!;
+        return false;
+    }
 
 
 
