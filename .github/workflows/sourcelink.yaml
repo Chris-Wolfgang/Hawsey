@@ -78,6 +78,14 @@ jobs:
               echo "== skip $proj (no net10.0 target) =="
               continue
             fi
+            # Skip projects that ship no package (<IsPackable>false</IsPackable>, e.g. the
+            # MAUI app, whose net10.0 target exists only for its unit tests): nobody
+            # debugs into their PDBs from a NuGet package, and building them here would
+            # need workloads this job does not install.
+            if grep -qiE '<IsPackable>[[:space:]]*false[[:space:]]*</IsPackable>' "$proj"; then
+              echo "== skip $proj (IsPackable=false) =="
+              continue
+            fi
             echo "== build $proj =="
             dotnet build "$proj" -c Release -f net10.0 -p:ContinuousIntegrationBuild=true
           done < <(git ls-files 'src/**/*.csproj' 'src/*.csproj')
