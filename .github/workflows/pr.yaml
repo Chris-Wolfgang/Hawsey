@@ -569,9 +569,12 @@ jobs:
             framework_count=$(echo "$frameworks" | wc -l)
 
             if [ "$framework_count" -eq 1 ]; then
-              # Single target framework - build normally
+              # Single compatible framework. Pass it explicitly: the project may also
+              # target platform TFMs (a MAUI app with net10.0 for its unit tests plus
+              # net10.0-android / -ios / -maccatalyst), and a build without --framework
+              # builds all of them, which this OS stage cannot.
               echo "  Target framework: $frameworks"
-              dotnet build "$proj" --no-restore --configuration Release || exit 1
+              dotnet build "$proj" --no-restore --configuration Release --framework "$frameworks" || exit 1
             else
               # Multi-targeting project - build each compatible framework separately
               echo "  Target frameworks (multi-targeting): $(echo "$frameworks" | tr '\n' ' ')"
@@ -1364,9 +1367,12 @@ jobs:
             framework_count=$(echo "$frameworks" | wc -l)
 
             if [ "$framework_count" -eq 1 ]; then
-              # Single target framework - build normally
+              # Single compatible framework. Pass it explicitly: the project may also
+              # target platform TFMs (a MAUI app with net10.0 for its unit tests plus
+              # net10.0-android / -ios / -maccatalyst), and a build without --framework
+              # builds all of them, which this OS stage cannot.
               echo "  Target framework: $frameworks"
-              dotnet build "$proj" --no-restore --configuration Release || exit 1
+              dotnet build "$proj" --no-restore --configuration Release --framework "$frameworks" || exit 1
             else
               # Multi-targeting project - build each compatible framework separately
               echo "  Target frameworks (multi-targeting): $(echo "$frameworks" | tr '\n' ' ')"
