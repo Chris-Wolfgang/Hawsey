@@ -1,10 +1,10 @@
 
 using Wolfgang.Hawsey.Engine.Players;
 
-namespace Wolfgang.Hawsey.UI.Maui.Services;
+namespace Wolfgang.Hawsey.Engine.Game;
 
 /// <summary>
-/// Payload for <see cref="GameService.GameOver"/>.
+/// Payload for <see cref="GameSession.GameOver"/>.
 /// </summary>
 public sealed class GameOverEventArgs : EventArgs
 {

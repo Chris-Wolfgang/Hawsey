@@ -4,7 +4,6 @@ using Wolfgang.Hawsey.Engine.Bidding;
 using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Game;
 using Wolfgang.Hawsey.Engine.Players;
-using Wolfgang.Hawsey.UI.Maui.Services;
 
 namespace Wolfgang.Hawsey.UI.Maui.Tests.Concurrency;
 
@@ -15,7 +14,7 @@ namespace Wolfgang.Hawsey.UI.Maui.Tests.Concurrency;
 /// interleaving is a bug, reported with a reproducible schedule.
 /// </summary>
 [Trait("Category", "Concurrency")]
-public class GameServiceConcurrencyTests
+public class GameSessionConcurrencyTests
 {
     /// <summary>Iterations per test; the weekly Coyote workflow raises this.</summary>
     private static uint Iterations =>
@@ -54,9 +53,9 @@ public class GameServiceConcurrencyTests
     /// <exception cref="InvalidOperationException">
     /// Thrown when the game never reaches South's turn within the step limit.
     /// </exception>
-    private static async Task<GameService> ReachHumanCardTurnAsync()
+    private static async Task<GameSession> ReachHumanCardTurnAsync()
     {
-        var service = new GameService();
+        var service = new GameSession();
         service.StartNewGame();
 
         for (var guard = 0; guard < 200; guard++)
@@ -106,7 +105,7 @@ public class GameServiceConcurrencyTests
         RunSystematicTest(async () =>
         {
             var service = await ReachHumanCardTurnAsync();
-            var handBefore = service.CurrentState!.Hands[GameService.HumanPosition].Count;
+            var handBefore = service.CurrentState!.Hands[GameSession.HumanPosition].Count;
             var legal = service.CurrentState.GetLegalPlays();
 
             // Two taps racing each other, as when the second tap lands before the
@@ -115,7 +114,7 @@ public class GameServiceConcurrencyTests
             var second = Task.Run(() => service.PlayHumanCard(legal[legal.Count - 1]));
             await Task.WhenAll(first, second);
 
-            var handAfter = service.CurrentState.Hands[GameService.HumanPosition].Count;
+            var handAfter = service.CurrentState.Hands[GameSession.HumanPosition].Count;
             Assert.Equal(handBefore - 1, handAfter);
         });
     }
@@ -127,7 +126,7 @@ public class GameServiceConcurrencyTests
     {
         RunSystematicTest(async () =>
         {
-            var service = new GameService();
+            var service = new GameSession();
             service.StartNewGame();
 
             // Scenario: the first game's AI bidding loop is sleeping when New Game is
@@ -145,7 +144,7 @@ public class GameServiceConcurrencyTests
             var state = service.CurrentState!;
             Assert.True
             (
-                state.Phase != GamePhase.Bidding || state.NextToAct == GameService.HumanPosition,
+                state.Phase != GamePhase.Bidding || state.NextToAct == GameSession.HumanPosition,
                 $"Bidding stopped at {state.NextToAct} instead of waiting for the human."
             );
         });
@@ -158,7 +157,7 @@ public class GameServiceConcurrencyTests
     {
         RunSystematicTest(async () =>
         {
-            var service = new GameService();
+            var service = new GameSession();
             var wrongTrickWinners = 0;
             var gameOverWinners = new List<Team>();
 
@@ -194,7 +193,7 @@ public class GameServiceConcurrencyTests
     /// <exception cref="InvalidOperationException">
     /// Thrown when the game does not finish within the step limit.
     /// </exception>
-    private static async Task PlayToGameOverAsync(GameService service)
+    private static async Task PlayToGameOverAsync(GameSession service)
     {
         for (var guard = 0; guard < 5000; guard++)
         {

@@ -1,4 +1,5 @@
-using Wolfgang.Hawsey.UI.Maui.Services;
+using Wolfgang.Hawsey.Engine.Game;
+using Wolfgang.Hawsey.UI.Maui.Threading;
 using Wolfgang.Hawsey.UI.Maui.ViewModels;
 using Wolfgang.Hawsey.UI.Maui.Views;
 
@@ -18,7 +19,8 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
-        builder.Services.AddSingleton<GameService>();
+        builder.Services.AddSingleton<IUiDispatcher, MainThreadDispatcher>();
+        builder.Services.AddSingleton<GameSession>();
         builder.Services.AddTransient<GameViewModel>();
         builder.Services.AddTransient<GamePage>();
 

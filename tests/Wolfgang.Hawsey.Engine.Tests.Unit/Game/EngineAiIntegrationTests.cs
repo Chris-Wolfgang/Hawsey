@@ -2,13 +2,13 @@ using Wolfgang.Hawsey.Engine.Bidding;
 using Wolfgang.Hawsey.Engine.Game;
 using Wolfgang.Hawsey.Engine.Players;
 using Wolfgang.Hawsey.Engine.Rules;
-using Wolfgang.Hawsey.UI.Maui.AI;
+using Wolfgang.Hawsey.Engine.Strategy;
 
-namespace Wolfgang.Hawsey.UI.Maui.Tests.Unit.Services;
+namespace Wolfgang.Hawsey.Engine.Tests.Unit.Game;
 
 /// <summary>
 /// Integration tests covering the engine + AI strategy interaction
-/// (the same flow patterns the MAUI <c>GameService</c> orchestrates),
+/// (the same flow patterns <see cref="GameSession"/> orchestrates),
 /// without taking any MAUI dependency.
 /// </summary>
 public class EngineAiIntegrationTests

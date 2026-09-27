@@ -1,10 +1,10 @@
 
 using Wolfgang.Hawsey.Engine.Players;
 
-namespace Wolfgang.Hawsey.UI.Maui.Services;
+namespace Wolfgang.Hawsey.Engine.Game;
 
 /// <summary>
-/// Payload for <see cref="GameService.TrickCompleted"/>.
+/// Payload for <see cref="GameSession.TrickCompleted"/>.
 /// </summary>
 public sealed class TrickCompletedEventArgs : EventArgs
 {

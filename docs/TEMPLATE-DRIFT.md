@@ -16,7 +16,7 @@ Last full sync: template `e5e665a` (2026-09-26, Hawsey #24).
 | `.github/workflows/codeql.yaml` | `timeout-minutes: 45` (template 30) | Same MAUI workload restore (#844). |
 | `.github/workflows/release.yaml` | Builds and attaches a reproducible-build manifest | See [REPRODUCIBLE-BUILD.md](REPRODUCIBLE-BUILD.md) (#91). |
 | `.github/workflows/benchmarks.yaml`, `BannedSymbols.txt` | Template placeholders filled in | Project path and namespace are Hawsey's. |
-| `.config/dotnet-tools.json` | Adds `microsoft.coyote.cli` | Concurrency tests for the MAUI `GameService` (#843). |
+| `.config/dotnet-tools.json` | Adds `microsoft.coyote.cli` | Concurrency tests for the engine's `GameSession` (#843). |
 | `.editorconfig` | Trimming, AOT and single-file analyzers at `warning` | The engine is AOT- and trim-compatible (#844). A candidate to feed back to the template. |
 | `docfx_project/docfx.json` | API metadata from the engine only, at `TargetFramework` net10.0; placeholders filled in | The MAUI project can't be built without workloads, and the engine doesn't target the template's old net8.0. |
 | `docs/WORKFLOW_SECURITY.md`, `docs/RELEASE-WORKFLOW-SETUP.md`, `.github/copilot-instructions.md`, `README.md`, `CONTRIBUTING.md` | Hawsey's own text | These describe this repository, not the template (#37, #40, #41). |
