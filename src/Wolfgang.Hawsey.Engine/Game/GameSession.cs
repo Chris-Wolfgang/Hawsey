@@ -43,7 +43,6 @@ public class GameSession
     private readonly object _sync = new();
 #pragma warning restore MA0158
     private GameState? _state;
-    private BiddingPhase? _biddingPhase;
     private readonly List<PlacedBid> _bids = new();
     private Random _random;
     private int _generation;
@@ -150,7 +149,6 @@ public class GameSession
         {
             _random = _randomFactory();
             var state = _engine.StartGame(rules ?? HouseRules.Default, PlayerPosition.North, _random);
-            _biddingPhase = new BiddingPhase(state.Dealer, state.Rules.MinimumBid);
             _bids.Clear();
             _generation++;
             Volatile.Write(ref _state, state);
@@ -174,24 +172,18 @@ public class GameSession
 
             lock (_sync)
             {
-                if (!TryGetOpenBidding(generation, out _, out var biddingPhase))
+                if (!TryGetOpenBidding(generation, out var open))
                 {
                     return false;
                 }
 
-                var next = biddingPhase.GetNextBidder();
-
-                if (!next.HasValue)
-                {
-                    return false;
-                }
-
-                if (next.Value == HumanPosition)
+                if (open.NextToAct == HumanPosition)
                 {
                     return true;
                 }
 
-                bidder = next.Value;
+                // Bidding is open, so someone is next to act.
+                bidder = open.NextToAct!.Value;
             }
 
             await PauseAsync(400).ConfigureAwait(false);
@@ -199,13 +191,13 @@ public class GameSession
             lock (_sync)
             {
                 // Another loop, a new game or a human move may have moved on while we slept.
-                if (!TryGetOpenBidding(generation, out var state, out var biddingPhase) || biddingPhase.GetNextBidder() != bidder)
+                if (!TryGetOpenBidding(generation, out var state) || state.NextToAct != bidder)
                 {
                     return false;
                 }
 
                 var aiBid = _aiStrategy.DecideBid(state, bidder);
-                Volatile.Write(ref _state, _engine.PlaceBid(state, bidder, aiBid, biddingPhase));
+                Volatile.Write(ref _state, _engine.PlaceBid(state, bidder, aiBid));
                 _bids.Add(new PlacedBid(bidder, aiBid));
             }
 
@@ -218,24 +210,24 @@ public class GameSession
     /// <summary>
     /// Places the human's bid. Returns false, and changes nothing, when it is
     /// not the human's turn to bid, or a number bid is below
-    /// <see cref="GameState.MinimumLegalBid"/> or above <see cref="BiddingPhase.MaximumBid"/>.
+    /// <see cref="GameState.MinimumLegalBid"/> or above <see cref="GameState.MaximumBid"/>.
     /// </summary>
     public bool PlaceHumanBid(BidAction action)
     {
         lock (_sync)
         {
-            if (!TryGetOpenBidding(_generation, out var state, out var biddingPhase) || biddingPhase.GetNextBidder() != HumanPosition)
+            if (!TryGetOpenBidding(_generation, out var state) || state.NextToAct != HumanPosition)
             {
                 return false;
             }
 
             // A number bid must beat the high bid, and at least meet the minimum (#867).
-            if (action is BidAction.NumberBid { Amount: var amount } && (amount < state.MinimumLegalBid || amount > BiddingPhase.MaximumBid))
+            if (action is BidAction.NumberBid { Amount: var amount } && (amount < state.MinimumLegalBid || amount > GameState.MaximumBid))
             {
                 return false;
             }
 
-            Volatile.Write(ref _state, _engine.PlaceBid(state, HumanPosition, action, biddingPhase));
+            Volatile.Write(ref _state, _engine.PlaceBid(state, HumanPosition, action));
             _bids.Add(new PlacedBid(HumanPosition, action));
         }
 
@@ -540,7 +532,6 @@ public class GameSession
             }
 
             var state = _engine.StartNextRound(_state, _random);
-            _biddingPhase = new BiddingPhase(state.Dealer, state.Rules.MinimumBid);
             _bids.Clear();
             Volatile.Write(ref _state, state);
         }
@@ -654,24 +645,20 @@ public class GameSession
 
     /// <summary>
     /// Whether bidding is still open in game <paramref name="generation"/>, and if so
-    /// the state and bidding phase to act on. A Try-method rather than
+    /// the state to act on. A Try-method rather than
     /// <c>[MemberNotNullWhen]</c>: that attribute is not in netstandard2.0, and a second
     /// PolySharp polyfill makes the engine build non-reproducible (see the engine's
     /// .csproj).
     /// </summary>
-    private bool TryGetOpenBidding(int generation, out GameState state, out BiddingPhase biddingPhase)
+    private bool TryGetOpenBidding(int generation, out GameState state)
     {
-        if (generation == _generation
-            && _state is { Phase: GamePhase.Bidding } openState
-            && _biddingPhase is { IsComplete: false } openPhase)
+        if (generation == _generation && _state is { Phase: GamePhase.Bidding } openState)
         {
             state = openState;
-            biddingPhase = openPhase;
             return true;
         }
 
         state = null!;
-        biddingPhase = null!;
         return false;
     }
 

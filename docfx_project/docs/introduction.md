@@ -9,7 +9,7 @@ The engine holds the rules and nothing else. It does no I/O and has no UI. A cal
 ## Key Features
 
 - Pinochle deck: `Card`, `Rank`, `Suit`, `Deck`, with bowers handled by `CardRanking`
-- Bidding: `BidAction` (`PassBid`, `NumberBid`, `HawseyBid`), `BiddingPhase`, `BiddingResult`
+- Bidding: `BidAction` (`PassBid`, `NumberBid`, `HawseyBid`), `BiddingResult`, `PlacedBid`
 - Trick play: `Trick`, `PlayedCard`, `FollowSuitValidator`, `TrickResult`
 - House rules: `HouseRules` (`MustBeat`, `MustTrump`, `MinimumBid`, `PointsToWin`) and `TrumpMode` (`Suited` or `AceHigh`)
 - Scoring: `ScoreKeeper`, `RoundScore`, `GameResult`

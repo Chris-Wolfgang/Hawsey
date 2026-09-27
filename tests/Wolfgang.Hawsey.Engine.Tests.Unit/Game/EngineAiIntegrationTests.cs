@@ -22,13 +22,12 @@ public class EngineAiIntegrationTests
     public void Full_bidding_round_with_ai_completes()
     {
         var state = _engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
-        var biddingPhase = new BiddingPhase(state.Dealer, state.Rules.MinimumBid);
 
-        while (!biddingPhase.IsComplete)
+        while (state.Phase == GamePhase.Bidding)
         {
-            var bidder = biddingPhase.GetNextBidder()!.Value;
+            var bidder = state.NextToAct!.Value;
             var action = _ai.DecideBid(state, bidder);
-            state = _engine.PlaceBid(state, bidder, action, biddingPhase);
+            state = _engine.PlaceBid(state, bidder, action);
         }
 
         Assert.Equal(GamePhase.TrumpSelection, state.Phase);
@@ -42,13 +41,12 @@ public class EngineAiIntegrationTests
         var state = _engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
 
         // Bidding
-        var biddingPhase = new BiddingPhase(state.Dealer, state.Rules.MinimumBid);
 
-        while (!biddingPhase.IsComplete)
+        while (state.Phase == GamePhase.Bidding)
         {
-            var bidder = biddingPhase.GetNextBidder()!.Value;
+            var bidder = state.NextToAct!.Value;
             var action = _ai.DecideBid(state, bidder);
-            state = _engine.PlaceBid(state, bidder, action, biddingPhase);
+            state = _engine.PlaceBid(state, bidder, action);
         }
 
         // Trump selection
@@ -83,13 +81,12 @@ public class EngineAiIntegrationTests
         for (var round = 0; round < maxRounds && state.Phase != GamePhase.GameOver; round++)
         {
             // Bidding
-            var biddingPhase = new BiddingPhase(state.Dealer, state.Rules.MinimumBid);
 
-            while (!biddingPhase.IsComplete)
+            while (state.Phase == GamePhase.Bidding)
             {
-                var bidder = biddingPhase.GetNextBidder()!.Value;
+                var bidder = state.NextToAct!.Value;
                 var action = _ai.DecideBid(state, bidder);
-                state = _engine.PlaceBid(state, bidder, action, biddingPhase);
+                state = _engine.PlaceBid(state, bidder, action);
             }
 
             // Trump
@@ -120,16 +117,15 @@ public class EngineAiIntegrationTests
     {
         // Simulate a game where human is South and AI plays the other 3
         var state = _engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
-        var biddingPhase = new BiddingPhase(state.Dealer, state.Rules.MinimumBid);
 
         // Process bidding — human always passes
-        while (!biddingPhase.IsComplete)
+        while (state.Phase == GamePhase.Bidding)
         {
-            var bidder = biddingPhase.GetNextBidder()!.Value;
+            var bidder = state.NextToAct!.Value;
             var action = bidder == PlayerPosition.South
                 ? BidAction.PassBid.Instance
                 : _ai.DecideBid(state, bidder);
-            state = _engine.PlaceBid(state, bidder, action, biddingPhase);
+            state = _engine.PlaceBid(state, bidder, action);
         }
 
         // Trump selection (whoever won, let AI/human handle)
