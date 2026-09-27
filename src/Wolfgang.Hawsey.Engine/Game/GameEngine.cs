@@ -260,7 +260,8 @@ public sealed class GameEngine
         ValidateCardIsLegal(state, card);
 
         var hands = RemoveCardFromHand(state.Hands, player, card);
-        var trick = state.CurrentTrick!;
+        // Play into a copy: the input state keeps its trick unchanged (#861).
+        var trick = state.CurrentTrick!.Copy();
         trick.Play(player, card);
 
         if (!trick.IsComplete)
