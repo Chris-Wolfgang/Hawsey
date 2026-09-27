@@ -134,7 +134,9 @@ public sealed class GameEngine
             nextToAct: biddingPhase.GetNextBidder(),
             tricksPlayedInRound: 0,
             isHawseyRound: false,
-            hawseyBidder: null
+            hawseyBidder: null,
+            highBid: biddingPhase.HighestBid,
+            highBidder: biddingPhase.HighestBidder
         );
     }
 

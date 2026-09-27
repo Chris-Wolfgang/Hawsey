@@ -43,7 +43,9 @@ public sealed class GameState
         PlayerPosition? nextToAct,
         int tricksPlayedInRound,
         bool isHawseyRound,
-        PlayerPosition? hawseyBidder
+        PlayerPosition? hawseyBidder,
+        int highBid = 0,
+        PlayerPosition? highBidder = null
     )
     {
         Phase = phase;
@@ -61,6 +63,8 @@ public sealed class GameState
         TricksPlayedInRound = tricksPlayedInRound;
         IsHawseyRound = isHawseyRound;
         HawseyBidder = hawseyBidder;
+        HighBid = highBid;
+        HighBidder = highBidder;
     }
 
 
@@ -201,6 +205,23 @@ public sealed class GameState
     /// Gets the Hawsey bidder's position, or <c>null</c> if not a Hawsey round.
     /// </summary>
     public PlayerPosition? HawseyBidder { get; }
+
+
+
+    /// <summary>
+    /// Gets the highest number bid so far while <see cref="Phase"/> is
+    /// <see cref="GamePhase.Bidding"/>, or <c>0</c> when nobody has bid yet. A bid must
+    /// beat it. Once bidding ends, <see cref="BiddingResult"/> holds the winning bid.
+    /// </summary>
+    public int HighBid { get; }
+
+
+
+    /// <summary>
+    /// Gets the player holding <see cref="HighBid"/> while bidding, or <c>null</c> when
+    /// nobody has bid yet.
+    /// </summary>
+    public PlayerPosition? HighBidder { get; }
 
 
 
