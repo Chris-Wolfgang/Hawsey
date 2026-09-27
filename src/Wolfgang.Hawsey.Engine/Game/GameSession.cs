@@ -14,9 +14,8 @@ namespace Wolfgang.Hawsey.Engine.Game;
 /// </summary>
 /// <remarks>
 /// Thread safety: the AI loops resume on thread-pool threads after their delays
-/// while human moves arrive on the UI thread, and the engine's
-/// <see cref="GameEngine.PlayCard"/> mutates the trick shared with the incoming
-/// state. So every transition of <c>_state</c> runs under <c>_sync</c>, and
+/// while human moves arrive on the UI thread, so two moves can race for the same
+/// turn. So every transition of <c>_state</c> runs under <c>_sync</c>, and
 /// each one re-checks, inside the lock, that it is still the right phase and
 /// player's turn. A stale human move (a double-tap, a tap during an AI turn)
 /// is ignored and reported as <c>false</c>. <c>_generation</c> increments on
@@ -521,8 +520,9 @@ public class GameSession
         var trickCompleted = state.CompletedTricks.Count > 0 && (state.CurrentTrick == null || state.CurrentTrick.Plays.Count == 0)
             ? new TrickCompletedEventArgs(state.CompletedTricks[state.CompletedTricks.Count - 1].Winner)
             : null;
-        var winner = state.NorthSouthScore >= state.Rules.PointsToWin ? Team.NorthSouth : Team.EastWest;
-        var gameOver = state.Phase == GamePhase.GameOver ? new GameOverEventArgs(winner) : null;
+        // GameState decides the winner, including the bidding-team rule when both
+        // teams reach the target in the same round (#862).
+        var gameOver = state.Winner is { } winner ? new GameOverEventArgs(winner) : null;
 
         return new PlayOutcome(trickCompleted, state.Phase == GamePhase.RoundScoring, gameOver);
     }

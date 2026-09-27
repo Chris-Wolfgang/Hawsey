@@ -266,12 +266,11 @@ public class GameSessionTests
         await PlayToGameOverAsync();
 
         var state = _session.CurrentState!;
+        // GameState decides the winner (GameStateWinnerTests covers its rule, #862);
+        // the session must announce exactly that team.
         Assert.Single(gameOvers);
-        Assert.Equal
-        (
-            state.NorthSouthScore >= state.Rules.PointsToWin ? Team.NorthSouth : Team.EastWest,
-            gameOvers[0].Winner
-        );
+        Assert.NotNull(state.Winner);
+        Assert.Equal(state.Winner, gameOvers[0].Winner);
         Assert.True(tricks >= 12);
         Assert.True(rounds >= 1);
         Assert.Equal(12 * (rounds + 1), tricks);
