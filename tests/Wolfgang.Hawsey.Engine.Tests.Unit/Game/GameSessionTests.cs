@@ -47,9 +47,11 @@ public class GameSessionTests
     {
         _session.StartNewGame();
 
-        for (var step = 0; _session.CurrentState!.Phase != GamePhase.GameOver; step++)
+        var steps = 0;
+
+        while (_session.CurrentState!.Phase != GamePhase.GameOver)
         {
-            Assert.True(step < 10_000, "The game did not finish.");
+            Assert.True(++steps < 10_000, "The game did not finish.");
             var state = _session.CurrentState;
 
             switch (state.Phase)
@@ -178,7 +180,7 @@ public class GameSessionTests
         Assert.Equal(GameSession.HumanPosition, _session.CurrentState!.BiddingResult!.Winner);
         Assert.False(await _session.AdvanceAiBiddingAsync());
         Assert.True(_session.SelectTrump(Suit.Spades));
-        Assert.Equal(GamePhase.TrickPlay, _session.CurrentState!.Phase);
+        Assert.Equal(GamePhase.TrickPlay, _session.CurrentState.Phase);
         Assert.Equal(Suit.Spades, _session.CurrentState.TrumpSuit);
     }
 

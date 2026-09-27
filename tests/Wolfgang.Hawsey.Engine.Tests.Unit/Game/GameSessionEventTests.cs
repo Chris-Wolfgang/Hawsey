@@ -3,6 +3,7 @@ using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Game;
 using Wolfgang.Hawsey.Engine.Players;
 using Wolfgang.Hawsey.Engine.Rules;
+using Wolfgang.Hawsey.Engine.Strategy;
 using Wolfgang.Hawsey.Engine.Tests.Unit.Helpers;
 
 namespace Wolfgang.Hawsey.Engine.Tests.Unit.Game;
@@ -11,7 +12,7 @@ namespace Wolfgang.Hawsey.Engine.Tests.Unit.Game;
 /// <see cref="GameSession"/>'s events and rules handling: one
 /// <see cref="GameSession.StateChanged"/> per move (a UI redraws on it), the trick
 /// winner it reports, the rules a game starts with, and the AI lines
-/// <see cref="Strategy.SimpleAiStrategy"/> never takes (an AI Hawsey bid, found with
+/// <see cref="SimpleAiStrategy"/> never takes (an AI Hawsey bid, found with
 /// an injected strategy).
 /// </summary>
 public class GameSessionEventTests
@@ -146,7 +147,7 @@ public class GameSessionEventTests
         }
 
         Assert.Equal(1, CountStateChanges(round, round.StartNextRound));
-        Assert.Equal(GamePhase.Bidding, round.CurrentState!.Phase);
+        Assert.Equal(GamePhase.Bidding, round.CurrentState.Phase);
     }
 
 
@@ -195,7 +196,7 @@ public class GameSessionEventTests
 
         Assert.Equal((1, false), await CountStateChangesAsync(session, session.HandleHawseyExchangeAsync));
 
-        Assert.Equal(GamePhase.TrickPlay, session.CurrentState!.Phase);
+        Assert.Equal(GamePhase.TrickPlay, session.CurrentState.Phase);
         Assert.NotEqual(before, session.CurrentState.Hands[PlayerPosition.East]);
         Assert.False(await session.HandleHawseyExchangeAsync());
     }
@@ -217,9 +218,11 @@ public class GameSessionEventTests
 
     private static async Task<bool> EndsOnAnAiCard(GameSession session)
     {
+        // The handler only counts; the loop reads the count around each AI call to see
+        // whether that call is the one that ended the game.
+        var gameOvers = 0;
         var endedByAi = false;
-        var inAiLoop = false;
-        session.GameOver += (_, _) => endedByAi = inAiLoop;
+        session.GameOver += (_, _) => gameOvers++;
         session.StartNewGame(new HouseRules { PointsToWin = 12 });
 
         while (session.CurrentState!.Phase != GamePhase.GameOver)
@@ -244,9 +247,9 @@ public class GameSessionEventTests
                     break;
 
                 default:
-                    inAiLoop = true;
+                    var before = gameOvers;
                     var humanPlays = await session.AdvanceAiPlaysAsync();
-                    inAiLoop = false;
+                    endedByAi |= gameOvers > before;
 
                     if (humanPlays)
                     {

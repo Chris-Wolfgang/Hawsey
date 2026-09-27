@@ -104,7 +104,7 @@ public class GameSessionNewGameDuringPauseTests
 
         Assert.Equal(1, newGames);
         Assert.Equal(0, rounds);
-        Assert.Equal(GamePhase.Bidding, _session.CurrentState!.Phase);
+        Assert.Equal(GamePhase.Bidding, _session.CurrentState.Phase);
     }
 
 
@@ -125,6 +125,6 @@ public class GameSessionNewGameDuringPauseTests
         session.StartNewGame(HouseRules.Default);
 
         Assert.False(await exchanging);
-        Assert.Equal(GamePhase.Bidding, session.CurrentState!.Phase);
+        Assert.Equal(GamePhase.Bidding, session.CurrentState.Phase);
     }
 }

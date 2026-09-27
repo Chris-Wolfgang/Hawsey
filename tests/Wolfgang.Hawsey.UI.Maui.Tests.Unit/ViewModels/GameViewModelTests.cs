@@ -256,9 +256,11 @@ public class GameViewModelTests
     {
         _vm.NewGameCommand.Execute(null);
 
-        for (var step = 0; !_vm.IsGameOverVisible; step++)
+        var steps = 0;
+
+        while (!_vm.IsGameOverVisible)
         {
-            Assert.True(step < 10_000, "The game did not finish.");
+            Assert.True(++steps < 10_000, "The game did not finish.");
 
             if (_vm.IsBiddingVisible)
             {
@@ -303,9 +305,11 @@ public class GameViewModelTests
             }
         };
 
-        for (var step = 0; !messages.Exists(m => m.StartsWith("Round over!", StringComparison.Ordinal)); step++)
+        var steps = 0;
+
+        while (!messages.Exists(m => m.StartsWith("Round over!", StringComparison.Ordinal)))
         {
-            Assert.True(step < 1_000, "No round was completed.");
+            Assert.True(++steps < 1_000, "No round was completed.");
             Assert.False(_vm.IsTrumpPickerVisible);
 
             if (_vm.IsBiddingVisible)
