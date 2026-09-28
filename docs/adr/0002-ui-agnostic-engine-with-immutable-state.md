@@ -4,6 +4,12 @@
 - **Date:** 2026-09-22 (records a decision made at the engine's creation)
 - **Deciders:** Chris Wolfgang
 
+> **Update (2026-09-27):** two of the exceptions listed under *Decision* are gone.
+> `PlayCard` plays into a copy of the trick (#873), and `PlaceBid` reads the bidding
+> so far from `GameState` instead of advancing a caller-owned `BiddingPhase`, which
+> was removed (#863). `Hands` and `CompletedTricks` are still exposed as mutable
+> collection types, so the rest of this record stands.
+
 ## Context
 
 Hawsey has, or plans, several front ends: a MAUI XAML app, plus (on

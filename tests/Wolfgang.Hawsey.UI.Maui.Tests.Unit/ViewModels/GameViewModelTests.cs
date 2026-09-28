@@ -201,7 +201,7 @@ public class GameViewModelTests
         _vm.PlaceBidCommand.Execute("hawsey");
         _vm.SelectTrumpCommand.Execute("hearts");
 
-        Assert.Equal("Hawsey! Select cards to exchange", _vm.StatusMessage);
+        Assert.Equal("Hawsey! Tap two cards to discard", _vm.StatusMessage);
         Assert.Equal("South called Hawsey!", _vm.BidInfoDisplay);
         Assert.Equal(GamePhase.HawseyExchange, _session.CurrentState!.Phase);
     }
@@ -323,6 +323,41 @@ public class GameViewModelTests
         }
 
         Assert.Contains(messages, m => m.EndsWith(" wins the trick!", StringComparison.Ordinal));
+    }
+
+
+
+    [Fact]
+    public void A_completed_trick_stays_on_the_table_until_the_next_lead()
+    {
+        _vm.NewGameCommand.Execute(null);
+
+        // The session refreshes the table before announcing the trick, so when the
+        // announcement arrives the table must show the trick just won - all four cards.
+        // That includes the twelfth trick, when the round is over and there is no
+        // current trick at all.
+        var checkedTricks = 0;
+        _vm.PropertyChanged += (_, e) =>
+        {
+            if (string.Equals(e.PropertyName, nameof(GameViewModel.StatusMessage), StringComparison.Ordinal)
+                && _vm.StatusMessage.EndsWith(" wins the trick!", StringComparison.Ordinal))
+            {
+                var trick = _session.CurrentState!.CompletedTricks[^1];
+                Assert.Equal
+                (
+                    trick.Cards.Select(p => new TrickCardViewModel(p.Card)).Select(c => c.RankText + c.SuitSymbol),
+                    _vm.TrickCards.Select(c => c.RankText + c.SuitSymbol)
+                );
+                checkedTricks++;
+            }
+        };
+
+        _vm.PlaceBidCommand.Execute("pass");
+
+        while (checkedTricks < 12)
+        {
+            PlayFirstLegalCard();
+        }
     }
 
 

@@ -33,11 +33,10 @@ public class SimpleAiStrategyTests
         var state = engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
 
         // Complete bidding
-        var biddingPhase = new BiddingPhase(PlayerPosition.North, 6);
-        state = engine.PlaceBid(state, PlayerPosition.East, BidAction.PassBid.Instance, biddingPhase);
-        state = engine.PlaceBid(state, PlayerPosition.South, BidAction.PassBid.Instance, biddingPhase);
-        state = engine.PlaceBid(state, PlayerPosition.West, BidAction.PassBid.Instance, biddingPhase);
-        state = engine.PlaceBid(state, PlayerPosition.North, BidAction.PassBid.Instance, biddingPhase);
+        state = engine.PlaceBid(state, PlayerPosition.East, BidAction.PassBid.Instance);
+        state = engine.PlaceBid(state, PlayerPosition.South, BidAction.PassBid.Instance);
+        state = engine.PlaceBid(state, PlayerPosition.West, BidAction.PassBid.Instance);
+        state = engine.PlaceBid(state, PlayerPosition.North, BidAction.PassBid.Instance);
 
         // Select trump
         state = engine.SelectTrump(state, Suit.Hearts);
@@ -57,11 +56,10 @@ public class SimpleAiStrategyTests
         var engine = new GameEngine();
         var state = engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
 
-        var biddingPhase = new BiddingPhase(PlayerPosition.North, 6);
-        state = engine.PlaceBid(state, PlayerPosition.East, BidAction.PassBid.Instance, biddingPhase);
-        state = engine.PlaceBid(state, PlayerPosition.South, BidAction.PassBid.Instance, biddingPhase);
-        state = engine.PlaceBid(state, PlayerPosition.West, BidAction.PassBid.Instance, biddingPhase);
-        state = engine.PlaceBid(state, PlayerPosition.North, BidAction.PassBid.Instance, biddingPhase);
+        state = engine.PlaceBid(state, PlayerPosition.East, BidAction.PassBid.Instance);
+        state = engine.PlaceBid(state, PlayerPosition.South, BidAction.PassBid.Instance);
+        state = engine.PlaceBid(state, PlayerPosition.West, BidAction.PassBid.Instance);
+        state = engine.PlaceBid(state, PlayerPosition.North, BidAction.PassBid.Instance);
 
         state = engine.SelectTrump(state, Suit.Hearts);
 
@@ -91,8 +89,7 @@ public class SimpleAiStrategyTests
         var engine = new GameEngine();
         var state = engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
 
-        var biddingPhase = new BiddingPhase(PlayerPosition.North, 6);
-        state = engine.PlaceBid(state, PlayerPosition.East, BidAction.HawseyBid.Instance, biddingPhase);
+        state = engine.PlaceBid(state, PlayerPosition.East, BidAction.HawseyBid.Instance);
 
         state = engine.SelectTrump(state, Suit.Clubs);
 

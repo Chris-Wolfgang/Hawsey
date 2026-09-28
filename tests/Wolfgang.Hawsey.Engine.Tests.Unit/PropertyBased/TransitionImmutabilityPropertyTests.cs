@@ -47,7 +47,6 @@ public class TransitionImmutabilityPropertyTests
         var strategy = hawsey
             ? new TestPlayerStrategy(new Queue<BidAction>([BidAction.HawseyBid.Instance]))
             : new TestPlayerStrategy();
-        var biddingPhase = new BiddingPhase(state.Dealer, state.Rules.MinimumBid);
 
         while (state.Phase is not (GamePhase.RoundScoring or GamePhase.GameOver))
         {
@@ -56,8 +55,8 @@ public class TransitionImmutabilityPropertyTests
 
             if (state.Phase == GamePhase.Bidding)
             {
-                var bidder = biddingPhase.GetNextBidder()!.Value;
-                next = _engine.PlaceBid(state, bidder, strategy.DecideBid(state, bidder), biddingPhase);
+                var bidder = state.NextToAct!.Value;
+                next = _engine.PlaceBid(state, bidder, strategy.DecideBid(state, bidder));
             }
             else if (state.Phase == GamePhase.TrumpSelection)
             {
@@ -93,11 +92,10 @@ public class TransitionImmutabilityPropertyTests
     public void PlayCard_twice_from_the_same_state_gives_the_same_result()
     {
         var state = _engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
-        var biddingPhase = new BiddingPhase(state.Dealer, state.Rules.MinimumBid);
 
         while (state.Phase == GamePhase.Bidding)
         {
-            state = _engine.PlaceBid(state, biddingPhase.GetNextBidder()!.Value, BidAction.PassBid.Instance, biddingPhase);
+            state = _engine.PlaceBid(state, state.NextToAct!.Value, BidAction.PassBid.Instance);
         }
 
         state = _engine.SelectTrump(state, Suit.Hearts);
