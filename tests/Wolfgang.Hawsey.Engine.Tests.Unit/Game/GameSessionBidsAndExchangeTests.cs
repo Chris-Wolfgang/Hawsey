@@ -103,8 +103,11 @@ public class GameSessionBidsAndExchangeTests
         var hand = state.Hands[GameSession.HumanPosition];
         Card[] discard = [hand[0], hand[1]];
         new SimpleAiStrategy().DecideHawseyExchange(state, GameSession.HumanPosition, out _, out var partnersBest);
+        var stateChanges = 0;
+        session.StateChanged += (_, _) => stateChanges++;
 
         Assert.True(session.PerformHumanHawseyExchange(discard));
+        Assert.Equal(1, stateChanges);
 
         var after = session.CurrentState!;
         var newHand = after.Hands[GameSession.HumanPosition];
