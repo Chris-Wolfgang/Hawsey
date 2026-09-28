@@ -73,4 +73,18 @@ public class RoundScoreTests
 
         Assert.Equal(0, score.DefendingTeamDelta);
     }
+
+
+
+    [Fact]
+    public void DeltaFor_and_TricksFor_give_each_team_its_own_side_of_the_round()
+    {
+        // East/West bid 8 and took 5: set, -8; North/South took the other 7.
+        var score = new RoundScore(Team.EastWest, 8, 5, 7, false);
+
+        Assert.Equal(-8, score.DeltaFor(Team.EastWest));
+        Assert.Equal(7, score.DeltaFor(Team.NorthSouth));
+        Assert.Equal(5, score.TricksFor(Team.EastWest));
+        Assert.Equal(7, score.TricksFor(Team.NorthSouth));
+    }
 }

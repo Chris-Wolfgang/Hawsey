@@ -376,13 +376,10 @@
     };
 
     /// <summary>
-    /// The trick just won, shown until the next card is led: while the current trick is
-    /// empty (or gone, after the last trick), the last completed trick.
+    /// The cards on the table, as the engine decides: the current trick, or the trick
+    /// just won until the next lead. The MAUI app shows the same.
     /// </summary>
-    private TrickResult? LastCompletedTrick =>
-        State is { CompletedTricks.Count: > 0 } s && (s.CurrentTrick is null || s.CurrentTrick.Plays.Count == 0)
-            ? s.CompletedTricks[^1]
-            : null;
+    private IReadOnlyList<PlayedCard> TableCards => State?.TableCards ?? Array.Empty<PlayedCard>();
 
     /// <summary>This round so far: each bid, then each trick's winner.</summary>
     private IEnumerable<string> GameLog
@@ -567,13 +564,8 @@
     {
         get
         {
-            if (LastCompletedTrick is { } recent && recent.Cards.Count > 0)
-            {
-                return $"Led by {LeaderName(recent.Cards[0].Player)}";
-            }
-            var trick = State?.CurrentTrick;
-            if (trick is null || trick.Plays.Count == 0) return "";
-            return $"Led by {LeaderName(trick.Plays[0].Player)}";
+            var table = TableCards;
+            return table.Count == 0 ? "" : $"Led by {LeaderName(table[0].Player)}";
         }
     }
 
@@ -581,18 +573,7 @@
     {
         get
         {
-            if (LastCompletedTrick is { } recent)
-            {
-                for (var i = 0; i < recent.Cards.Count; i++)
-                {
-                    if (recent.Cards[i].Player == recent.Winner)
-                    {
-                        var c = recent.Cards[i].Card;
-                        return $"{RankText(c.Rank)} {SuitSymbol(c.Suit)}";
-                    }
-                }
-            }
-            var winner = State?.CurrentTrick?.GetCurrentWinner();
+            var winner = State?.TableWinningCard;
             return winner is null ? "—" : $"{RankText(winner.Value.Rank)} {SuitSymbol(winner.Value.Suit)}";
         }
     }
@@ -608,11 +589,8 @@
 
     private PlayedCard? PlayInTrick(PlayerPosition p)
     {
-        var plays = LastCompletedTrick is { } recent
-            ? recent.Cards
-            : State?.CurrentTrick?.Plays;
+        var plays = TableCards;
 
-        if (plays is null) return null;
         for (var i = 0; i < plays.Count; i++)
         {
             if (plays[i].Player == p) return plays[i];
@@ -733,34 +711,12 @@
     private RoundSummarySnapshot CaptureRoundSummary(bool isGameOver)
     {
         var s = State;
-        var br = s?.BiddingResult;
 
-        var usTricks = 0;
-        var themTricks = 0;
-        if (s is not null)
-        {
-            for (var i = 0; i < s.CompletedTricks.Count; i++)
-            {
-                var w = s.CompletedTricks[i].Winner;
-                if (w is PlayerPosition.North or PlayerPosition.South) usTricks++;
-                else themTricks++;
-            }
-        }
-
-        var bidTeam = br?.Winner.GetTeam() ?? Team.NorthSouth;
-        var biddingTeamTricks = bidTeam == Team.NorthSouth ? usTricks : themTricks;
-        var bidAmount = br?.BidAmount ?? 0;
-        var isHawsey = br?.IsHawsey ?? false;
-
-        // The engine's scoring, not a copy of it.
-        var score = new RoundScore(bidTeam, bidAmount, biddingTeamTricks, 12 - biddingTeamTricks, isHawsey);
-        var (usDelta, themDelta) = bidTeam == Team.NorthSouth
-            ? (score.BiddingTeamDelta, score.DefendingTeamDelta)
-            : (score.DefendingTeamDelta, score.BiddingTeamDelta);
-
-        var made = score.BiddingTeamDelta > 0;
-        var bidText = isHawsey ? "Hawsey (24)" : bidAmount.ToString(System.Globalization.CultureInfo.InvariantCulture);
-        var bidTeamLabel = bidTeam == Team.NorthSouth ? "US" : "THEM";
+        // The engine's own score for the round just played; nothing is recounted here.
+        var score = s?.RoundScore;
+        var bidTeam = score?.BiddingTeam ?? Team.NorthSouth;
+        var isHawsey = score?.IsHawsey ?? false;
+        var bidText = isHawsey ? "Hawsey (24)" : (score?.BidAmount ?? 0).ToString(System.Globalization.CultureInfo.InvariantCulture);
 
         // The engine names the winner, including the bidding-team rule when both
         // teams reach the target in the same round.
@@ -772,13 +728,13 @@
 
         return new RoundSummarySnapshot
         (
-            BidTeamLabel: bidTeamLabel,
+            BidTeamLabel: bidTeam == Team.NorthSouth ? "US" : "THEM",
             BidText: bidText,
-            Made: made,
-            UsTricks: usTricks,
-            ThemTricks: themTricks,
-            UsDelta: usDelta,
-            ThemDelta: themDelta,
+            Made: score is { BiddingTeamDelta: > 0 },
+            UsTricks: score?.TricksFor(Team.NorthSouth) ?? 0,
+            ThemTricks: score?.TricksFor(Team.EastWest) ?? 0,
+            UsDelta: score?.DeltaFor(Team.NorthSouth) ?? 0,
+            ThemDelta: score?.DeltaFor(Team.EastWest) ?? 0,
             UsTotal: s?.NorthSouthScore ?? 0,
             ThemTotal: s?.EastWestScore ?? 0,
             IsGameOver: isGameOver,

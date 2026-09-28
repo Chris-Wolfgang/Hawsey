@@ -2,6 +2,7 @@ using Wolfgang.Hawsey.Engine.Bidding;
 using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Players;
 using Wolfgang.Hawsey.Engine.Rules;
+using Wolfgang.Hawsey.Engine.Scoring;
 using Wolfgang.Hawsey.Engine.TrickPlay;
 
 namespace Wolfgang.Hawsey.Engine.Game;
@@ -45,7 +46,8 @@ public sealed class GameState
         bool isHawseyRound,
         PlayerPosition? hawseyBidder,
         int highBid = 0,
-        PlayerPosition? highBidder = null
+        PlayerPosition? highBidder = null,
+        RoundScore? roundScore = null
     )
     {
         Phase = phase;
@@ -65,6 +67,7 @@ public sealed class GameState
         HawseyBidder = hawseyBidder;
         HighBid = highBid;
         HighBidder = highBidder;
+        RoundScore = roundScore;
     }
 
 
@@ -245,6 +248,67 @@ public sealed class GameState
     /// open, the dealer is next (the dealer bids last), and nobody has bid.
     /// </summary>
     public bool IsNextBidderStuck => Phase == GamePhase.Bidding && NextToAct == Dealer && HighBid == 0;
+
+
+
+    /// <summary>
+    /// Gets the round the engine has just scored: set once the last trick of a round is
+    /// played (in the <see cref="GamePhase.RoundScoring"/> and <see cref="GamePhase.GameOver"/>
+    /// phases), <see langword="null"/> otherwise. A UI shows the round's result from it
+    /// instead of recounting the tricks.
+    /// </summary>
+    public RoundScore? RoundScore { get; }
+
+
+
+    /// <summary>
+    /// Gets the cards to show on the table, in the order they were played: the current
+    /// trick's cards, or, from the moment a trick is won until the next card is led, the
+    /// trick just won (including the last trick of a round). Empty before the first lead
+    /// of a round.
+    /// </summary>
+    public IReadOnlyList<PlayedCard> TableCards
+    {
+        get
+        {
+            if (CurrentTrick is { Plays.Count: > 0 } current)
+            {
+                return current.Plays;
+            }
+
+            return CompletedTricks.Count > 0
+                ? CompletedTricks[CompletedTricks.Count - 1].Cards
+                : Array.Empty<PlayedCard>();
+        }
+    }
+
+
+
+    /// <summary>
+    /// Gets the card winning the trick on the table (<see cref="TableCards"/>): the
+    /// current trick's winning card so far, or the card that won the trick just
+    /// completed. <see langword="null"/> when the table is empty.
+    /// </summary>
+    public Card? TableWinningCard
+    {
+        get
+        {
+            if (CurrentTrick is { Plays.Count: > 0 } current)
+            {
+                return current.GetCurrentWinner();
+            }
+
+            if (CompletedTricks.Count == 0)
+            {
+                return null;
+            }
+
+            var won = CompletedTricks[CompletedTricks.Count - 1];
+
+            // The winner played exactly one card in the trick.
+            return won.Cards.First(p => p.Player == won.Winner).Card;
+        }
+    }
 
 
 
