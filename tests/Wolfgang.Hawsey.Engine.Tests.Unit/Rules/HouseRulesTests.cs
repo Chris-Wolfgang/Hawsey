@@ -34,4 +34,48 @@ public class HouseRulesTests
         Assert.Equal(7, rules.MinimumBid);
         Assert.Equal(100, rules.PointsToWin);
     }
+
+
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(13)]
+    public void MinimumBid_when_out_of_range_throws(int minimumBid)
+    {
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new HouseRules { MinimumBid = minimumBid });
+
+        // An init accessor's parameter is "value", as for any .NET property setter.
+        Assert.Equal("value", ex.ParamName);
+    }
+
+
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(12)]
+    public void MinimumBid_at_a_bound_is_accepted(int minimumBid)
+    {
+        Assert.Equal(minimumBid, new HouseRules { MinimumBid = minimumBid }.MinimumBid);
+    }
+
+
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-5)]
+    public void PointsToWin_when_below_one_throws(int pointsToWin)
+    {
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new HouseRules { PointsToWin = pointsToWin });
+
+        Assert.Equal("value", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void PointsToWin_of_one_is_accepted()
+    {
+        Assert.Equal(1, new HouseRules { PointsToWin = 1 }.PointsToWin);
+    }
 }

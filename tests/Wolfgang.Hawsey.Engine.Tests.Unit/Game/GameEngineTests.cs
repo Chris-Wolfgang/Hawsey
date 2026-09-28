@@ -522,4 +522,18 @@ public class GameEngineTests
 
         return state;
     }
+
+
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(4)]
+    public void SelectTrump_when_the_suit_is_undefined_throws(int suit)
+    {
+        var state = CreateStateAtTrumpSelection();
+
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(() => _engine.SelectTrump(state, (Suit)suit));
+
+        Assert.Equal("trumpSuit", ex.ParamName);
+    }
 }
