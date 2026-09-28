@@ -146,8 +146,11 @@ public class GameSessionEventTests
             }
         }
 
+        Assert.NotEmpty(round.Bids);
         Assert.Equal(1, CountStateChanges(round, round.StartNextRound));
         Assert.Equal(GamePhase.Bidding, round.CurrentState.Phase);
+        // The next deal starts its own bidding: last round's bids are gone.
+        Assert.Empty(round.Bids);
     }
 
 
@@ -165,7 +168,9 @@ public class GameSessionEventTests
         await session.AdvanceAiBiddingAsync();
         await session.HandleTrumpSelectionAsync();
 
-        while (winners.Count == 0)
+        // A whole round, so the winners include seats other than North, the enum's
+        // default value, and an event that never set its winner would be caught.
+        while (session.CurrentState!.Phase == GamePhase.TrickPlay)
         {
             if (await session.AdvanceAiPlaysAsync())
             {
@@ -173,7 +178,8 @@ public class GameSessionEventTests
             }
         }
 
-        Assert.Equal(session.CurrentState!.CompletedTricks[0].Winner, winners[0]);
+        Assert.Equal(session.CurrentState!.CompletedTricks.Select(t => t.Winner), winners);
+        Assert.Contains(winners, w => w != PlayerPosition.North);
     }
 
 
