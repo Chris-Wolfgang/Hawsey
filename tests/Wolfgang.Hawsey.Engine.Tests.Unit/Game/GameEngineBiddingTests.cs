@@ -119,6 +119,7 @@ public class GameEngineBiddingTests
         var result = state.BiddingResult!;
         Assert.Equal(PlayerPosition.East, result.Winner);
         Assert.True(result.IsHawsey);
+        Assert.False(result.IsStuck);
         Assert.Equal(24, result.BidAmount);
         Assert.True(state.IsHawseyRound);
         Assert.Equal(PlayerPosition.East, state.HawseyBidder);
