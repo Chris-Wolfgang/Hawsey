@@ -108,13 +108,10 @@ public sealed class GameRunner
 
     private GameState RunBidding(GameState state, IPlayerStrategy strategy)
     {
-        var biddingPhase = new BiddingPhase(state.Dealer, state.Rules.MinimumBid);
-
-        while (!biddingPhase.IsComplete)
+        while (state is { Phase: GamePhase.Bidding, NextToAct: { } bidder })
         {
-            var bidder = biddingPhase.GetNextBidder()!.Value;
             var action = strategy.DecideBid(state, bidder);
-            state = _engine.PlaceBid(state, bidder, action, biddingPhase);
+            state = _engine.PlaceBid(state, bidder, action);
         }
 
         return state;

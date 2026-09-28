@@ -1,3 +1,4 @@
+using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Game;
 using Wolfgang.Hawsey.Engine.Players;
 using Wolfgang.Hawsey.Engine.Rules;
@@ -9,7 +10,7 @@ namespace Wolfgang.Hawsey.Engine.Tests.Unit.Game;
 /// <summary>
 /// <see cref="GameState.Winner"/> (#862): the team that reached
 /// <see cref="HouseRules.PointsToWin"/>, and the bidding team when both reached it in
-/// the same round, the rule <c>ScoreKeeper.GetWinner</c> documents.
+/// the same round.
 /// </summary>
 public class GameStateWinnerTests
 {
@@ -81,5 +82,43 @@ public class GameStateWinnerTests
         Assert.Equal(GamePhase.GameOver, state.Phase);
         Assert.Equal(Team.EastWest, state.BiddingResult!.Winner.GetTeam());
         Assert.Equal(Team.EastWest, state.Winner);
+    }
+
+
+
+    private static GameState Scored(GamePhase phase, int northSouth, int eastWest) =>
+        new
+        (
+            phase,
+            PlayerPosition.North,
+            new Dictionary<PlayerPosition, List<Card>>(),
+            trumpSuit: null,
+            TrumpMode.AceHigh,
+            biddingResult: null,
+            completedTricks: [],
+            currentTrick: null,
+            northSouth,
+            eastWest,
+            HouseRules.Default,
+            nextToAct: null,
+            tricksPlayedInRound: 0,
+            isHawseyRound: false,
+            hawseyBidder: null
+        );
+
+
+
+    [Fact]
+    public void Winner_when_East_West_finishes_exactly_on_the_target_is_East_West()
+    {
+        Assert.Equal(Team.EastWest, Scored(GamePhase.GameOver, northSouth: 10, eastWest: HouseRules.Default.PointsToWin).Winner);
+    }
+
+
+
+    [Fact]
+    public void Winner_before_game_over_is_null_even_past_the_target()
+    {
+        Assert.Null(Scored(GamePhase.RoundScoring, northSouth: HouseRules.Default.PointsToWin + 5, eastWest: 0).Winner);
     }
 }

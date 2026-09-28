@@ -73,9 +73,8 @@ public class GameEngineTests
     public void PlaceBid_advances_to_next_bidder()
     {
         var state = _engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
-        var biddingPhase = new BiddingPhase(PlayerPosition.North, 6);
 
-        state = _engine.PlaceBid(state, PlayerPosition.East, BidAction.PassBid.Instance, biddingPhase);
+        state = _engine.PlaceBid(state, PlayerPosition.East, BidAction.PassBid.Instance);
 
         Assert.Equal(PlayerPosition.South, state.NextToAct);
     }
@@ -86,12 +85,11 @@ public class GameEngineTests
     public void PlaceBid_when_all_pass_moves_to_trump_selection()
     {
         var state = _engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
-        var biddingPhase = new BiddingPhase(PlayerPosition.North, 6);
 
-        state = _engine.PlaceBid(state, PlayerPosition.East, BidAction.PassBid.Instance, biddingPhase);
-        state = _engine.PlaceBid(state, PlayerPosition.South, BidAction.PassBid.Instance, biddingPhase);
-        state = _engine.PlaceBid(state, PlayerPosition.West, BidAction.PassBid.Instance, biddingPhase);
-        state = _engine.PlaceBid(state, PlayerPosition.North, BidAction.PassBid.Instance, biddingPhase);
+        state = _engine.PlaceBid(state, PlayerPosition.East, BidAction.PassBid.Instance);
+        state = _engine.PlaceBid(state, PlayerPosition.South, BidAction.PassBid.Instance);
+        state = _engine.PlaceBid(state, PlayerPosition.West, BidAction.PassBid.Instance);
+        state = _engine.PlaceBid(state, PlayerPosition.North, BidAction.PassBid.Instance);
 
         Assert.Equal(GamePhase.TrumpSelection, state.Phase);
         Assert.True(state.BiddingResult!.IsStuck);
@@ -104,9 +102,8 @@ public class GameEngineTests
     public void PlaceBid_when_hawsey_moves_to_trump_selection()
     {
         var state = _engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
-        var biddingPhase = new BiddingPhase(PlayerPosition.North, 6);
 
-        state = _engine.PlaceBid(state, PlayerPosition.East, BidAction.HawseyBid.Instance, biddingPhase);
+        state = _engine.PlaceBid(state, PlayerPosition.East, BidAction.HawseyBid.Instance);
 
         Assert.Equal(GamePhase.TrumpSelection, state.Phase);
         Assert.True(state.IsHawseyRound);
@@ -118,18 +115,17 @@ public class GameEngineTests
     public void PlaceBid_when_wrong_phase_throws()
     {
         var state = _engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
-        var biddingPhase = new BiddingPhase(PlayerPosition.North, 6);
 
         // Complete bidding
-        state = _engine.PlaceBid(state, PlayerPosition.East, BidAction.PassBid.Instance, biddingPhase);
-        state = _engine.PlaceBid(state, PlayerPosition.South, BidAction.PassBid.Instance, biddingPhase);
-        state = _engine.PlaceBid(state, PlayerPosition.West, BidAction.PassBid.Instance, biddingPhase);
-        state = _engine.PlaceBid(state, PlayerPosition.North, BidAction.PassBid.Instance, biddingPhase);
+        state = _engine.PlaceBid(state, PlayerPosition.East, BidAction.PassBid.Instance);
+        state = _engine.PlaceBid(state, PlayerPosition.South, BidAction.PassBid.Instance);
+        state = _engine.PlaceBid(state, PlayerPosition.West, BidAction.PassBid.Instance);
+        state = _engine.PlaceBid(state, PlayerPosition.North, BidAction.PassBid.Instance);
 
         // Now in TrumpSelection, not Bidding
         Assert.Throws<InvalidOperationException>
         (
-            () => _engine.PlaceBid(state, PlayerPosition.North, BidAction.PassBid.Instance, biddingPhase)
+            () => _engine.PlaceBid(state, PlayerPosition.North, BidAction.PassBid.Instance)
         );
     }
 
@@ -465,12 +461,11 @@ public class GameEngineTests
     private GameState CreateStateAtTrumpSelection()
     {
         var state = _engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
-        var biddingPhase = new BiddingPhase(PlayerPosition.North, 6);
 
-        state = _engine.PlaceBid(state, PlayerPosition.East, BidAction.PassBid.Instance, biddingPhase);
-        state = _engine.PlaceBid(state, PlayerPosition.South, BidAction.PassBid.Instance, biddingPhase);
-        state = _engine.PlaceBid(state, PlayerPosition.West, BidAction.PassBid.Instance, biddingPhase);
-        state = _engine.PlaceBid(state, PlayerPosition.North, BidAction.PassBid.Instance, biddingPhase);
+        state = _engine.PlaceBid(state, PlayerPosition.East, BidAction.PassBid.Instance);
+        state = _engine.PlaceBid(state, PlayerPosition.South, BidAction.PassBid.Instance);
+        state = _engine.PlaceBid(state, PlayerPosition.West, BidAction.PassBid.Instance);
+        state = _engine.PlaceBid(state, PlayerPosition.North, BidAction.PassBid.Instance);
 
         return state;
     }
@@ -480,9 +475,8 @@ public class GameEngineTests
     private GameState CreateHawseyStateAtTrumpSelection()
     {
         var state = _engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
-        var biddingPhase = new BiddingPhase(PlayerPosition.North, 6);
 
-        state = _engine.PlaceBid(state, PlayerPosition.East, BidAction.HawseyBid.Instance, biddingPhase);
+        state = _engine.PlaceBid(state, PlayerPosition.East, BidAction.HawseyBid.Instance);
 
         return state;
     }
@@ -521,5 +515,65 @@ public class GameEngineTests
         }
 
         return state;
+    }
+
+
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(4)]
+    public void SelectTrump_when_the_suit_is_undefined_throws(int suit)
+    {
+        var state = CreateStateAtTrumpSelection();
+
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(() => _engine.SelectTrump(state, (Suit)suit));
+
+        Assert.Equal("trumpSuit", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void TryPlayCard_plays_a_legal_card_like_PlayCard()
+    {
+        var state = _engine.SelectTrump(CreateStateAtTrumpSelection(), Suit.Hearts);
+        var player = state.NextToAct!.Value;
+        var card = state.GetLegalPlays()[0];
+
+        var next = _engine.TryPlayCard(state, player, card);
+
+        Assert.NotNull(next);
+        Assert.Equal(card, next.CurrentTrick!.Plays[0].Card);
+        Assert.DoesNotContain(card, next.Hands[player]);
+    }
+
+
+
+    [Fact]
+    public void TryPlayCard_refuses_an_illegal_card_the_wrong_player_or_the_wrong_phase()
+    {
+        var trumpSelection = CreateStateAtTrumpSelection();
+        var state = _engine.SelectTrump(trumpSelection, Suit.Hearts);
+        var leader = state.NextToAct!.Value;
+        var lead = state.GetLegalPlays()[0];
+        var notHeld = Deck.CreatePinochleDeck().First(c => !state.Hands[leader].Contains(c));
+        var other = leader.NextClockwise();
+
+        Assert.Null(_engine.TryPlayCard(trumpSelection, leader, lead));
+        Assert.Null(_engine.TryPlayCard(state, other, state.Hands[other][0]));
+        Assert.Null(_engine.TryPlayCard(state, leader, notHeld));
+
+        // Play on until the player to act holds a card they may not play (the leader
+        // never does, so this plays at least one card).
+        while (state.GetLegalPlays().Count == state.Hands[state.NextToAct!.Value].Count)
+        {
+            state = _engine.PlayCard(state, state.NextToAct.Value, state.GetLegalPlays()[0]);
+        }
+
+        var player = state.NextToAct.Value;
+        var legal = state.GetLegalPlays();
+        var illegal = state.Hands[player].First(c => !legal.Contains(c));
+
+        Assert.Null(_engine.TryPlayCard(state, player, illegal));
     }
 }

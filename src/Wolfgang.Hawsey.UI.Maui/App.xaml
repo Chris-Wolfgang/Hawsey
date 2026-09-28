@@ -10,9 +10,6 @@
             </ResourceDictionary.MergedDictionaries>
             <converters:BoolToStrokeConverter x:Key="BoolToStrokeConverter" />
             <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
-            <converters:SuitToColorConverter x:Key="SuitToColorConverter" />
-            <converters:SuitToSymbolConverter x:Key="SuitToSymbolConverter" />
-            <converters:RankToStringConverter x:Key="RankToStringConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

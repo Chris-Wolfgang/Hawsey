@@ -22,6 +22,9 @@ namespace Wolfgang.Hawsey.Engine.Game;
     Justification = "Instance API preserved to avoid CS0176 breaks at existing call sites and to keep the type DI-friendly.")]
 public sealed class GameEngine
 {
+    /// <summary>The bid amount a Hawsey bid records: 24.</summary>
+    private const int HawseyBidAmount = 24;
+
     /// <summary>
     /// Starts a new game by dealing the first hand.
     /// </summary>
@@ -67,55 +70,61 @@ public sealed class GameEngine
 
 
     /// <summary>
-    /// Places a bid in the current bidding phase.
+    /// Places a bid for the player whose turn it is. Bidding goes once round clockwise
+    /// from the dealer's left, so the dealer bids last; it ends after the dealer's bid,
+    /// or at once on a Hawsey bid. When nobody has made a number bid by then, the dealer
+    /// is stuck at the minimum bid. The bidding so far is read from
+    /// <paramref name="state"/> (<see cref="GameState.HighBid"/>,
+    /// <see cref="GameState.HighBidder"/>, <see cref="GameState.NextToAct"/>).
     /// </summary>
     /// <param name="state">The current game state.</param>
     /// <param name="player">The player placing the bid.</param>
     /// <param name="action">The bid action.</param>
-    /// <param name="biddingPhase">The bidding phase tracker.</param>
-    /// <returns>The updated game state.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="biddingPhase"/> is <c>null</c>.</exception>
-    /// <exception cref="InvalidOperationException">Thrown when the game is not in the bidding phase or it is not the specified player's turn.</exception>
-    public GameState PlaceBid
-    (
-        GameState state,
-        PlayerPosition player,
-        BidAction action,
-        BiddingPhase biddingPhase
-    )
+    /// <returns>The updated game state: still bidding, or trump selection once bidding is over.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="action"/> is <c>null</c>.</exception>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the game is not in the bidding phase, it is not the specified player's
+    /// turn, or a number bid is below <see cref="HouseRules.MinimumBid"/>, above
+    /// <see cref="GameState.MaximumBid"/>, or not above <see cref="GameState.HighBid"/>.
+    /// </exception>
+    public GameState PlaceBid(GameState state, PlayerPosition player, BidAction action)
     {
         ValidatePhase(state, GamePhase.Bidding);
         ValidatePlayer(state, player);
 
-        if (biddingPhase == null)
+        if (action == null)
         {
-            throw new ArgumentNullException(nameof(biddingPhase));
+            throw new ArgumentNullException(nameof(action));
         }
 
-        biddingPhase.PlaceBid(player, action);
+        var highBid = state.HighBid;
+        var highBidder = state.HighBidder;
 
-        if (biddingPhase.IsComplete)
+        switch (action)
         {
-            var result = biddingPhase.GetResult();
+            case BidAction.PassBid:
+                break;
 
-            return new GameState
-            (
-                phase: GamePhase.TrumpSelection,
-                dealer: state.Dealer,
-                hands: state.Hands,
-                trumpSuit: null,
-                trumpMode: TrumpMode.AceHigh,
-                biddingResult: result,
-                completedTricks: state.CompletedTricks,
-                currentTrick: null,
-                northSouthScore: state.NorthSouthScore,
-                eastWestScore: state.EastWestScore,
-                rules: state.Rules,
-                nextToAct: result.Winner,
-                tricksPlayedInRound: 0,
-                isHawseyRound: result.IsHawsey,
-                hawseyBidder: result.IsHawsey ? result.Winner : null
-            );
+            case BidAction.NumberBid numberBid:
+                ValidateNumberBid(state, numberBid.Amount);
+                highBid = numberBid.Amount;
+                highBidder = player;
+                break;
+
+            case BidAction.HawseyBid:
+                return CreateTrumpSelectionState(state, new BiddingResult(player, HawseyBidAmount, isHawsey: true, isStuck: false));
+
+            default:
+                throw new InvalidOperationException($"Unknown bid action type: {action.GetType().Name}");
+        }
+
+        if (player == state.Dealer)
+        {
+            var result = highBidder is { } winner
+                ? new BiddingResult(winner, highBid, isHawsey: false, isStuck: false)
+                : new BiddingResult(state.Dealer, state.Rules.MinimumBid, isHawsey: false, isStuck: true);
+
+            return CreateTrumpSelectionState(state, result);
         }
 
         return new GameState
@@ -131,14 +140,65 @@ public sealed class GameEngine
             northSouthScore: state.NorthSouthScore,
             eastWestScore: state.EastWestScore,
             rules: state.Rules,
-            nextToAct: biddingPhase.GetNextBidder(),
+            nextToAct: player.NextClockwise(),
             tricksPlayedInRound: 0,
             isHawseyRound: false,
             hawseyBidder: null,
-            highBid: biddingPhase.HighestBid,
-            highBidder: biddingPhase.HighestBidder
+            highBid: highBid,
+            highBidder: highBidder
         );
     }
+
+
+
+    private static void ValidateNumberBid(GameState state, int amount)
+    {
+        if (amount < state.Rules.MinimumBid)
+        {
+            throw new InvalidOperationException
+            (
+                $"Bid of {amount} is below the minimum bid of {state.Rules.MinimumBid}."
+            );
+        }
+
+        if (amount > GameState.MaximumBid)
+        {
+            throw new InvalidOperationException
+            (
+                $"Bid of {amount} is above the maximum bid of {GameState.MaximumBid}."
+            );
+        }
+
+        if (amount <= state.HighBid)
+        {
+            throw new InvalidOperationException
+            (
+                $"Bid of {amount} does not beat the current highest bid of {state.HighBid}."
+            );
+        }
+    }
+
+
+
+    private static GameState CreateTrumpSelectionState(GameState state, BiddingResult result) =>
+        new
+        (
+            phase: GamePhase.TrumpSelection,
+            dealer: state.Dealer,
+            hands: state.Hands,
+            trumpSuit: null,
+            trumpMode: TrumpMode.AceHigh,
+            biddingResult: result,
+            completedTricks: state.CompletedTricks,
+            currentTrick: null,
+            northSouthScore: state.NorthSouthScore,
+            eastWestScore: state.EastWestScore,
+            rules: state.Rules,
+            nextToAct: result.Winner,
+            tricksPlayedInRound: 0,
+            isHawseyRound: result.IsHawsey,
+            hawseyBidder: result.IsHawsey ? result.Winner : null
+        );
 
 
 
@@ -148,9 +208,18 @@ public sealed class GameEngine
     /// <param name="state">The current game state.</param>
     /// <param name="trumpSuit">The trump suit, or <c>null</c> for Ace high.</param>
     /// <returns>The updated game state.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="trumpSuit"/> is not a defined <see cref="Suit"/>.
+    /// </exception>
     public GameState SelectTrump(GameState state, Suit? trumpSuit)
     {
         ValidatePhase(state, GamePhase.TrumpSelection);
+
+        // An undefined suit would otherwise only fail later, inside trick play.
+        if (trumpSuit is { } suit && (suit < Suit.Hearts || suit > Suit.Spades))
+        {
+            throw new ArgumentOutOfRangeException(nameof(trumpSuit), suit, "Not a defined suit.");
+        }
 
         var trumpMode = trumpSuit.HasValue ? TrumpMode.Suited : TrumpMode.AceHigh;
 
@@ -261,6 +330,34 @@ public sealed class GameEngine
         ValidatePlayer(state, player);
         ValidateCardIsLegal(state, card);
 
+        return ApplyPlay(state, player, card);
+    }
+
+
+
+    /// <summary>
+    /// <see cref="PlayCard"/> for a caller that treats an illegal move as a refusal
+    /// rather than an error: the legal plays are worked out once, not once to check
+    /// and again to play.
+    /// </summary>
+    /// <returns>The updated game state, or <c>null</c> when it is not a trick-play turn of
+    /// <paramref name="player"/> or <paramref name="card"/> is not a legal play.</returns>
+    internal GameState? TryPlayCard(GameState state, PlayerPosition player, Card card)
+    {
+        if (state.Phase != GamePhase.TrickPlay
+            || state.NextToAct != player
+            || !ContainsCard(state.GetLegalPlays(), card))
+        {
+            return null;
+        }
+
+        return ApplyPlay(state, player, card);
+    }
+
+
+
+    private GameState ApplyPlay(GameState state, PlayerPosition player, Card card)
+    {
         var hands = RemoveCardFromHand(state.Hands, player, card);
         // Play into a copy: the input state keeps its trick unchanged (#861).
         var trick = state.CurrentTrick!.Copy();

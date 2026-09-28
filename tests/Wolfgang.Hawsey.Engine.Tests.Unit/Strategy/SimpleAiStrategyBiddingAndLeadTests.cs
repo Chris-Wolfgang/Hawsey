@@ -374,4 +374,86 @@ public class SimpleAiStrategyBiddingAndLeadTests
 
         Assert.Equal([C(Rank.Ten, Suit.Spades), C(Rank.Queen, Suit.Clubs)], discard);
     }
+
+
+
+    private static List<TrickResult> TricksOf(IReadOnlyList<Card> cards)
+    {
+        List<TrickResult> tricks = [];
+
+        for (var i = 0; i < cards.Count; i += 4)
+        {
+            tricks.Add
+            (
+                new
+                (
+                    PlayerPosition.North,
+                    [
+                        new(cards[i], PlayerPosition.North, 0),
+                        new(cards[i + 1], PlayerPosition.East, 1),
+                        new(cards[i + 2], PlayerPosition.South, 2),
+                        new(cards[i + 3], PlayerPosition.West, 3),
+                    ]
+                )
+            );
+        }
+
+        return tricks;
+    }
+
+
+
+    [Fact]
+    public void DecidePlay_when_every_other_trump_is_gone_a_side_card_is_a_sure_winner()
+    {
+        // Hearts are trump. Of the 14 trumps (12 hearts and the two left bowers), East
+        // holds one nine of hearts and the other 13 are gone, as are both aces and kings
+        // of clubs. Nothing can beat or ruff the queen of clubs, and nothing can beat the
+        // nine of hearts: both are sure winners, and the AI leads the higher, the queen.
+        // Miscounting the trumps still out makes the queen look ruffable.
+        Rank[] above = [Rank.Ten, Rank.Jack, Rank.Queen, Rank.King, Rank.Ace];
+        var gone = above
+            .SelectMany(r => new[] { C(r, Suit.Hearts), C(r, Suit.Hearts) })
+            .Concat([C(Rank.Nine, Suit.Hearts), C(Rank.Jack, Suit.Diamonds), C(Rank.Jack, Suit.Diamonds)])
+            .Concat([C(Rank.Ace, Suit.Clubs), C(Rank.Ace, Suit.Clubs), C(Rank.King, Suit.Clubs), C(Rank.King, Suit.Clubs)])
+            .Concat([C(Rank.Nine, Suit.Spades), C(Rank.Nine, Suit.Spades), C(Rank.Ten, Suit.Spades)])
+            .ToList();
+        Card[] hand = [C(Rank.Nine, Suit.Hearts), C(Rank.Queen, Suit.Clubs)];
+
+        var play = _ai.DecidePlay(State(GamePhase.TrickPlay, PlayerPosition.East, hand, PlayerPosition.North, Suit.Hearts, new Trick(Suit.Hearts), TricksOf(gone)), PlayerPosition.East);
+
+        Assert.Equal(C(Rank.Queen, Suit.Clubs), play);
+    }
+
+
+
+    [Fact]
+    public void DecidePlay_leads_a_lower_sure_winner_over_a_higher_card_that_can_be_beaten()
+    {
+        // No trump. Both kings and both aces of spades are gone, so the queen of spades
+        // can't be beaten; the king of clubs can, by either ace of clubs still out. The AI
+        // leads the queen, not its highest card.
+        var gone = TricksOf([C(Rank.King, Suit.Spades), C(Rank.King, Suit.Spades), C(Rank.Ace, Suit.Spades), C(Rank.Ace, Suit.Spades)]);
+        Card[] hand = [C(Rank.Queen, Suit.Spades), C(Rank.King, Suit.Clubs)];
+
+        var play = _ai.DecidePlay(State(GamePhase.TrickPlay, PlayerPosition.East, hand, PlayerPosition.North, trump: null, new Trick(null), gone), PlayerPosition.East);
+
+        Assert.Equal(C(Rank.Queen, Suit.Spades), play);
+    }
+
+
+
+    [Fact]
+    public void DecidePlay_when_an_opponent_ties_the_partners_card_the_partner_still_wins()
+    {
+        // North (South's partner) led the king of spades and East played the other king.
+        // The first copy keeps the trick, so North is winning: South throws the nine
+        // rather than spend the ace.
+        Card[] hand = [C(Rank.Ace, Suit.Spades), C(Rank.Nine, Suit.Spades)];
+        var trick = TrickOf(Suit.Hearts, (PlayerPosition.North, C(Rank.King, Suit.Spades)), (PlayerPosition.East, C(Rank.King, Suit.Spades)));
+
+        var play = _ai.DecidePlay(State(GamePhase.TrickPlay, PlayerPosition.South, hand, PlayerPosition.West, Suit.Hearts, trick, []), PlayerPosition.South);
+
+        Assert.Equal(C(Rank.Nine, Suit.Spades), play);
+    }
 }
