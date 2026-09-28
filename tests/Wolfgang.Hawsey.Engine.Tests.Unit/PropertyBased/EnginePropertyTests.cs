@@ -113,18 +113,39 @@ public class EnginePropertyTests
         bool mustBeat
     )
     {
-        var deck = ShuffledDeck(seed);
-        var hand = deck.Take(1 + Math.Abs(handSize % 12)).ToList();
+        var deck = ShuffledDeck(seed).ToList();
         var trumpSuit = SuitFrom(trump);
         var ledSuit = SuitFrom(led);
+
+        // The card winning the trick, so the must-beat rule really runs: the first card
+        // of the led suit, taken out of the deck before the hand is dealt from the rest.
+        var winningIndex = deck.FindIndex(c => CardRanking.GetEffectiveSuit(c, trumpSuit) == ledSuit);
+        var winning = deck[winningIndex];
+        deck.RemoveAt(winningIndex);
+
+        var hand = deck.Take(1 + Math.Abs(handSize % 12)).ToList();
         var rules = new HouseRules { MustBeat = mustBeat };
         var canFollow = hand.Exists(c => CardRanking.GetEffectiveSuit(c, trumpSuit) == ledSuit);
+        var comparer = new CardComparer(trumpSuit, ledSuit);
+        var following = hand
+            .Where(c => CardRanking.GetEffectiveSuit(c, trumpSuit) == ledSuit)
+            .ToList();
+        var beating = following
+            .Where(c => comparer.Compare(c, winning) > 0)
+            .ToList();
 
-        var legal = FollowSuitValidator.GetLegalPlays(hand, ledSuit, trumpSuit, rules, currentWinningCard: null);
+        var legal = FollowSuitValidator.GetLegalPlays(hand, ledSuit, trumpSuit, rules, winning);
 
         if (canFollow)
         {
-            Assert.All(legal, card => Assert.Equal(ledSuit, CardRanking.GetEffectiveSuit(card, trumpSuit)));
+            // Must follow suit; with must-beat, must also beat the winner when a
+            // following card can.
+            var expected = mustBeat && beating.Count > 0 ? beating : following;
+            Assert.Equal
+            (
+                expected.OrderBy(c => c.Suit).ThenBy(c => c.Rank),
+                legal.OrderBy(c => c.Suit).ThenBy(c => c.Rank)
+            );
         }
         else
         {

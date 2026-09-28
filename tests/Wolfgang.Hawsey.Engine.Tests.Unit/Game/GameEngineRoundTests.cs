@@ -32,11 +32,10 @@ public class GameEngineRoundTests
     private GameState ReachFirstTrick()
     {
         var state = StartAtNorth();
-        var biddingPhase = new BiddingPhase(state.Dealer, state.Rules.MinimumBid);
 
         while (state.Phase == GamePhase.Bidding)
         {
-            state = _engine.PlaceBid(state, biddingPhase.GetNextBidder()!.Value, BidAction.PassBid.Instance, biddingPhase);
+            state = _engine.PlaceBid(state, state.NextToAct!.Value, BidAction.PassBid.Instance);
         }
 
         return _engine.SelectTrump(state, Suit.Hearts);
@@ -47,8 +46,7 @@ public class GameEngineRoundTests
     private GameState ReachHawseyExchange()
     {
         var state = StartAtNorth();
-        var biddingPhase = new BiddingPhase(state.Dealer, state.Rules.MinimumBid);
-        state = _engine.PlaceBid(state, PlayerPosition.East, BidAction.HawseyBid.Instance, biddingPhase);
+        state = _engine.PlaceBid(state, PlayerPosition.East, BidAction.HawseyBid.Instance);
 
         return _engine.SelectTrump(state, Suit.Hearts);
     }
@@ -67,9 +65,8 @@ public class GameEngineRoundTests
     public void PlaceBid_while_bidding_continues_is_not_a_Hawsey_round()
     {
         var state = StartAtNorth();
-        var biddingPhase = new BiddingPhase(state.Dealer, state.Rules.MinimumBid);
 
-        var next = _engine.PlaceBid(state, PlayerPosition.East, BidAction.PassBid.Instance, biddingPhase);
+        var next = _engine.PlaceBid(state, PlayerPosition.East, BidAction.PassBid.Instance);
 
         Assert.Equal(GamePhase.Bidding, next.Phase);
         Assert.False(next.IsHawseyRound);
@@ -81,11 +78,10 @@ public class GameEngineRoundTests
     public void PlaceBid_when_normal_bidding_completes_has_no_Hawsey_bidder()
     {
         var state = StartAtNorth();
-        var biddingPhase = new BiddingPhase(state.Dealer, state.Rules.MinimumBid);
 
         while (state.Phase == GamePhase.Bidding)
         {
-            state = _engine.PlaceBid(state, biddingPhase.GetNextBidder()!.Value, BidAction.PassBid.Instance, biddingPhase);
+            state = _engine.PlaceBid(state, state.NextToAct!.Value, BidAction.PassBid.Instance);
         }
 
         Assert.Equal(GamePhase.TrumpSelection, state.Phase);
@@ -225,40 +221,37 @@ public class GameEngineRoundTests
 
 
     [Fact]
-    public void PlaceBid_when_trick_play_has_started_throws_even_if_player_and_bidding_phase_agree()
+    public void PlaceBid_when_trick_play_has_started_throws_even_for_the_player_to_act()
     {
-        // The stuck dealer (North) leads the first trick. A bidding phase dealt by West
-        // makes North its next bidder, so only the phase guard can reject this bid.
+        // The stuck dealer (North) leads the first trick, so only the phase guard can
+        // reject North's bid.
         var state = ReachFirstTrick();
         Assert.Equal(PlayerPosition.North, state.NextToAct);
-        var agreeingPhase = new BiddingPhase(PlayerPosition.West, state.Rules.MinimumBid);
 
-        Assert.Throws<InvalidOperationException>(() => _engine.PlaceBid(state, PlayerPosition.North, BidAction.PassBid.Instance, agreeingPhase));
+        Assert.Throws<InvalidOperationException>(() => _engine.PlaceBid(state, PlayerPosition.North, BidAction.PassBid.Instance));
     }
 
 
 
     [Fact]
-    public void PlaceBid_when_it_is_not_the_players_turn_throws_even_if_the_bidding_phase_agrees()
+    public void PlaceBid_when_it_is_not_the_players_turn_throws()
     {
-        // East is next to bid in the game; a phase dealt by East makes South its next
-        // bidder, so only the engine's turn guard can reject South's bid.
+        // East is next to bid, so the turn guard rejects South's bid.
         var state = StartAtNorth();
-        var agreeingPhase = new BiddingPhase(PlayerPosition.East, state.Rules.MinimumBid);
 
-        Assert.Throws<InvalidOperationException>(() => _engine.PlaceBid(state, PlayerPosition.South, BidAction.PassBid.Instance, agreeingPhase));
+        Assert.Throws<InvalidOperationException>(() => _engine.PlaceBid(state, PlayerPosition.South, BidAction.PassBid.Instance));
     }
 
 
 
     [Fact]
-    public void PlaceBid_when_bidding_phase_is_null_throws()
+    public void PlaceBid_when_the_action_is_null_throws()
     {
         var state = StartAtNorth();
 
-        var ex = Assert.Throws<ArgumentNullException>(() => _engine.PlaceBid(state, PlayerPosition.East, BidAction.PassBid.Instance, null!));
+        var ex = Assert.Throws<ArgumentNullException>(() => _engine.PlaceBid(state, PlayerPosition.East, null!));
 
-        Assert.Equal("biddingPhase", ex.ParamName);
+        Assert.Equal("action", ex.ParamName);
     }
 
 
