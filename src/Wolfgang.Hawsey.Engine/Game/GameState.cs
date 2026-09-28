@@ -226,6 +226,13 @@ public sealed class GameState
 
 
     /// <summary>
+    /// The highest number bid: all twelve tricks.
+    /// </summary>
+    public const int MaximumBid = 12;
+
+
+
+    /// <summary>
     /// Gets the lowest number bid the next bidder may make: the house minimum, or one
     /// more than <see cref="HighBid"/>.
     /// </summary>

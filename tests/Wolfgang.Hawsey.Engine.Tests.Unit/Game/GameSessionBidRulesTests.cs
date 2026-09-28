@@ -64,10 +64,10 @@ public class GameSessionBidRulesTests
 
         Assert.False(session.PlaceHumanBid(new BidAction.NumberBid(8)));
         Assert.False(session.PlaceHumanBid(new BidAction.NumberBid(5)));
-        Assert.False(session.PlaceHumanBid(new BidAction.NumberBid(BiddingPhase.MaximumBid + 1)));
+        Assert.False(session.PlaceHumanBid(new BidAction.NumberBid(GameState.MaximumBid + 1)));
 
         Assert.Same(before, session.CurrentState);
-        Assert.True(session.PlaceHumanBid(new BidAction.NumberBid(BiddingPhase.MaximumBid)));
+        Assert.True(session.PlaceHumanBid(new BidAction.NumberBid(GameState.MaximumBid)));
     }
 
 
@@ -78,12 +78,11 @@ public class GameSessionBidRulesTests
         // North deals; East, South and West pass, so North (the dealer) is next and stuck.
         var engine = new GameEngine();
         var state = engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(1));
-        var phase = new BiddingPhase(state.Dealer, state.Rules.MinimumBid);
 
         foreach (var bidder in new[] { PlayerPosition.East, PlayerPosition.South, PlayerPosition.West })
         {
             Assert.False(state.IsNextBidderStuck);
-            state = engine.PlaceBid(state, bidder, BidAction.PassBid.Instance, phase);
+            state = engine.PlaceBid(state, bidder, BidAction.PassBid.Instance);
         }
 
         Assert.Equal(PlayerPosition.North, state.NextToAct);
@@ -97,10 +96,9 @@ public class GameSessionBidRulesTests
     {
         var engine = new GameEngine();
         var state = engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(1));
-        var phase = new BiddingPhase(state.Dealer, state.Rules.MinimumBid);
-        state = engine.PlaceBid(state, PlayerPosition.East, new BidAction.NumberBid(7), phase);
-        state = engine.PlaceBid(state, PlayerPosition.South, BidAction.PassBid.Instance, phase);
-        state = engine.PlaceBid(state, PlayerPosition.West, BidAction.PassBid.Instance, phase);
+        state = engine.PlaceBid(state, PlayerPosition.East, new BidAction.NumberBid(7));
+        state = engine.PlaceBid(state, PlayerPosition.South, BidAction.PassBid.Instance);
+        state = engine.PlaceBid(state, PlayerPosition.West, BidAction.PassBid.Instance);
 
         Assert.Equal(PlayerPosition.North, state.NextToAct);
         Assert.False(state.IsNextBidderStuck);

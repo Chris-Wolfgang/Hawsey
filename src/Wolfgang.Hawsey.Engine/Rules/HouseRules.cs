@@ -1,4 +1,4 @@
-using Wolfgang.Hawsey.Engine.Bidding;
+using Wolfgang.Hawsey.Engine.Game;
 
 namespace Wolfgang.Hawsey.Engine.Rules;
 
@@ -38,23 +38,23 @@ public sealed class HouseRules
 
 
     /// <summary>
-    /// Gets the minimum bid allowed, from 1 to <see cref="BiddingPhase.MaximumBid"/>. Default is 6.
+    /// Gets the minimum bid allowed, from 1 to <see cref="GameState.MaximumBid"/>. Default is 6.
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException">
-    /// The value is below 1 or above <see cref="BiddingPhase.MaximumBid"/>.
+    /// The value is below 1 or above <see cref="GameState.MaximumBid"/>.
     /// </exception>
     public int MinimumBid
     {
         get => _minimumBid;
         init
         {
-            if (value < 1 || value > BiddingPhase.MaximumBid)
+            if (value < 1 || value > GameState.MaximumBid)
             {
                 throw new ArgumentOutOfRangeException
                 (
                     nameof(value),
                     value,
-                    $"The minimum bid must be from 1 to {BiddingPhase.MaximumBid}."
+                    $"The minimum bid must be from 1 to {GameState.MaximumBid}."
                 );
             }
 

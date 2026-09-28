@@ -14,14 +14,13 @@ internal static class RoundDriver
     public static GameState PlayOneRound(GameState state, IPlayerStrategy strategy)
     {
         var engine = new GameEngine();
-        var biddingPhase = new BiddingPhase(state.Dealer, state.Rules.MinimumBid);
 
         while (state.Phase is not (GamePhase.RoundScoring or GamePhase.GameOver))
         {
             if (state.Phase == GamePhase.Bidding)
             {
-                var bidder = biddingPhase.GetNextBidder()!.Value;
-                state = engine.PlaceBid(state, bidder, strategy.DecideBid(state, bidder), biddingPhase);
+                var bidder = state.NextToAct!.Value;
+                state = engine.PlaceBid(state, bidder, strategy.DecideBid(state, bidder));
             }
             else if (state.Phase == GamePhase.TrumpSelection)
             {
