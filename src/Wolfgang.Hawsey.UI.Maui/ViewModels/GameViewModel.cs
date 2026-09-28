@@ -10,6 +10,7 @@ using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Game;
 using Wolfgang.Hawsey.Engine.Players;
 using Wolfgang.Hawsey.Engine.Rules;
+using Wolfgang.Hawsey.Engine.TrickPlay;
 using Wolfgang.Hawsey.UI.Maui.Threading;
 
 namespace Wolfgang.Hawsey.UI.Maui.ViewModels;
@@ -767,13 +768,27 @@ public partial class GameViewModel : INotifyPropertyChanged
     {
         TrickCards.Clear();
 
-        if (state.CurrentTrick != null)
+        // The move that completes a trick leaves an empty next trick (or none, at the
+        // end of the round), so the card that decided it would never be drawn. Until
+        // the next card is led, show the trick just won.
+        IReadOnlyList<PlayedCard> plays;
+
+        if (state.CurrentTrick is { Plays.Count: > 0 } current)
         {
-            for (var i = 0; i < state.CurrentTrick.Plays.Count; i++)
-            {
-                var play = state.CurrentTrick.Plays[i];
-                TrickCards.Add(new TrickCardViewModel(play.Card));
-            }
+            plays = current.Plays;
+        }
+        else if (state.CompletedTricks.Count > 0)
+        {
+            plays = state.CompletedTricks[state.CompletedTricks.Count - 1].Cards;
+        }
+        else
+        {
+            return;
+        }
+
+        for (var i = 0; i < plays.Count; i++)
+        {
+            TrickCards.Add(new TrickCardViewModel(plays[i].Card));
         }
     }
 

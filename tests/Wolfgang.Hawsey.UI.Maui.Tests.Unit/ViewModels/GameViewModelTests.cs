@@ -328,6 +328,41 @@ public class GameViewModelTests
 
 
     [Fact]
+    public void A_completed_trick_stays_on_the_table_until_the_next_lead()
+    {
+        _vm.NewGameCommand.Execute(null);
+
+        // The session refreshes the table before announcing the trick, so when the
+        // announcement arrives the table must show the trick just won - all four cards.
+        // That includes the twelfth trick, when the round is over and there is no
+        // current trick at all.
+        var checkedTricks = 0;
+        _vm.PropertyChanged += (_, e) =>
+        {
+            if (string.Equals(e.PropertyName, nameof(GameViewModel.StatusMessage), StringComparison.Ordinal)
+                && _vm.StatusMessage.EndsWith(" wins the trick!", StringComparison.Ordinal))
+            {
+                var trick = _session.CurrentState!.CompletedTricks[^1];
+                Assert.Equal
+                (
+                    trick.Cards.Select(p => new TrickCardViewModel(p.Card)).Select(c => c.RankText + c.SuitSymbol),
+                    _vm.TrickCards.Select(c => c.RankText + c.SuitSymbol)
+                );
+                checkedTricks++;
+            }
+        };
+
+        _vm.PlaceBidCommand.Execute("pass");
+
+        while (checkedTricks < 12)
+        {
+            PlayFirstLegalCard();
+        }
+    }
+
+
+
+    [Fact]
     public void PropertyChanged_is_raised_only_when_a_value_changes()
     {
         var changed = new List<string?>();
