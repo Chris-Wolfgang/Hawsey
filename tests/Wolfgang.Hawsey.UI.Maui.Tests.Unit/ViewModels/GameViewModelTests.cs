@@ -201,7 +201,7 @@ public class GameViewModelTests
         _vm.PlaceBidCommand.Execute("hawsey");
         _vm.SelectTrumpCommand.Execute("hearts");
 
-        Assert.Equal("Hawsey! Select cards to exchange", _vm.StatusMessage);
+        Assert.Equal("Hawsey! Tap two cards to discard", _vm.StatusMessage);
         Assert.Equal("South called Hawsey!", _vm.BidInfoDisplay);
         Assert.Equal(GamePhase.HawseyExchange, _session.CurrentState!.Phase);
     }

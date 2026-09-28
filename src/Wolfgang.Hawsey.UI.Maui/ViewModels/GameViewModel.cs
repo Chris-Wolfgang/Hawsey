@@ -37,6 +37,13 @@ public partial class GameViewModel : INotifyPropertyChanged
     private int _westCardCount;
     private string _bidPrompt = "";
     private bool _canPass = true;
+    private bool _isHawseyExchangeVisible;
+    private string _exchangeSelectionText = "";
+
+    // Indexes into the human's hand, not cards: a pinochle hand can hold both copies
+    // of a card, and the human may discard both.
+    private readonly List<int> _discardIndexes = new();
+    private readonly Command _confirmHawseyExchangeCommand;
 
 
 
@@ -59,7 +66,17 @@ public partial class GameViewModel : INotifyPropertyChanged
         PlaceBidCommand = new Command<string>(s => _ = PlaceBidAsync(s));
         SelectTrumpCommand = new Command<string>(s => _ = SelectTrumpAsync(s));
         PlayCardCommand = new Command<CardViewModel>(c => _ = PlayCardAsync(c));
+        _confirmHawseyExchangeCommand = new Command
+        (
+            () => _ = ConfirmHawseyExchangeAsync(),
+            () => _discardIndexes.Count == HawseyDiscardCount
+        );
     }
+
+
+
+    /// <summary>The human discards two cards in a Hawsey exchange.</summary>
+    public const int HawseyDiscardCount = 2;
 
 
 
@@ -199,6 +216,35 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
+    /// <summary>
+    /// Whether the human is making a Hawsey exchange: tapping a card in the hand then
+    /// picks (or unpicks) it as a discard instead of playing it.
+    /// </summary>
+    public bool IsHawseyExchangeVisible
+    {
+        get => _isHawseyExchangeVisible;
+        set => SetProperty(ref _isHawseyExchangeVisible, value);
+    }
+
+
+
+    /// <summary>How many of the two discards are picked, for example "Selected: 1 / 2".</summary>
+    public string ExchangeSelectionText
+    {
+        get => _exchangeSelectionText;
+        set => SetProperty(ref _exchangeSelectionText, value);
+    }
+
+
+
+    /// <summary>
+    /// Makes the Hawsey exchange with the two picked cards; the partner gives their two
+    /// best. It can run only when exactly two cards are picked.
+    /// </summary>
+    public ICommand ConfirmHawseyExchangeCommand => _confirmHawseyExchangeCommand;
+
+
+
     public ICommand NewGameCommand { get; }
     public ICommand PlaceBidCommand { get; }
     public ICommand SelectTrumpCommand { get; }
@@ -272,7 +318,18 @@ public partial class GameViewModel : INotifyPropertyChanged
 
     private async Task PlayCardAsync(CardViewModel? cardVm)
     {
-        if (cardVm == null || !cardVm.IsLegal)
+        if (cardVm == null)
+        {
+            return;
+        }
+
+        if (IsHawseyExchangeVisible)
+        {
+            ToggleDiscard(cardVm);
+            return;
+        }
+
+        if (!cardVm.IsLegal)
         {
             return;
         }
@@ -280,6 +337,52 @@ public partial class GameViewModel : INotifyPropertyChanged
         // A double-tap, or a tap that lands during an AI turn, is rejected by the
         // service; only an accepted move advances the game.
         if (!_gameService.PlayHumanCard(cardVm.Card))
+        {
+            return;
+        }
+
+        await AdvanceGameAsync().ConfigureAwait(true);
+    }
+
+
+
+    private void ToggleDiscard(CardViewModel cardVm)
+    {
+        var index = HumanCards.IndexOf(cardVm);
+
+        if (index < 0)
+        {
+            return;
+        }
+
+        if (!_discardIndexes.Remove(index))
+        {
+            if (_discardIndexes.Count == HawseyDiscardCount)
+            {
+                return;
+            }
+
+            _discardIndexes.Add(index);
+        }
+
+        UpdateFromState();
+    }
+
+
+
+    private async Task ConfirmHawseyExchangeAsync()
+    {
+        var state = _gameService.CurrentState;
+
+        if (state == null || _discardIndexes.Count != HawseyDiscardCount)
+        {
+            return;
+        }
+
+        var hand = state.Hands[GameSession.HumanPosition];
+        var discard = _discardIndexes.Select(i => hand[i]).ToArray();
+
+        if (!_gameService.PerformHumanHawseyExchange(discard))
         {
             return;
         }
@@ -369,7 +472,7 @@ public partial class GameViewModel : INotifyPropertyChanged
 
         if (humanExchanges)
         {
-            StatusMessage = "Hawsey! Select cards to exchange";
+            StatusMessage = "Hawsey! Tap two cards to discard";
         }
         else
         {
@@ -454,8 +557,29 @@ public partial class GameViewModel : INotifyPropertyChanged
         }
 
         UpdateScoresAndInfo(state);
+        UpdateHawseyExchange(state);
         UpdateHumanHand(state);
         UpdateTrickArea(state);
+    }
+
+
+
+    /// <summary>
+    /// The exchange panel shows while the human, as the Hawsey bidder, has yet to
+    /// exchange. Any other state (the exchange made, or a New Game) drops the picks.
+    /// </summary>
+    private void UpdateHawseyExchange(GameState state)
+    {
+        var exchanging = state is { Phase: GamePhase.HawseyExchange, HawseyBidder: GameSession.HumanPosition };
+
+        if (!exchanging)
+        {
+            _discardIndexes.Clear();
+        }
+
+        IsHawseyExchangeVisible = exchanging;
+        ExchangeSelectionText = $"Selected: {_discardIndexes.Count} / {HawseyDiscardCount}";
+        _confirmHawseyExchangeCommand.ChangeCanExecute();
     }
 
 
@@ -603,7 +727,13 @@ public partial class GameViewModel : INotifyPropertyChanged
                 }
             }
 
-            HumanCards.Add(new CardViewModel(card, isLegal));
+            // In the exchange every card may be picked as a discard.
+            HumanCards.Add
+            (
+                IsHawseyExchangeVisible
+                    ? new CardViewModel(card, isLegal: true, isSelected: _discardIndexes.Contains(i))
+                    : new CardViewModel(card, isLegal)
+            );
         }
     }
 

@@ -86,6 +86,12 @@
                             <Border.Stroke>
                                 <SolidColorBrush Color="{Binding IsLegal, Converter={StaticResource BoolToStrokeConverter}}" />
                             </Border.Stroke>
+                            <Border.Triggers>
+                                <!-- A card picked as a Hawsey-exchange discard is raised. -->
+                                <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                    <Setter Property="TranslationY" Value="-16" />
+                                </DataTrigger>
+                            </Border.Triggers>
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer
                                     Command="{Binding PlayCardCommand, Source={RelativeSource AncestorType={x:Type vm:GameViewModel}}, x:DataType=vm:GameViewModel}"
@@ -195,6 +201,37 @@
                     <Button Text="Ace High (No Trump)"
                             Command="{Binding SelectTrumpCommand}" CommandParameter="acehigh"
                             BackgroundColor="#FF8F00" TextColor="White" FontSize="16" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- Hawsey exchange panel: covers the table only, so the hand stays tappable -->
+        <Grid Grid.Row="0" Grid.RowSpan="2"
+              IsVisible="{Binding IsHawseyExchangeVisible}"
+              BackgroundColor="#CC000000">
+            <Border StrokeShape="RoundRectangle 12"
+                    BackgroundColor="#424242"
+                    Stroke="#FFD600"
+                    StrokeThickness="2"
+                    Padding="20"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    MaximumWidthRequest="350">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Hawsey Exchange"
+                           TextColor="#FFD600" FontSize="22"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center" />
+                    <Label Text="Tap 2 cards in your hand to discard. Your partner gives you their 2 best for the trump named."
+                           TextColor="White" FontSize="14"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center" />
+                    <Label Text="{Binding ExchangeSelectionText}"
+                           TextColor="White" FontSize="14"
+                           HorizontalOptions="Center" />
+                    <Button Text="Discard &amp; Receive"
+                            Command="{Binding ConfirmHawseyExchangeCommand}"
+                            BackgroundColor="#4CAF50" TextColor="White" FontSize="16" />
                 </VerticalStackLayout>
             </Border>
         </Grid>
