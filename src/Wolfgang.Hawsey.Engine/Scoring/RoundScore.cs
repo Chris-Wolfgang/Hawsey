@@ -92,4 +92,23 @@ public sealed class RoundScore
     /// Gets the point change for the defending team.
     /// </summary>
     public int DefendingTeamDelta => DefendingTeamTricks;
+
+
+
+    /// <summary>
+    /// Gets the point change for <paramref name="team"/>: the bidding team's delta or the
+    /// defending team's.
+    /// </summary>
+    /// <param name="team">The team.</param>
+    /// <returns>The points <paramref name="team"/> gains (or, when negative, loses) this round.</returns>
+    public int DeltaFor(Team team) => team == BiddingTeam ? BiddingTeamDelta : DefendingTeamDelta;
+
+
+
+    /// <summary>
+    /// Gets the tricks <paramref name="team"/> took this round.
+    /// </summary>
+    /// <param name="team">The team.</param>
+    /// <returns>The bidding team's tricks or the defending team's.</returns>
+    public int TricksFor(Team team) => team == BiddingTeam ? BiddingTeamTricks : DefendingTeamTricks;
 }

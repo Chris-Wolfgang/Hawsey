@@ -426,7 +426,7 @@ public sealed class GameEngine
         var biddingResult = state.BiddingResult!;
         var biddingTeam = biddingResult.Winner.GetTeam();
         var roundScore = CreateRoundScore(completedTricks, biddingTeam, biddingResult.BidAmount, state.IsHawseyRound);
-        var (nsScore, ewScore) = CalculateNewScores(state, biddingTeam, roundScore);
+        var (nsScore, ewScore) = CalculateNewScores(state, roundScore);
         var phase = DeterminePostRoundPhase(nsScore, ewScore, state.Rules.PointsToWin);
 
         return new GameState
@@ -445,7 +445,8 @@ public sealed class GameEngine
             nextToAct: null,
             tricksPlayedInRound: tricksPlayed,
             isHawseyRound: state.IsHawseyRound,
-            hawseyBidder: state.HawseyBidder
+            hawseyBidder: state.HawseyBidder,
+            roundScore: roundScore
         );
     }
 
@@ -657,25 +658,14 @@ public sealed class GameEngine
     private static (int NorthSouthScore, int EastWestScore) CalculateNewScores
     (
         GameState state,
-        Team biddingTeam,
         RoundScore roundScore
     )
     {
-        var nsScore = state.NorthSouthScore;
-        var ewScore = state.EastWestScore;
-
-        if (biddingTeam == Team.NorthSouth)
-        {
-            nsScore += roundScore.BiddingTeamDelta;
-            ewScore += roundScore.DefendingTeamDelta;
-        }
-        else
-        {
-            ewScore += roundScore.BiddingTeamDelta;
-            nsScore += roundScore.DefendingTeamDelta;
-        }
-
-        return (nsScore, ewScore);
+        return
+        (
+            state.NorthSouthScore + roundScore.DeltaFor(Team.NorthSouth),
+            state.EastWestScore + roundScore.DeltaFor(Team.EastWest)
+        );
     }
 
 

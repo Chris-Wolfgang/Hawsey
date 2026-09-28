@@ -10,7 +10,6 @@ using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Game;
 using Wolfgang.Hawsey.Engine.Players;
 using Wolfgang.Hawsey.Engine.Rules;
-using Wolfgang.Hawsey.Engine.TrickPlay;
 using Wolfgang.Hawsey.UI.Maui.Threading;
 
 namespace Wolfgang.Hawsey.UI.Maui.ViewModels;
@@ -768,23 +767,9 @@ public partial class GameViewModel : INotifyPropertyChanged
     {
         TrickCards.Clear();
 
-        // The move that completes a trick leaves an empty next trick (or none, at the
-        // end of the round), so the card that decided it would never be drawn. Until
-        // the next card is led, show the trick just won.
-        IReadOnlyList<PlayedCard> plays;
-
-        if (state.CurrentTrick is { Plays.Count: > 0 } current)
-        {
-            plays = current.Plays;
-        }
-        else if (state.CompletedTricks.Count > 0)
-        {
-            plays = state.CompletedTricks[state.CompletedTricks.Count - 1].Cards;
-        }
-        else
-        {
-            return;
-        }
+        // The engine decides what is on the table, including the trick just won until
+        // the next lead; the Blazor UI shows the same.
+        var plays = state.TableCards;
 
         for (var i = 0; i < plays.Count; i++)
         {
