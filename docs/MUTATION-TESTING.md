@@ -19,6 +19,7 @@ dotnet tool restore && dotnet stryker
 | 2026-09-25 | 92.42% | 88 | Survivors triaged and killed (#36) |
 | 2026-09-27 | 90.06% | 88 | `GameSession` and `SimpleAiStrategy` moved into the engine; their behaviour tests added (#859) |
 | 2026-09-27 | 90.43% | 88 | The Blazor UI's AI becomes the engine's (#879); bidding progress on `GameState` (#878); session bids and the human Hawsey exchange (#882) |
+| 2026-09-28 | 91.54% | 88 | After #884–#897 and #907 (stateless bidding, unused types removed, the #897 killing tests); four more gaps killed (#875) |
 
 ## Triage of the surviving mutants (2026-09-25)
 
@@ -90,3 +91,21 @@ The 10 that remain are equivalent, and accepted:
 | `SimpleAiStrategy.DecidePlay`: the one-legal-card shortcut | Block removed | The rest of the method picks that card anyway. |
 | `SimpleAiStrategy` trump choice: `bestScore` starts at -1 | Becomes +1 | A dealt 12-card hand always has a suit that scores above 1. |
 | `SimpleAiStrategy.CountInHand` (the count, and its use in the sure-winner check) | `count--`, the increment removed, `+ CountInHand` | The count only decides a card when the AI holds the other copy of a higher card, and that card is then itself a sure winner that outranks it and gets led instead. |
+
+## After the 2026-09-27 PRs merged (2026-09-28)
+
+Run on `main` at 1c6d643: **91.54%**, with 557 killed, 6 timeouts, 49 survived and 3 without
+coverage. The survivors are in the accepted categories above, except four genuine gaps,
+now killed:
+
+| Location | Mutation | Killing test |
+|---|---|---|
+| `GameEngine.PlaceBid`: a Hawsey bid's `isStuck: false` | `true` | The Hawsey-bid test asserts `IsStuck` is false |
+| `GameSession.PerformHumanHawseyExchange`: `StateChanged` | Statement removed | The exchange test counts one state change |
+| `GameSession.StartNextRound`: `_bids.Clear()` | Statement removed | The next deal's `Bids` is empty |
+| `TrickCompletedEventArgs`: `Winner = winner` | Block removed | The winners of a whole round are checked; only checking the first trick missed it, because that trick's winner was North, the enum's default |
+
+A scoped run over `GameEngine.cs`, `GameSession.cs` and `TrickCompletedEventArgs.cs` confirms
+all four killed. The `random` null guards in `StartGame` and `StartNextRound` remain, and are
+equivalent as listed above.
+
