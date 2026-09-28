@@ -5,10 +5,11 @@ namespace Wolfgang.Hawsey.UI.Maui.ViewModels;
 
 public class CardViewModel
 {
-    public CardViewModel(Card card, bool isLegal)
+    public CardViewModel(Card card, bool isLegal, bool isSelected = false)
     {
         Card = card;
         IsLegal = isLegal;
+        IsSelected = isSelected;
         RankText = card.Rank switch
         {
             Rank.Nine => "9",
@@ -34,6 +35,9 @@ public class CardViewModel
 
     public Card Card { get; }
     public bool IsLegal { get; }
+
+    /// <summary>Whether the card is picked as one of the two Hawsey-exchange discards.</summary>
+    public bool IsSelected { get; }
     public string RankText { get; }
     public string SuitSymbol { get; }
     public Color SuitColor { get; }

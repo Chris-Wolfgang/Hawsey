@@ -21,7 +21,7 @@ public static class FollowSuitValidator
     /// <param name="currentWinningCard">
     /// The card currently winning the trick, or <c>null</c> if this player is leading.
     /// </param>
-    /// <returns>A list of legal cards to play.</returns>
+    /// <returns>A new list of the legal cards to play; never <paramref name="hand"/> itself.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="hand"/> or <paramref name="rules"/> is <c>null</c>.</exception>
     public static IReadOnlyList<Card> GetLegalPlays
     (
@@ -47,10 +47,12 @@ public static class FollowSuitValidator
             return Array.Empty<Card>();
         }
 
-        // Leading: all cards are legal
+        // Leading: all cards are legal. Every path returns a new list, never the hand
+        // itself: the hand is often the game state's own list, and the caller must not
+        // be able to change it through the result.
         if (!ledSuit.HasValue)
         {
-            return hand;
+            return hand.ToArray();
         }
 
         // Find cards that follow the led suit (using effective suit for bower logic)
@@ -84,7 +86,7 @@ public static class FollowSuitValidator
         }
 
         // Can play anything
-        return hand;
+        return hand.ToArray();
     }
 
 

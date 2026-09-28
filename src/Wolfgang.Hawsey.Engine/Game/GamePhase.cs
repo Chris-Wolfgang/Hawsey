@@ -5,9 +5,6 @@ namespace Wolfgang.Hawsey.Engine.Game;
 /// </summary>
 public enum GamePhase
 {
-    /// <summary>Cards are being dealt.</summary>
-    Dealing,
-
     /// <summary>Players are bidding.</summary>
     Bidding,
 

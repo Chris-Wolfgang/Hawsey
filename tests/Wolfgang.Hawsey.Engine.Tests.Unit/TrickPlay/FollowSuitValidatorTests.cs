@@ -360,4 +360,26 @@ public class FollowSuitValidatorTests
 
         Assert.Equal(new[] { new Card(Rank.King, Suit.Hearts), new Card(Rank.Nine, Suit.Hearts) }, result);
     }
+
+
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void GetLegalPlays_when_every_card_is_legal_returns_a_copy_of_the_hand(bool leading)
+    {
+        // Leading, or void in the led suit with no must-trump: every card is legal.
+        var hand = new List<Card>
+        {
+            new Card(Rank.Ace, Suit.Spades),
+            new Card(Rank.King, Suit.Hearts)
+        };
+        var rules = new HouseRules { MustTrump = false };
+
+        var result = FollowSuitValidator.GetLegalPlays(hand, leading ? null : Suit.Clubs, Suit.Diamonds, rules, null);
+        hand.Clear();
+
+        Assert.NotSame(hand, result);
+        Assert.Equal(2, result.Count);
+    }
 }
