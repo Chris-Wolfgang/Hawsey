@@ -9,7 +9,7 @@ namespace Wolfgang.Hawsey.Engine.Tests.Unit.Game;
 /// <summary>
 /// <see cref="GameState.Winner"/> (#862): the team that reached
 /// <see cref="HouseRules.PointsToWin"/>, and the bidding team when both reached it in
-/// the same round, the rule <c>ScoreKeeper.GetWinner</c> documents.
+/// the same round.
 /// </summary>
 public class GameStateWinnerTests
 {
