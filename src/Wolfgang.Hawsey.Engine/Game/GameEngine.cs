@@ -330,6 +330,34 @@ public sealed class GameEngine
         ValidatePlayer(state, player);
         ValidateCardIsLegal(state, card);
 
+        return ApplyPlay(state, player, card);
+    }
+
+
+
+    /// <summary>
+    /// <see cref="PlayCard"/> for a caller that treats an illegal move as a refusal
+    /// rather than an error: the legal plays are worked out once, not once to check
+    /// and again to play.
+    /// </summary>
+    /// <returns>The updated game state, or <c>null</c> when it is not a trick-play turn of
+    /// <paramref name="player"/> or <paramref name="card"/> is not a legal play.</returns>
+    internal GameState? TryPlayCard(GameState state, PlayerPosition player, Card card)
+    {
+        if (state.Phase != GamePhase.TrickPlay
+            || state.NextToAct != player
+            || !ContainsCard(state.GetLegalPlays(), card))
+        {
+            return null;
+        }
+
+        return ApplyPlay(state, player, card);
+    }
+
+
+
+    private GameState ApplyPlay(GameState state, PlayerPosition player, Card card)
+    {
         var hands = RemoveCardFromHand(state.Hands, player, card);
         // Play into a copy: the input state keeps its trick unchanged (#861).
         var trick = state.CurrentTrick!.Copy();

@@ -420,12 +420,12 @@ public class GameSession
 
         lock (_sync)
         {
-            if (_state is not { Phase: GamePhase.TrickPlay, NextToAct: HumanPosition } || !_state.GetLegalPlays().Contains(card))
+            // One legality check, inside the engine; an illegal or out-of-turn card is refused.
+            if (_state is null || _engine.TryPlayCard(_state, HumanPosition, card) is not { } state)
             {
                 return false;
             }
 
-            var state = _engine.PlayCard(_state, HumanPosition, card);
             Volatile.Write(ref _state, state);
             outcome = OutcomeOf(state);
         }
