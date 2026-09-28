@@ -32,8 +32,8 @@ public class AppHostTests
         var window = app.Create();
 
         Assert.IsType<AppShell>(window.Page);
-        Assert.True(app.Resources.ContainsKey("SuitToColorConverter"));
-        Assert.True(app.Resources.TryGetValue("RedSuitColor", out _));
+        Assert.True(app.Resources.ContainsKey("BoolToStrokeConverter"));
+        Assert.True(app.Resources.TryGetValue("LegalPlayHighlight", out _));
     }
 
 
