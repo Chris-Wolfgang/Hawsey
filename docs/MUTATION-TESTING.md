@@ -18,6 +18,7 @@ dotnet tool restore && dotnet stryker
 | 2026-09-22 | 82.30% | 75 | Gate introduced (#71) |
 | 2026-09-25 | 92.42% | 88 | Survivors triaged and killed (#36) |
 | 2026-09-27 | 90.06% | 88 | `GameSession` and `SimpleAiStrategy` moved into the engine; their behaviour tests added (#859) |
+| 2026-09-27 | 90.43% | 88 | The Blazor UI's AI becomes the engine's (#879); bidding progress on `GameState` (#878); session bids and the human Hawsey exchange (#882) |
 
 ## Triage of the surviving mutants (2026-09-25)
 
@@ -61,3 +62,31 @@ brought it back to 90.06%. The remaining survivors in these two files are accept
 | `CompletedTricks.Count > 0` becomes `>= 0` | Equivalent: after any play, either the current trick holds a card or a trick has just completed. |
 | `>` becomes `>=` and `<` becomes `<=` in the AI's rank comparisons | Equivalent: the only equal ranks are the two copies of one card. |
 | The game-over winner expression | Replaced by the engine's own `GameState.Winner` (#862). |
+
+## The engine AI from the Blazor UI (2026-09-27)
+
+Run on `main` at 699e064, after #878, #879, #880, #882 and #883: **90.43%**, with 579 killed,
+59 survived, 4 without coverage and 16 timeouts. #879's four behaviour tests had
+already been added. Most survivors fall into the categories above: exception-message
+strings, the `GameSession` pause guards, generation and `ConfigureAwait` variants, the
+removed null guards in `GameEngine` and `GameRunner`, and the `Trick.GetCurrentWinner`
+tie. The rest were **genuine gaps**, killed by the tests in #897. A scoped run over
+`SimpleAiStrategy.cs` and `GameState.cs` took those two files from 21 survivors to 10:
+
+| Location | Mutation | Killing test (#897) |
+|---|---|---|
+| `GameState.Winner`: `EastWestScore >= Rules.PointsToWin` | `>=` becomes `>` | East/West finishing exactly on the target |
+| `GameState.Winner`: the "not game over" early return | Block removed | A not-yet-over state past the target |
+| `SimpleAiStrategy` sure-winner check: trumps still out | Arithmetic and equality mutations | Every other trump gone, so a side queen is a sure winner |
+| `SimpleAiStrategy` sure-winner check: higher copies still out, and the lead choice | `< 0`, `!= target`, `&&` becomes `\|\|` | A lower sure winner over a higher card that can be beaten |
+| `SimpleAiStrategy.WinningPlay`: `>` | `>=`: a tying copy takes the trick | An opponent ties the partner's card |
+
+The 10 that remain are equivalent, and accepted:
+
+| Location | Mutation | Why it is equivalent |
+|---|---|---|
+| `GameState.Winner`: the final `eastWestReached ? EastWest : null` | Always `EastWest` | At game over one team has always reached the target. |
+| `SimpleAiStrategy`: the rank comparisons that pick the highest, lowest or cheapest winning card | `>` / `<` become `>=` / `<=` | The only equal ranks are the two copies of one card. |
+| `SimpleAiStrategy.DecidePlay`: the one-legal-card shortcut | Block removed | The rest of the method picks that card anyway. |
+| `SimpleAiStrategy` trump choice: `bestScore` starts at -1 | Becomes +1 | A dealt 12-card hand always has a suit that scores above 1. |
+| `SimpleAiStrategy.CountInHand` (the count, and its use in the sure-winner check) | `count--`, the increment removed, `+ CountInHand` | The count only decides a card when the AI holds the other copy of a higher card, and that card is then itself a sure winner that outranks it and gets led instead. |
