@@ -136,8 +136,8 @@
             var legal = LegalPlays.Contains(card);
             var canPlay = IsHumanPlayTurn && legal;
             var isDragging = _dragIndex == index;
-            var isSelectedForDiscard = HawseyExchangeVisible && _hawseyDiscardSelection.Contains(card);
-            var interactive = HawseyExchangeVisible || canPlay;
+            var isSelectedForDiscard = _hawseyExchangeVisible && _hawseyDiscardSelection.Contains(card);
+            var interactive = _hawseyExchangeVisible || canPlay;
             <div class="card @(IsRed(card) ? "red" : "") @(canPlay ? "playable" : "") @(!interactive ? "disabled" : "") @(isDragging ? "dragging" : "") @(isSelectedForDiscard ? "selected-discard" : "")"
                  draggable="true"
                  @ondragstart="@(() => OnDragStart(index))"
@@ -152,19 +152,19 @@
         }
     </div>
 
-    <div class="statusbar">@StatusMessage</div>
+    <div class="statusbar">@_statusMessage</div>
 
     <div class="controls left">
         <button class="btn" @onclick="StartNewGameAsync">&#9776; NEW GAME</button>
-        <button class="btn" @onclick="() => LogVisible = !LogVisible">Game log</button>
+        <button class="btn" @onclick="() => _logVisible = !_logVisible">Game log</button>
     </div>
 
-    @if (LogVisible)
+    @if (_logVisible)
     {
         <div class="ai-log">
             <div class="ai-log-header">
                 <span>Game log</span>
-                <button class="btn small" @onclick="() => LogVisible = false">close</button>
+                <button class="btn small" @onclick="() => _logVisible = false">close</button>
             </div>
             <div class="ai-log-entries">
                 @foreach (var entry in GameLog)
@@ -175,7 +175,7 @@
         </div>
     }
 
-    @if (TrumpPickerVisible)
+    @if (_trumpPickerVisible)
     {
         <div class="modal-backdrop">
             <div class="modal-card">
@@ -191,7 +191,7 @@
         </div>
     }
 
-    @if (RoundSummary is { } rs)
+    @if (_roundSummary is { } rs)
     {
         <div class="modal-backdrop">
             <div class="modal-card round-summary">
@@ -243,7 +243,7 @@
         </div>
     }
 
-    @if (HawseyExchangeVisible)
+    @if (_hawseyExchangeVisible)
     {
         <div class="modal-backdrop bid-mode">
             <div class="modal-card">
@@ -261,7 +261,7 @@
         </div>
     }
 
-    @if (BidPickerVisible)
+    @if (_bidPickerVisible)
     {
         <div class="modal-backdrop bid-mode">
             <div class="modal-card">
@@ -308,13 +308,13 @@
 
 @code {
     private GameState? State => Game.CurrentState;
-    private bool BidPickerVisible;
-    private bool TrumpPickerVisible;
-    private bool HawseyExchangeVisible;
+    private bool _bidPickerVisible;
+    private bool _trumpPickerVisible;
+    private bool _hawseyExchangeVisible;
     private readonly List<Card> _hawseyDiscardSelection = new();
-    private bool LogVisible;
-    private RoundSummarySnapshot? RoundSummary;
-    private string StatusMessage = "Welcome to Hawsey. Click NEW GAME to start.";
+    private bool _logVisible;
+    private RoundSummarySnapshot? _roundSummary;
+    private string _statusMessage = "Welcome to Hawsey. Click NEW GAME to start.";
 
     private sealed record RoundSummarySnapshot
     (
@@ -497,7 +497,7 @@
 
     private void OnDrop(int dropIndex)
     {
-        if (_dragIndex is not int from || _customOrder is null)
+        if (_dragIndex is not { } from || _customOrder is null)
         {
             _dragIndex = null;
             return;
@@ -674,11 +674,11 @@
 
     private async Task StartNewGameAsync()
     {
-        BidPickerVisible = false;
-        TrumpPickerVisible = false;
-        HawseyExchangeVisible = false;
+        _bidPickerVisible = false;
+        _trumpPickerVisible = false;
+        _hawseyExchangeVisible = false;
         _hawseyDiscardSelection.Clear();
-        RoundSummary = null;
+        _roundSummary = null;
         _customOrder = null;
         _dragIndex = null;
         Game.StartNewGame();
@@ -687,21 +687,21 @@
 
     private async Task PlaceHumanBidAsync(BidAction action)
     {
-        BidPickerVisible = false;
+        _bidPickerVisible = false;
         Game.PlaceHumanBid(action);
         await DriveLoopAsync();
     }
 
     private async Task SelectTrumpAsync(Suit? trump)
     {
-        TrumpPickerVisible = false;
+        _trumpPickerVisible = false;
         Game.SelectTrump(trump);
         await DriveLoopAsync();
     }
 
     private void ToggleHawseyDiscard(Card card)
     {
-        if (!HawseyExchangeVisible) return;
+        if (!_hawseyExchangeVisible) return;
         var idx = _hawseyDiscardSelection.IndexOf(card);
         if (idx >= 0)
         {
@@ -718,14 +718,14 @@
         if (_hawseyDiscardSelection.Count != 2) return;
         var discard = _hawseyDiscardSelection.ToArray();
         _hawseyDiscardSelection.Clear();
-        HawseyExchangeVisible = false;
+        _hawseyExchangeVisible = false;
         Game.PerformHumanHawseyExchange(discard);
         await DriveLoopAsync();
     }
 
     private async Task OnNextRoundAsync()
     {
-        RoundSummary = null;
+        _roundSummary = null;
         Game.StartNextRound();
         await DriveLoopAsync();
     }
@@ -796,12 +796,12 @@
             switch (s.Phase)
             {
                 case GamePhase.Bidding:
-                    StatusMessage = "Bidding...";
+                    _statusMessage = "Bidding...";
                     var humanBids = await Game.AdvanceAiBiddingAsync();
                     if (humanBids)
                     {
-                        BidPickerVisible = true;
-                        StatusMessage = "Your turn to bid.";
+                        _bidPickerVisible = true;
+                        _statusMessage = "Your turn to bid.";
                         await InvokeAsync(StateHasChanged);
                         return;
                     }
@@ -811,8 +811,8 @@
                     var humanPicksTrump = await Game.HandleTrumpSelectionAsync();
                     if (humanPicksTrump)
                     {
-                        TrumpPickerVisible = true;
-                        StatusMessage = "Pick trump.";
+                        _trumpPickerVisible = true;
+                        _statusMessage = "Pick trump.";
                         await InvokeAsync(StateHasChanged);
                         return;
                     }
@@ -822,9 +822,9 @@
                     var humanExchanges = await Game.HandleHawseyExchangeAsync();
                     if (humanExchanges)
                     {
-                        HawseyExchangeVisible = true;
+                        _hawseyExchangeVisible = true;
                         _hawseyDiscardSelection.Clear();
-                        StatusMessage = "Hawsey! Pick 2 cards to discard.";
+                        _statusMessage = "Hawsey! Pick 2 cards to discard.";
                         await InvokeAsync(StateHasChanged);
                         return;
                     }
@@ -841,23 +841,23 @@
                             Game.PlayHumanCard(HumanHand[0]);
                             break;
                         }
-                        StatusMessage = "Your turn. Play a card.";
+                        _statusMessage = "Your turn. Play a card.";
                         await InvokeAsync(StateHasChanged);
                         return;
                     }
                     break;
 
                 case GamePhase.RoundScoring:
-                    StatusMessage = "Round complete.";
-                    RoundSummary = CaptureRoundSummary(isGameOver: false);
+                    _statusMessage = "Round complete.";
+                    _roundSummary = CaptureRoundSummary(isGameOver: false);
                     await InvokeAsync(StateHasChanged);
                     return;
 
                 case GamePhase.GameOver:
-                    StatusMessage = "Game over.";
-                    if (RoundSummary is null)
+                    _statusMessage = "Game over.";
+                    if (_roundSummary is null)
                     {
-                        RoundSummary = CaptureRoundSummary(isGameOver: true);
+                        _roundSummary = CaptureRoundSummary(isGameOver: true);
                         await InvokeAsync(StateHasChanged);
                     }
                     return;
@@ -871,7 +871,7 @@
     private async Task OnCardClickAsync(Card card)
     {
         // Hawsey discard-selection mode steals clicks from trick play.
-        if (HawseyExchangeVisible)
+        if (_hawseyExchangeVisible)
         {
             ToggleHawseyDiscard(card);
             return;
