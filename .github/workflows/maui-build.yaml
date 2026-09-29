@@ -58,6 +58,13 @@ jobs:
           - name: iOS + Mac Catalyst (macOS)
             os: macos-latest
             frameworks: net10.0-ios net10.0-maccatalyst
+            # Pinned workload set: 10.0.401 (2026-09-08) carries .NET for iOS 26.5.10318,
+            # which builds with the image's default Xcode 26.6. Set 10.0.401.1
+            # (2026-09-28) moved to iOS 27.0.10722, which requires Xcode 27.0, and the
+            # macos-26 image has no Xcode 27 yet, so every build failed with "requires
+            # Xcode 27.0". Remove this pin once the image's default Xcode is 27; the
+            # build then fails, or passes, with the latest set on its own.
+            workload-set: '10.0.401'
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
@@ -74,12 +81,16 @@ jobs:
       # of them, so let the SDK work out this OS's workloads from the project itself.
       - name: Restore MAUI workloads
         shell: bash
-        run: dotnet workload restore "$PROJECT"
+        env:
+          WORKLOAD_SET: ${{ matrix.workload-set }}
+        # No workload-set on an entry: the SDK's latest set. With one: that set exactly.
+        run: dotnet workload restore "$PROJECT" ${WORKLOAD_SET:+--version "$WORKLOAD_SET"}
 
-      # Use the runner image's default Xcode. The image moves its default to the
-      # Xcode the current .NET iOS workload requires (26.6 alongside iOS workload
+      # Use the runner image's default Xcode. The image usually moves its default to
+      # the Xcode the current .NET iOS workload requires (26.6 alongside iOS workload
       # 26.5.10318), and the workload's own check fails the build with a clear
-      # message ("requires Xcode X") when they drift apart. Two earlier attempts
+      # message ("requires Xcode X") when they drift apart - as they did on
+      # 2026-09-28, which is why the macOS entry pins its workload set above. Two earlier attempts
       # to choose one here both went wrong: the Microsoft.iOS.* pack suffix is
       # the iOS SDK level, not the Xcode version, and xcode-select on a symlink
       # such as Xcode_26.6.0.app breaks xcrun's SDK lookup. This step only
