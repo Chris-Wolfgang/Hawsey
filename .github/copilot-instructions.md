@@ -43,7 +43,7 @@ pwsh ./scripts/build-pr.ps1
 
 ### Critical Build Requirements
 - **Warnings as errors**: `TreatWarningsAsErrors` is on for Release builds (`Directory.Build.props`).
-- **Code coverage**: 90% line coverage for `src/` assemblies and 100% for test assemblies (`CODECOV_MINIMUM` / `CODECOV_TEST_MINIMUM` in `pr.yaml`).
+- **Code coverage**: 95% line coverage for `src/` assemblies and 100% for test assemblies (`CODECOV_MINIMUM` / `CODECOV_TEST_MINIMUM` in `pr.yaml`).
 - **Banned APIs**: `BannedSymbols.txt` bans blocking and synchronous APIs (`Task.Wait`, `Task.Result`, `Thread.Sleep`, synchronous file and stream I/O, `DateTime.Now`, and others).
 - **Changelog**: a PR that changes `src/` adds a fragment under `changelog/unreleased/` (see `changelog/unreleased/README.md`) or carries the `no-changelog` label.
 - **Protected files**: workflows, `.editorconfig`, `Directory.Build.props`, `BannedSymbols.txt` and the other files listed in `.github/workflows/protected-files.yaml` go in their own PR. The Protected Files Guard fails a PR that mixes them with other changes.
