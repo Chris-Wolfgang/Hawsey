@@ -742,86 +742,57 @@
         );
     }
 
+    /// <summary>
+    /// Lets the engine play the AI seats until it waits for the human (or for the next
+    /// round), then shows what the human must do. The loop itself is the engine's
+    /// (<see cref="GameSession.AdvanceAsync"/>), shared with the MAUI app; this page only
+    /// shows the result, and waits for "Next round" after each round's summary.
+    /// </summary>
     private async Task DriveLoopAsync()
     {
-        while (true)
+        if (Game.CurrentState?.Phase == GamePhase.Bidding)
         {
-            var s = Game.CurrentState;
-            if (s is null) return;
-
-            switch (s.Phase)
-            {
-                case GamePhase.Bidding:
-                    _statusMessage = "Bidding...";
-                    var humanBids = await Game.AdvanceAiBiddingAsync();
-                    if (humanBids)
-                    {
-                        _bidPickerVisible = true;
-                        _statusMessage = "Your turn to bid.";
-                        await InvokeAsync(StateHasChanged);
-                        return;
-                    }
-                    break;
-
-                case GamePhase.TrumpSelection:
-                    var humanPicksTrump = await Game.HandleTrumpSelectionAsync();
-                    if (humanPicksTrump)
-                    {
-                        _trumpPickerVisible = true;
-                        _statusMessage = "Pick trump.";
-                        await InvokeAsync(StateHasChanged);
-                        return;
-                    }
-                    break;
-
-                case GamePhase.HawseyExchange:
-                    var humanExchanges = await Game.HandleHawseyExchangeAsync();
-                    if (humanExchanges)
-                    {
-                        _hawseyExchangeVisible = true;
-                        _hawseyDiscardSelection.Clear();
-                        _statusMessage = "Hawsey! Pick 2 cards to discard.";
-                        await InvokeAsync(StateHasChanged);
-                        return;
-                    }
-                    break;
-
-                case GamePhase.TrickPlay:
-                    var humanPlays = await Game.AdvanceAiPlaysAsync();
-                    if (humanPlays)
-                    {
-                        // Auto-play when there's only one card left in hand
-                        // (12th trick) — no decision for the player to make.
-                        if (HumanHand.Count == 1)
-                        {
-                            Game.PlayHumanCard(HumanHand[0]);
-                            break;
-                        }
-                        _statusMessage = "Your turn. Play a card.";
-                        await InvokeAsync(StateHasChanged);
-                        return;
-                    }
-                    break;
-
-                case GamePhase.RoundScoring:
-                    _statusMessage = "Round complete.";
-                    _roundSummary = CaptureRoundSummary(isGameOver: false);
-                    await InvokeAsync(StateHasChanged);
-                    return;
-
-                case GamePhase.GameOver:
-                    _statusMessage = "Game over.";
-                    if (_roundSummary is null)
-                    {
-                        _roundSummary = CaptureRoundSummary(isGameOver: true);
-                        await InvokeAsync(StateHasChanged);
-                    }
-                    return;
-
-                default:
-                    return;
-            }
+            _statusMessage = "Bidding...";
         }
+
+        switch (await Game.AdvanceAsync())
+        {
+            case WaitingFor.HumanBid:
+                _bidPickerVisible = true;
+                _statusMessage = "Your turn to bid.";
+                break;
+
+            case WaitingFor.HumanTrump:
+                _trumpPickerVisible = true;
+                _statusMessage = "Pick trump.";
+                break;
+
+            case WaitingFor.HumanHawseyExchange:
+                _hawseyExchangeVisible = true;
+                _hawseyDiscardSelection.Clear();
+                _statusMessage = "Hawsey! Pick 2 cards to discard.";
+                break;
+
+            case WaitingFor.HumanCard:
+                _statusMessage = "Your turn. Play a card.";
+                break;
+
+            case WaitingFor.NextRound:
+                _statusMessage = "Round complete.";
+                _roundSummary = CaptureRoundSummary(isGameOver: false);
+                break;
+
+            case WaitingFor.GameOver:
+                _statusMessage = "Game over.";
+                _roundSummary ??= CaptureRoundSummary(isGameOver: true);
+                break;
+
+            default:
+                // A New Game took over during an AI pause; its own loop shows it.
+                return;
+        }
+
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task OnCardClickAsync(Card card)
