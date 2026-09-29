@@ -7,7 +7,7 @@ This guide explains how this repository's `release.yaml` workflow is configured 
 The release workflow triggers when you **publish a GitHub Release**. It:
 - ✅ Checks that the release tag matches a `<Version>` in a `src/` csproj
 - ✅ Tests all target frameworks per test project on Windows
-- ✅ Enforces line coverage: 90% for `src/` assemblies, 100% for test assemblies
+- ✅ Enforces line coverage: 95% for `src/` assemblies, 100% for test assemblies
 - ✅ Packs the NuGet packages and smoke-tests installing them
 - ✅ Verifies the documentation builds
 - ✅ Attests build provenance and publishes to NuGet.org through Trusted Publishing
