@@ -332,24 +332,22 @@ public class GameViewModelTests
     {
         _vm.NewGameCommand.Execute(null);
 
-        // The session refreshes the table before announcing the trick, so when the
-        // announcement arrives the table must show the trick just won - all four cards.
-        // That includes the twelfth trick, when the round is over and there is no
-        // current trick at all.
+        // The session refreshes the table (StateChanged) before it announces the trick
+        // (TrickCompleted), and the view model subscribed before this test did, so when
+        // the test's handler runs the table must show the trick just won - all four
+        // cards. That includes the twelfth trick, when the round is over and there is
+        // no current trick at all. (Counting "wins the trick!" status changes instead
+        // misses a trick when the same seat wins two in a row with no status between.)
         var checkedTricks = 0;
-        _vm.PropertyChanged += (_, e) =>
+        _session.TrickCompleted += (_, _) =>
         {
-            if (string.Equals(e.PropertyName, nameof(GameViewModel.StatusMessage), StringComparison.Ordinal)
-                && _vm.StatusMessage.EndsWith(" wins the trick!", StringComparison.Ordinal))
-            {
-                var trick = _session.CurrentState!.CompletedTricks[^1];
-                Assert.Equal
-                (
-                    trick.Cards.Select(p => new TrickCardViewModel(p.Card)).Select(c => c.RankText + c.SuitSymbol),
-                    _vm.TrickCards.Select(c => c.RankText + c.SuitSymbol)
-                );
-                checkedTricks++;
-            }
+            var trick = _session.CurrentState!.CompletedTricks[^1];
+            Assert.Equal
+            (
+                trick.Cards.Select(p => new TrickCardViewModel(p.Card)).Select(c => c.RankText + c.SuitSymbol),
+                _vm.TrickCards.Select(c => c.RankText + c.SuitSymbol)
+            );
+            checkedTricks++;
         };
 
         _vm.PlaceBidCommand.Execute("pass");

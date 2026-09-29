@@ -416,110 +416,46 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
+    /// <summary>
+    /// Lets the engine play the AI seats until it waits for the human (or for the next
+    /// round), then shows what the human must do. The loop itself is the engine's
+    /// (<see cref="GameSession.AdvanceAsync"/>), shared with the Blazor UI; only the
+    /// app's own policies are here: a pause, then the next deal, after each round.
+    /// </summary>
     private async Task AdvanceGameAsync()
     {
-        var state = _gameService.CurrentState;
-
-        if (state == null)
+        while (true)
         {
-            return;
-        }
+            switch (await _gameService.AdvanceAsync().ConfigureAwait(true))
+            {
+                case WaitingFor.HumanBid:
+                    StatusMessage = "Your turn to bid";
+                    IsBiddingVisible = true;
+                    return;
 
-        switch (state.Phase)
-        {
-            case GamePhase.Bidding:
-                await AdvanceBiddingPhaseAsync().ConfigureAwait(true);
-                break;
+                case WaitingFor.HumanTrump:
+                    StatusMessage = "Choose trump suit or Ace High";
+                    IsTrumpPickerVisible = true;
+                    return;
 
-            case GamePhase.TrumpSelection:
-                await AdvanceTrumpSelectionPhaseAsync().ConfigureAwait(true);
-                break;
+                case WaitingFor.HumanHawseyExchange:
+                    // The exchange panel follows the state (UpdateHawseyExchange).
+                    StatusMessage = "Hawsey! Tap two cards to discard";
+                    return;
 
-            case GamePhase.HawseyExchange:
-                await AdvanceHawseyExchangePhaseAsync().ConfigureAwait(true);
-                break;
+                case WaitingFor.HumanCard:
+                    StatusMessage = "Your turn to play";
+                    return;
 
-            case GamePhase.TrickPlay:
-                await AdvanceTrickPlayPhaseAsync().ConfigureAwait(true);
-                break;
+                case WaitingFor.NextRound:
+                    await _gameService.PauseBeforeNextRoundAsync().ConfigureAwait(true);
+                    _gameService.StartNextRound();
+                    break;
 
-            case GamePhase.RoundScoring:
-                await _gameService.PauseBeforeNextRoundAsync().ConfigureAwait(true);
-                _gameService.StartNextRound();
-                await AdvanceGameAsync().ConfigureAwait(true);
-                break;
-
-            case GamePhase.GameOver:
-                break;
-        }
-    }
-
-
-
-    private async Task AdvanceBiddingPhaseAsync()
-    {
-        var humanNeedsToBid = await _gameService.AdvanceAiBiddingAsync().ConfigureAwait(true);
-
-        if (humanNeedsToBid)
-        {
-            StatusMessage = "Your turn to bid";
-            IsBiddingVisible = true;
-        }
-        else
-        {
-            await AdvanceGameAsync().ConfigureAwait(true);
-        }
-    }
-
-
-
-    private async Task AdvanceTrumpSelectionPhaseAsync()
-    {
-        var humanSelectsTrump = await _gameService.HandleTrumpSelectionAsync().ConfigureAwait(true);
-
-        if (humanSelectsTrump)
-        {
-            StatusMessage = "Choose trump suit or Ace High";
-            IsTrumpPickerVisible = true;
-        }
-        else
-        {
-            await AdvanceGameAsync().ConfigureAwait(true);
-        }
-    }
-
-
-
-    private async Task AdvanceHawseyExchangePhaseAsync()
-    {
-        var humanExchanges = await _gameService.HandleHawseyExchangeAsync().ConfigureAwait(true);
-
-        if (humanExchanges)
-        {
-            StatusMessage = "Hawsey! Tap two cards to discard";
-        }
-        else
-        {
-            await AdvanceGameAsync().ConfigureAwait(true);
-        }
-    }
-
-
-
-    private async Task AdvanceTrickPlayPhaseAsync()
-    {
-        var humanPlays = await _gameService.AdvanceAiPlaysAsync().ConfigureAwait(true);
-
-        if (humanPlays)
-        {
-            StatusMessage = "Your turn to play";
-        }
-        else if (_gameService.CurrentState?.Phase == GamePhase.RoundScoring)
-        {
-            // An AI card finished the round: go on to the next deal, as a human
-            // card that finishes it does. Game over and a New Game in the meantime
-            // (a different phase) stop here.
-            await AdvanceGameAsync().ConfigureAwait(true);
+                default:
+                    // Game over (the GameOver event shows it), or a New Game took over.
+                    return;
+            }
         }
     }
 

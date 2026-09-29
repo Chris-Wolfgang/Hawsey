@@ -160,6 +160,89 @@ public class GameSession
 
 
     /// <summary>
+    /// Plays the AI seats' moves, phase after phase, until the game needs something
+    /// from outside: a move from the human, or the UI's go-ahead for the next round.
+    /// This is the loop every UI runs after each human move, so they all drive the game
+    /// the same way. The human's last card of a round is played here too, since there
+    /// is no choice to make.
+    /// </summary>
+    /// <returns>
+    /// What the session is waiting for; <see cref="WaitingFor.Nothing"/> when no game has
+    /// started, or a newer move (such as a New Game) took over during an AI pause.
+    /// </returns>
+    public async Task<WaitingFor> AdvanceAsync()
+    {
+        var generation = CurrentGeneration();
+
+        while (true)
+        {
+            var state = CurrentState;
+
+            // A New Game during one of the AI pauses below: that game has its own loop.
+            if (state == null || generation != CurrentGeneration())
+            {
+                return WaitingFor.Nothing;
+            }
+
+            switch (state.Phase)
+            {
+                case GamePhase.Bidding:
+                    if (await AdvanceAiBiddingAsync().ConfigureAwait(false))
+                    {
+                        return WaitingFor.HumanBid;
+                    }
+
+                    break;
+
+                case GamePhase.TrumpSelection:
+                    if (await HandleTrumpSelectionAsync().ConfigureAwait(false))
+                    {
+                        return WaitingFor.HumanTrump;
+                    }
+
+                    break;
+
+                case GamePhase.HawseyExchange:
+                    if (await HandleHawseyExchangeAsync().ConfigureAwait(false))
+                    {
+                        return WaitingFor.HumanHawseyExchange;
+                    }
+
+                    break;
+
+                case GamePhase.TrickPlay:
+                    if (await AdvanceAiPlaysAsync().ConfigureAwait(false) && !PlayForcedLastCard())
+                    {
+                        return WaitingFor.HumanCard;
+                    }
+
+                    break;
+
+                case GamePhase.RoundScoring:
+                    return WaitingFor.NextRound;
+
+                default:
+                    return WaitingFor.GameOver;
+            }
+        }
+    }
+
+
+
+    /// <summary>
+    /// Plays the human's card when it is the only one left in hand. Returns
+    /// <see langword="true"/> when it did.
+    /// </summary>
+    private bool PlayForcedLastCard()
+    {
+        var hand = CurrentState?.Hands[HumanPosition];
+
+        return hand is { Count: 1 } && PlayHumanCard(hand[0]);
+    }
+
+
+
+    /// <summary>
     /// Advances AI bidding. Returns true if human needs to bid.
     /// </summary>
     public async Task<bool> AdvanceAiBiddingAsync()
