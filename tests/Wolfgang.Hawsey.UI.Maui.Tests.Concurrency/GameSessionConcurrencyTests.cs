@@ -64,9 +64,11 @@ public class GameSessionConcurrencyTests
         // Every line here runs on a passing run (the test assembly is held to 100% line
         // coverage): the step limit is an assertion inside the loop rather than a throw
         // after it, and the phases that can't occur are left to the default case.
-        for (var guard = 0; ; guard++)
+        var steps = 0;
+
+        while (true)
         {
-            Assert.True(guard < 200, "Never reached South's turn to play.");
+            Assert.True(++steps <= 200, "Never reached South's turn to play.");
 
             // Deals the next round if the last one has just been scored, and does nothing
             // otherwise. Called on every step, not in a case of its own: a round only
@@ -201,9 +203,11 @@ public class GameSessionConcurrencyTests
     /// </summary>
     private static async Task PlayToGameOverAsync(GameSession service)
     {
-        for (var guard = 0; ; guard++)
+        var steps = 0;
+
+        while (true)
         {
-            Assert.True(guard < 5000, "The game did not finish.");
+            Assert.True(++steps <= 5000, "The game did not finish.");
             var state = service.CurrentState!;
 
             switch (state.Phase)
