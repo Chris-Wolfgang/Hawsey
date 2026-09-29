@@ -174,11 +174,11 @@ public class GameSessionEventTests
         {
             if (await session.AdvanceAiPlaysAsync())
             {
-                Assert.True(session.PlayHumanCard(session.CurrentState!.GetLegalPlays()[0]));
+                Assert.True(session.PlayHumanCard(session.CurrentState.GetLegalPlays()[0]));
             }
         }
 
-        Assert.Equal(session.CurrentState!.CompletedTricks.Select(t => t.Winner), winners);
+        Assert.Equal(session.CurrentState.CompletedTricks.Select(t => t.Winner), winners);
         Assert.Contains(winners, w => w != PlayerPosition.North);
     }
 
