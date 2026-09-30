@@ -1,0 +1,113 @@
+name: MAUI Build
+
+# Builds every target framework of the MAUI app (#51, #52, #129).
+#
+# pr.yaml's per-OS stages filter TFMs through an allowlist of plain framework
+# names, so a platform TFM such as net10.0-android is silently skipped there.
+# CodeQL's Windows build compiles the Android and Windows TFMs as a side effect,
+# but nothing compiled iOS or Mac Catalyst. This workflow builds each platform
+# TFM on the OS that can build it, in Release, so warnings are errors
+# (Directory.Build.props).
+#
+# Build-only: no signing, no packaging. iOS builds for the simulator (the SDK
+# default for `dotnet build`), which needs no provisioning profile.
+#
+# Workloads are installed per job rather than cached. The runner's SDK lives in
+# a root-owned directory, so caching a workload means moving the SDK to a
+# user-writable DOTNET_INSTALL_DIR first; revisit if the install time hurts.
+
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'Directory.Build.*'
+      - 'Directory.Packages.props'
+      - 'global.json'
+      - '.github/workflows/maui-build.yaml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: maui-build-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_NOLOGO: 1
+  PROJECT: src/Wolfgang.Hawsey.UI.Maui/Wolfgang.Hawsey.UI.Maui.csproj
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Android (Linux)
+            os: ubuntu-latest
+            frameworks: net10.0-android
+          - name: Windows
+            os: windows-latest
+            frameworks: net10.0-windows10.0.19041.0
+          - name: iOS + Mac Catalyst (macOS)
+            os: macos-latest
+            frameworks: net10.0-ios net10.0-maccatalyst
+            # Pinned workload set: 10.0.401 (2026-09-08) carries .NET for iOS 26.5.10318,
+            # which builds with the image's default Xcode 26.6. Set 10.0.401.1
+            # (2026-09-28) moved to iOS 27.0.10722, which requires Xcode 27.0, and the
+            # macos-26 image has no Xcode 27 yet, so every build failed with "requires
+            # Xcode 27.0". Remove this pin once the image's default Xcode is 27; the
+            # build then fails, or passes, with the latest set on its own.
+            workload-set: '10.0.401'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68  # v6.0.0
+        with:
+          dotnet-version: 10.0.x
+
+      # The project's TargetFrameworks depend on the OS (android everywhere, plus
+      # windows on Windows and ios / maccatalyst on macOS), and restore evaluates all
+      # of them, so let the SDK work out this OS's workloads from the project itself.
+      - name: Restore MAUI workloads
+        shell: bash
+        env:
+          WORKLOAD_SET: ${{ matrix.workload-set }}
+        # No workload-set on an entry: the SDK's latest set. With one: that set exactly.
+        run: dotnet workload restore "$PROJECT" ${WORKLOAD_SET:+--version "$WORKLOAD_SET"}
+
+      # Use the runner image's default Xcode. The image usually moves its default to
+      # the Xcode the current .NET iOS workload requires (26.6 alongside iOS workload
+      # 26.5.10318), and the workload's own check fails the build with a clear
+      # message ("requires Xcode X") when they drift apart - as they did on
+      # 2026-09-28, which is why the macOS entry pins its workload set above. Two earlier attempts
+      # to choose one here both went wrong: the Microsoft.iOS.* pack suffix is
+      # the iOS SDK level, not the Xcode version, and xcode-select on a symlink
+      # such as Xcode_26.6.0.app breaks xcrun's SDK lookup. This step only
+      # records which Xcode ran.
+      - name: Show the Xcode in use
+        if: runner.os == 'macOS'
+        run: |
+          xcode-select -p
+          xcodebuild -version
+
+      - name: Build
+        shell: bash
+        env:
+          FRAMEWORKS: ${{ matrix.frameworks }}
+        run: |
+          for tfm in $FRAMEWORKS; do
+            echo "::group::Build $tfm"
+            dotnet build "$PROJECT" -c Release -f "$tfm"
+            echo "::endgroup::"
+          done
