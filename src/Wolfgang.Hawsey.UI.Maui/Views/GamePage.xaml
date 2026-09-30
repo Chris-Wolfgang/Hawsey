@@ -82,10 +82,12 @@
                                 BackgroundColor="#FFFFF8E1"
                                 StrokeThickness="2"
                                 WidthRequest="65" HeightRequest="95"
-                                Opacity="{Binding IsLegal, Converter={StaticResource BoolToOpacityConverter}}">
-                            <Border.Stroke>
-                                <SolidColorBrush Color="{Binding IsLegal, Converter={StaticResource BoolToStrokeConverter}}" />
-                            </Border.Stroke>
+                                Opacity="{Binding IsLegal, Converter={StaticResource BoolToOpacityConverter}}"
+                                Stroke="{Binding IsLegal, Converter={StaticResource BoolToStrokeConverter}}">
+                            <!-- Stroke binds on the Border itself, and the Color converts to a
+                                 brush. A SolidColorBrush nested in Border.Stroke does not get the
+                                 card's BindingContext, so its Color stays null, and Windows
+                                 throws a NullReferenceException drawing it (New Game crashed). -->
                             <Border.Triggers>
                                 <!-- A card picked as a Hawsey-exchange discard is raised. -->
                                 <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
