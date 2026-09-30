@@ -11,7 +11,7 @@ public class BoolToOpacityConverter : IValueConverter
             return 1.0;
         }
 
-        return 0.5;
+        return 0.55;
     }
 
 

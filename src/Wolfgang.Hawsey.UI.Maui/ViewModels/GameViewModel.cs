@@ -3,17 +3,23 @@
 #pragma warning disable VSTHRD101
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Wolfgang.Hawsey.Engine.Bidding;
 using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Game;
 using Wolfgang.Hawsey.Engine.Players;
-using Wolfgang.Hawsey.Engine.Rules;
 using Wolfgang.Hawsey.UI.Maui.Threading;
 
 namespace Wolfgang.Hawsey.UI.Maui.ViewModels;
 
+/// <summary>
+/// The game table, as the Blazor UI shows it: the four seats, the trick on the table, the
+/// tricks and score panels, the human's hand, the bid / trump / Hawsey-exchange panels,
+/// the round summary and the game log. The game itself is the engine's
+/// <see cref="GameSession"/>; this class only shows it and passes on the human's moves.
+/// </summary>
 // `partial` is required on the Windows TFM: GameViewModel implements WinRT-projected
 // interfaces, and the CsWinRT AOT source generator emits the other part of this
 // class there (without it, CsWinRT1028). InspectCode analyzes a slice where that
@@ -21,27 +27,37 @@ namespace Wolfgang.Hawsey.UI.Maui.ViewModels;
 // ReSharper disable once PartialTypeWithSinglePart
 public partial class GameViewModel : INotifyPropertyChanged
 {
+    private const string NoCard = "—";
+
     private readonly GameSession _gameService;
     private readonly IUiDispatcher _dispatcher;
-    private string _statusMessage = "Welcome to Hawsey! Tap New Game to start.";
+    private string _statusMessage = "Welcome to Hawsey. Click NEW GAME to start.";
     private bool _isBiddingVisible;
     private bool _isTrumpPickerVisible;
-    private bool _isGameOverVisible;
-    private string _gameOverMessage = "";
+    private bool _isLogVisible;
+    private RoundSummaryViewModel? _roundSummary;
     private int _northSouthScore;
     private int _eastWestScore;
-    private string _trumpDisplay = "";
-    private string _bidInfoDisplay = "";
-    private int _northCardCount;
-    private int _eastCardCount;
-    private int _westCardCount;
+    private int _usTricks;
+    private int _themTricks;
+    private string _trumpSymbol = NoCard;
+    private bool _isTrumpRed;
+    private bool _hasTrumpSuit;
+    private string _trumpSetterTeam = "";
+    private string _bidAmountText = "";
+    private string _ledByText = "";
+    private string _winningCardText = NoCard;
     private string _bidPrompt = "";
     private bool _canPass = true;
     private bool _isHawseyExchangeVisible;
     private string _exchangeSelectionText = "";
 
-    // Indexes into the human's hand, not cards: a pinochle hand can hold both copies
-    // of a card, and the human may discard both.
+    // The hand in the order the human sees it: sorted by suit and rank when dealt, then
+    // kept as the human rearranges it. Null until the first deal of a game.
+    private List<Card>? _handOrder;
+
+    // Positions in the shown hand, not cards: a pinochle hand can hold both copies of a
+    // card, and the human may discard both.
     private readonly List<int> _discardIndexes = new();
     private readonly Command _confirmHawseyExchangeCommand;
 
@@ -55,17 +71,16 @@ public partial class GameViewModel : INotifyPropertyChanged
         _gameService = gameService;
         _dispatcher = dispatcher;
         _gameService.StateChanged += OnStateChanged;
-        _gameService.TrickCompleted += OnTrickCompleted;
-        _gameService.RoundCompleted += OnRoundCompleted;
-        _gameService.GameOver += OnGameOver;
 
         // Command takes Action/Action<T>; an `async () => await ...` lambda would be
         // async-void (MA0147). Each command starts its move through Run, which reports
         // a failure instead of letting the discarded task lose it.
         NewGameCommand = new Command(() => Run(StartNewGameAsync));
+        NextRoundCommand = new Command(() => Run(StartNextRoundAsync));
         PlaceBidCommand = new Command<string>(s => Run(() => PlaceBidAsync(s)));
         SelectTrumpCommand = new Command<string>(s => Run(() => SelectTrumpAsync(s)));
         PlayCardCommand = new Command<CardViewModel>(c => Run(() => PlayCardAsync(c)));
+        ToggleLogCommand = new Command(() => IsLogVisible = !IsLogVisible);
         _confirmHawseyExchangeCommand = new Command
         (
             () => Run(ConfirmHawseyExchangeAsync),
@@ -80,11 +95,33 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
+    /// <summary>The human's hand, in the order the human has arranged it.</summary>
     public ObservableCollection<CardViewModel> HumanCards { get; } = new();
 
 
 
-    public ObservableCollection<TrickCardViewModel> TrickCards { get; } = new();
+    /// <summary>The partner's seat, across the table.</summary>
+    public SeatViewModel North { get; } = new(PlayerPosition.North, "PARTNER");
+
+
+
+    /// <summary>The opponent to the human's right.</summary>
+    public SeatViewModel East { get; } = new(PlayerPosition.East, "OPPONENT RIGHT");
+
+
+
+    /// <summary>The opponent to the human's left.</summary>
+    public SeatViewModel West { get; } = new(PlayerPosition.West, "OPPONENT LEFT");
+
+
+
+    /// <summary>The human's own seat: tricks, bid and dealer (the hand is <see cref="HumanCards"/>).</summary>
+    public SeatViewModel South { get; } = new(PlayerPosition.South, "YOU");
+
+
+
+    /// <summary>This round so far: each bid, then each trick's winner.</summary>
+    public ObservableCollection<string> GameLog { get; } = new();
 
 
 
@@ -112,22 +149,38 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
-    public bool IsGameOverVisible
+    /// <summary>Whether the game log panel is open.</summary>
+    public bool IsLogVisible
     {
-        get => _isGameOverVisible;
-        set => SetProperty(ref _isGameOverVisible, value);
+        get => _isLogVisible;
+        set => SetProperty(ref _isLogVisible, value);
     }
 
 
 
-    public string GameOverMessage
+    /// <summary>
+    /// The summary of the round just scored, shown until the human starts the next round
+    /// (or, at game over, a new game); <see langword="null"/> otherwise.
+    /// </summary>
+    public RoundSummaryViewModel? RoundSummary
     {
-        get => _gameOverMessage;
-        set => SetProperty(ref _gameOverMessage, value);
+        get => _roundSummary;
+        private set
+        {
+            if (SetProperty(ref _roundSummary, value))
+            {
+                OnPropertyChanged(nameof(IsRoundSummaryVisible));
+            }
+        }
     }
 
 
 
+    public bool IsRoundSummaryVisible => _roundSummary != null;
+
+
+
+    /// <summary>The human's team's score (North/South: "US").</summary>
     public int NorthSouthScore
     {
         get => _northSouthScore;
@@ -136,6 +189,7 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
+    /// <summary>The opponents' score (East/West: "THEM").</summary>
     public int EastWestScore
     {
         get => _eastWestScore;
@@ -144,42 +198,103 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
-    public string TrumpDisplay
+    /// <summary>Tricks the human's team has won this round.</summary>
+    public int UsTricks
     {
-        get => _trumpDisplay;
-        set => SetProperty(ref _trumpDisplay, value);
+        get => _usTricks;
+        private set => SetProperty(ref _usTricks, value);
     }
 
 
 
-    public string BidInfoDisplay
+    /// <summary>Tricks the opponents have won this round.</summary>
+    public int ThemTricks
     {
-        get => _bidInfoDisplay;
-        set => SetProperty(ref _bidInfoDisplay, value);
+        get => _themTricks;
+        private set => SetProperty(ref _themTricks, value);
     }
 
 
 
-    public int NorthCardCount
+    /// <summary>The trump suit's symbol, or a dash before trump is named or in ace high.</summary>
+    public string TrumpSymbol
     {
-        get => _northCardCount;
-        set => SetProperty(ref _northCardCount, value);
+        get => _trumpSymbol;
+        private set => SetProperty(ref _trumpSymbol, value);
     }
 
 
 
-    public int EastCardCount
+    public bool IsTrumpRed
     {
-        get => _eastCardCount;
-        set => SetProperty(ref _eastCardCount, value);
+        get => _isTrumpRed;
+        private set
+        {
+            if (SetProperty(ref _isTrumpRed, value))
+            {
+                OnPropertyChanged(nameof(TrumpMarkColor));
+            }
+        }
     }
 
 
 
-    public int WestCardCount
+    /// <summary>The colour of the trump watermarks in the corners of the table.</summary>
+    public Color TrumpMarkColor => _isTrumpRed ? TableColors.RedTrumpMark : TableColors.BlackTrumpMark;
+
+
+
+    /// <summary>Whether a trump suit is named (the table shows it in its corners).</summary>
+    public bool HasTrumpSuit
     {
-        get => _westCardCount;
-        set => SetProperty(ref _westCardCount, value);
+        get => _hasTrumpSuit;
+        private set => SetProperty(ref _hasTrumpSuit, value);
+    }
+
+
+
+    /// <summary>"US" or "THEM": the team that won the bid, or empty during the bidding.</summary>
+    public string TrumpSetterTeam
+    {
+        get => _trumpSetterTeam;
+        private set
+        {
+            if (SetProperty(ref _trumpSetterTeam, value))
+            {
+                OnPropertyChanged(nameof(IsTrumpSetterUs));
+            }
+        }
+    }
+
+
+
+    public bool IsTrumpSetterUs => string.Equals(_trumpSetterTeam, "US", StringComparison.Ordinal);
+
+
+
+    /// <summary>The winning bid next to the team, for example "· 7" or "· Hawsey (24)".</summary>
+    public string BidAmountText
+    {
+        get => _bidAmountText;
+        private set => SetProperty(ref _bidAmountText, value);
+    }
+
+
+
+    /// <summary>Who led the trick on the table, for example "Led by Partner".</summary>
+    public string LedByText
+    {
+        get => _ledByText;
+        private set => SetProperty(ref _ledByText, value);
+    }
+
+
+
+    /// <summary>The card winning the trick on the table, for example "J ♦", or a dash.</summary>
+    public string WinningCardText
+    {
+        get => _winningCardText;
+        private set => SetProperty(ref _winningCardText, value);
     }
 
 
@@ -246,13 +361,39 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
     public ICommand NewGameCommand { get; }
+    public ICommand NextRoundCommand { get; }
     public ICommand PlaceBidCommand { get; }
     public ICommand SelectTrumpCommand { get; }
     public ICommand PlayCardCommand { get; }
+    public ICommand ToggleLogCommand { get; }
 
 
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+
+
+    /// <summary>
+    /// Moves a card in the shown hand, as dragging it does: the card at
+    /// <paramref name="from"/> goes before the card now at <paramref name="to"/>. It
+    /// changes only the order the human sees, never the game. Any picked Hawsey
+    /// discards are dropped, since they are positions in the old order.
+    /// </summary>
+    public void MoveCard(int from, int to)
+    {
+        if (_handOrder == null || from == to
+            || from < 0 || from >= _handOrder.Count
+            || to < 0 || to >= _handOrder.Count)
+        {
+            return;
+        }
+
+        var card = _handOrder[from];
+        _handOrder.RemoveAt(from);
+        _handOrder.Insert(to > from ? to - 1 : to, card);
+        _discardIndexes.Clear();
+        UpdateFromState();
+    }
 
 
 
@@ -282,8 +423,29 @@ public partial class GameViewModel : INotifyPropertyChanged
 
     private async Task StartNewGameAsync()
     {
-        IsGameOverVisible = false;
+        IsBiddingVisible = false;
+        IsTrumpPickerVisible = false;
+        RoundSummary = null;
+        _handOrder = null;
+        _discardIndexes.Clear();
         _gameService.StartNewGame();
+        await AdvanceGameAsync().ConfigureAwait(true);
+    }
+
+
+
+    private async Task StartNextRoundAsync()
+    {
+        var state = _gameService.CurrentState;
+
+        if (state is not { Phase: GamePhase.RoundScoring })
+        {
+            return;
+        }
+
+        RoundSummary = null;
+        _handOrder = null;
+        _gameService.StartNextRound();
         await AdvanceGameAsync().ConfigureAwait(true);
     }
 
@@ -301,7 +463,7 @@ public partial class GameViewModel : INotifyPropertyChanged
         {
             bid = BidAction.HawseyBid.Instance;
         }
-        else if (int.TryParse(bidString, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out var amount))
+        else if (int.TryParse(bidString, NumberStyles.Integer, CultureInfo.InvariantCulture, out var amount))
         {
             bid = new BidAction.NumberBid(amount);
         }
@@ -396,15 +558,12 @@ public partial class GameViewModel : INotifyPropertyChanged
 
     private async Task ConfirmHawseyExchangeAsync()
     {
-        var state = _gameService.CurrentState;
-
-        if (state == null || _discardIndexes.Count != HawseyDiscardCount)
+        if (_handOrder == null || _discardIndexes.Count != HawseyDiscardCount)
         {
             return;
         }
 
-        var hand = state.Hands[GameSession.HumanPosition];
-        var discard = _discardIndexes.Select(i => hand[i]).ToArray();
+        var discard = _discardIndexes.Select(i => _handOrder[i]).ToArray();
 
         if (!_gameService.PerformHumanHawseyExchange(discard))
         {
@@ -419,44 +578,53 @@ public partial class GameViewModel : INotifyPropertyChanged
     /// <summary>
     /// Lets the engine play the AI seats until it waits for the human (or for the next
     /// round), then shows what the human must do. The loop itself is the engine's
-    /// (<see cref="GameSession.AdvanceAsync"/>), shared with the Blazor UI; only the
-    /// app's own policies are here: a pause, then the next deal, after each round.
+    /// (<see cref="GameSession.AdvanceAsync"/>), shared with the Blazor UI, and so are the
+    /// messages: after each round the summary waits for "Next round".
     /// </summary>
     private async Task AdvanceGameAsync()
     {
-        while (true)
+        if (_gameService.CurrentState?.Phase == GamePhase.Bidding)
         {
-            switch (await _gameService.AdvanceAsync().ConfigureAwait(true))
-            {
-                case WaitingFor.HumanBid:
-                    StatusMessage = "Your turn to bid";
-                    IsBiddingVisible = true;
-                    return;
-
-                case WaitingFor.HumanTrump:
-                    StatusMessage = "Choose trump suit or Ace High";
-                    IsTrumpPickerVisible = true;
-                    return;
-
-                case WaitingFor.HumanHawseyExchange:
-                    // The exchange panel follows the state (UpdateHawseyExchange).
-                    StatusMessage = "Hawsey! Tap two cards to discard";
-                    return;
-
-                case WaitingFor.HumanCard:
-                    StatusMessage = "Your turn to play";
-                    return;
-
-                case WaitingFor.NextRound:
-                    await _gameService.PauseBeforeNextRoundAsync().ConfigureAwait(true);
-                    _gameService.StartNextRound();
-                    break;
-
-                default:
-                    // Game over (the GameOver event shows it), or a New Game took over.
-                    return;
-            }
+            StatusMessage = "Bidding...";
         }
+
+        switch (await _gameService.AdvanceAsync().ConfigureAwait(true))
+        {
+            case WaitingFor.HumanBid:
+                IsBiddingVisible = true;
+                StatusMessage = "Your turn to bid.";
+                break;
+
+            case WaitingFor.HumanTrump:
+                IsTrumpPickerVisible = true;
+                StatusMessage = "Pick trump.";
+                break;
+
+            case WaitingFor.HumanHawseyExchange:
+                // The exchange panel follows the state (UpdateHawseyExchange).
+                StatusMessage = "Hawsey! Pick 2 cards to discard.";
+                break;
+
+            case WaitingFor.HumanCard:
+                StatusMessage = "Your turn. Play a card.";
+                break;
+
+            case WaitingFor.NextRound:
+                StatusMessage = "Round complete.";
+                RoundSummary = RoundSummaryViewModel.From(_gameService.CurrentState!, isGameOver: false);
+                break;
+
+            case WaitingFor.GameOver:
+                StatusMessage = "Game over.";
+                RoundSummary = RoundSummaryViewModel.From(_gameService.CurrentState!, isGameOver: true);
+                break;
+
+            default:
+                // A New Game took over during an AI pause; its own loop shows it.
+                return;
+        }
+
+        UpdateFromState();
     }
 
 
@@ -464,45 +632,6 @@ public partial class GameViewModel : INotifyPropertyChanged
     private void OnStateChanged(object? sender, EventArgs e)
     {
         _dispatcher.Post(UpdateFromState);
-    }
-
-
-
-    private void OnTrickCompleted(object? sender, TrickCompletedEventArgs e)
-    {
-        _dispatcher.Post(() =>
-        {
-            StatusMessage = $"{e.Winner} wins the trick!";
-        });
-    }
-
-
-
-    private void OnRoundCompleted(object? sender, EventArgs e)
-    {
-        _dispatcher.Post(() =>
-        {
-            var state = _gameService.CurrentState;
-
-            if (state != null)
-            {
-                StatusMessage = $"Round over! NS: {state.NorthSouthScore} — EW: {state.EastWestScore}";
-            }
-        });
-    }
-
-
-
-    private void OnGameOver(object? sender, GameOverEventArgs e)
-    {
-        _dispatcher.Post(() =>
-        {
-            var state = _gameService.CurrentState;
-            var winnerText = e.Winner == Team.NorthSouth ? "North/South (Your team)" : "East/West";
-            GameOverMessage = $"{winnerText} wins!\n\nNS: {state?.NorthSouthScore} — EW: {state?.EastWestScore}";
-            IsGameOverVisible = true;
-            StatusMessage = "Game Over!";
-        });
     }
 
 
@@ -516,10 +645,70 @@ public partial class GameViewModel : INotifyPropertyChanged
             return;
         }
 
-        UpdateScoresAndInfo(state);
+        UpdatePanels(state);
+        UpdateSeats(state);
+        UpdateTrickInfo();
         UpdateHawseyExchange(state);
         UpdateHumanHand(state);
-        UpdateTrickArea(state);
+        UpdateGameLog(state);
+
+        if (state.Phase == GamePhase.Bidding)
+        {
+            UpdateBidChoices(state);
+        }
+    }
+
+
+
+    private void UpdatePanels(GameState state)
+    {
+        NorthSouthScore = state.NorthSouthScore;
+        EastWestScore = state.EastWestScore;
+        UsTricks = state.CompletedTricks.Count(t => t.Winner.GetTeam() == Team.NorthSouth);
+        ThemTricks = state.CompletedTricks.Count(t => t.Winner.GetTeam() == Team.EastWest);
+
+        // Until trump is named the engine's TrumpSuit is empty, as it is in ace high.
+        var trump = state.Phase is GamePhase.Bidding or GamePhase.TrumpSelection ? null : state.TrumpSuit;
+        HasTrumpSuit = trump.HasValue;
+        TrumpSymbol = trump.HasValue ? SuitSymbol(trump.Value) : NoCard;
+        IsTrumpRed = trump is Suit.Hearts or Suit.Diamonds;
+
+        var result = state.BiddingResult;
+
+        if (result == null)
+        {
+            TrumpSetterTeam = "";
+            BidAmountText = "";
+            return;
+        }
+
+        TrumpSetterTeam = result.Winner.GetTeam() == Team.NorthSouth ? "US" : "THEM";
+        var bid = result.IsHawsey ? "Hawsey (24)" : result.BidAmount.ToString(CultureInfo.InvariantCulture);
+        BidAmountText = $"· {bid}";
+    }
+
+
+
+    private void UpdateSeats(GameState state)
+    {
+        var bids = _gameService.Bids;
+        var table = _gameService.TableCards;
+
+        North.Update(state, bids, table);
+        East.Update(state, bids, table);
+        West.Update(state, bids, table);
+        South.Update(state, bids, table);
+    }
+
+
+
+    private void UpdateTrickInfo()
+    {
+        var table = _gameService.TableCards;
+        LedByText = table.Count == 0 ? "" : $"Led by {LeaderName(table[0].Player)}";
+
+        var winning = _gameService.TableWinningCard;
+        WinningCardText = winning is { } card ? $"{RankText(card.Rank)} {SuitSymbol(card.Suit)}" : NoCard;
     }
 
 
@@ -544,29 +733,10 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
-    private void UpdateScoresAndInfo(GameState state)
-    {
-        NorthSouthScore = state.NorthSouthScore;
-        EastWestScore = state.EastWestScore;
-        NorthCardCount = state.Hands[PlayerPosition.North].Count;
-        EastCardCount = state.Hands[PlayerPosition.East].Count;
-        WestCardCount = state.Hands[PlayerPosition.West].Count;
-
-        TrumpDisplay = GetTrumpDisplayText(state);
-        BidInfoDisplay = GetBidInfoText(state);
-
-        if (state.Phase == GamePhase.Bidding)
-        {
-            UpdateBidChoices(state);
-        }
-    }
-
-
-
     /// <summary>
-    /// The bid overlay's prompt and buttons, from the engine's bidding progress. Same
-    /// rules as the Blazor UI: the minimum legal bid up to 11; the stuck dealer may only
-    /// bid the minimum or call Hawsey.
+    /// The bid panel's prompt and buttons, from the engine's bidding progress. Same
+    /// rules and words as the Blazor UI: the minimum legal bid up to 11; the stuck dealer
+    /// may only bid the minimum or call Hawsey.
     /// </summary>
     private void UpdateBidChoices(GameState state)
     {
@@ -579,7 +749,7 @@ public partial class GameViewModel : INotifyPropertyChanged
 
         for (var amount = state.MinimumLegalBid; amount <= highest; amount++)
         {
-            BidOptions.Add(amount.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            BidOptions.Add(amount.ToString(CultureInfo.InvariantCulture));
         }
 
         CanPass = !stuck;
@@ -592,7 +762,7 @@ public partial class GameViewModel : INotifyPropertyChanged
     {
         if (stuck)
         {
-            return $"You're stuck as dealer: bid {state.MinimumLegalBid} or call Hawsey.";
+            return $"You're stuck as dealer — bid {state.MinimumLegalBid} or call Hawsey.";
         }
 
         if (state.HighBidder is { } holder)
@@ -605,124 +775,171 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
-    // The human never faces its own bid (bidding goes round once), so the holder is
+    // The human never faces their own bid (bidding goes round once), so the holder is
     // the partner or an opponent.
     private static string BidderName(PlayerPosition player) =>
-        player == PlayerPosition.North ? "North (your partner)" : $"{player} (opponents)";
+        player == PlayerPosition.North ? "your partner" : $"{player} (opponents)";
 
 
 
-    private static string GetTrumpDisplayText(GameState state)
+    private static string LeaderName(PlayerPosition player) => player switch
     {
-        // Until trump is named, the engine's TrumpMode is a placeholder (AceHigh).
-        if (state.Phase is GamePhase.Bidding or GamePhase.TrumpSelection)
-        {
-            return "";
-        }
-
-        if (state.TrumpSuit.HasValue)
-        {
-            var symbol = state.TrumpSuit.Value switch
-            {
-                Suit.Hearts => "\u2665",
-                Suit.Diamonds => "\u2666",
-                Suit.Clubs => "\u2663",
-                Suit.Spades => "\u2660",
-                _ => "?"
-            };
-
-            return $"Trump: {symbol}";
-        }
-
-        return state.TrumpMode == TrumpMode.AceHigh ? "Ace High" : "";
-    }
-
-
-
-    private static string GetBidInfoText(GameState state)
-    {
-        if (state.BiddingResult == null)
-        {
-            return "";
-        }
-
-        var result = state.BiddingResult;
-
-        if (result.IsHawsey)
-        {
-            return $"{result.Winner} called Hawsey!";
-        }
-
-        if (result.IsStuck)
-        {
-            return $"{result.Winner} stuck at {result.BidAmount}";
-        }
-
-        return $"{result.Winner} bid {result.BidAmount}";
-    }
+        PlayerPosition.North => "Partner",
+        PlayerPosition.East => "Right",
+        PlayerPosition.South => "You",
+        _ => "Left",
+    };
 
 
 
     private void UpdateHumanHand(GameState state)
     {
-        var legalPlays = state.Phase == GamePhase.TrickPlay && state.NextToAct == GameSession.HumanPosition
-            ? state.GetLegalPlays()
-            : Array.Empty<Card>();
+        var humanPlays = state.Phase == GamePhase.TrickPlay && state.NextToAct == GameSession.HumanPosition;
+        var legalPlays = humanPlays ? state.GetLegalPlays() : Array.Empty<Card>();
+        var hand = SyncHandOrder(state.Hands[GameSession.HumanPosition]);
 
         HumanCards.Clear();
 
-        var humanHand = state.Hands[GameSession.HumanPosition];
-
-        for (var i = 0; i < humanHand.Count; i++)
+        for (var i = 0; i < hand.Count; i++)
         {
-            var card = humanHand[i];
-            var isLegal = false;
-
-            for (var j = 0; j < legalPlays.Count; j++)
-            {
-                if (legalPlays[j].Equals(card))
-                {
-                    isLegal = true;
-                    break;
-                }
-            }
+            var card = hand[i];
 
             // In the exchange every card may be picked as a discard.
             HumanCards.Add
             (
                 IsHawseyExchangeVisible
-                    ? new CardViewModel(card, isLegal: true, isSelected: _discardIndexes.Contains(i))
-                    : new CardViewModel(card, isLegal)
+                    ? new CardViewModel(card, isLegal: false, isSelected: _discardIndexes.Contains(i), isInteractive: true)
+                    : new CardViewModel(card, legalPlays.Contains(card))
             );
         }
     }
 
 
 
-    private void UpdateTrickArea(GameState state)
+    /// <summary>
+    /// Brings the shown order up to date with the hand, as the Blazor UI does: a new deal
+    /// is sorted; after that, cards that left the hand (played, or discarded in the
+    /// exchange) drop out, the rest keep the human's order, and cards that arrived (from
+    /// the partner in the exchange) are added at the end in sorted order.
+    /// </summary>
+    private List<Card> SyncHandOrder(List<Card> hand)
     {
-        TrickCards.Clear();
-
-        // The engine decides what is on the table, including the trick just won until
-        // the next lead; the Blazor UI shows the same.
-        var plays = state.TableCards;
-
-        for (var i = 0; i < plays.Count; i++)
+        if (_handOrder == null)
         {
-            TrickCards.Add(new TrickCardViewModel(plays[i].Card));
+            _handOrder = new List<Card>(hand);
+            _handOrder.Sort(CompareForDisplay);
+            return _handOrder;
         }
+
+        var remaining = new List<Card>(hand);
+        var order = new List<Card>(hand.Count);
+
+        foreach (var card in _handOrder)
+        {
+            if (remaining.Remove(card))
+            {
+                order.Add(card);
+            }
+        }
+
+        remaining.Sort(CompareForDisplay);
+        order.AddRange(remaining);
+        _handOrder = order;
+        return order;
     }
 
 
 
-    private void SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    // Spades, hearts, clubs, diamonds (alternating colours), high rank first.
+    private static int CompareForDisplay(Card a, Card b)
     {
-        if (EqualityComparer<T>.Default.Equals(field, value))
+        var bySuit = SuitDisplayOrder(a.Suit).CompareTo(SuitDisplayOrder(b.Suit));
+        return bySuit != 0 ? bySuit : ((int)b.Rank).CompareTo((int)a.Rank);
+    }
+
+
+
+    private static int SuitDisplayOrder(Suit suit) => suit switch
+    {
+        Suit.Spades => 0,
+        Suit.Hearts => 1,
+        Suit.Clubs => 2,
+        _ => 3,
+    };
+
+
+
+    private void UpdateGameLog(GameState state)
+    {
+        var entries = new List<string>();
+
+        foreach (var bid in _gameService.Bids)
+        {
+            var what = bid.Action switch
+            {
+                BidAction.NumberBid n => $"bids {n.Amount}",
+                BidAction.HawseyBid => "calls Hawsey",
+                _ => "passes",
+            };
+            entries.Add($"{bid.Player} {what}.");
+        }
+
+        for (var i = 0; i < state.CompletedTricks.Count; i++)
+        {
+            entries.Add($"Trick {i + 1}: {state.CompletedTricks[i].Winner} wins.");
+        }
+
+        if (entries.SequenceEqual(GameLog, StringComparer.Ordinal))
         {
             return;
         }
 
-        field = value;
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        GameLog.Clear();
+
+        foreach (var entry in entries)
+        {
+            GameLog.Add(entry);
+        }
     }
+
+
+
+    private static string SuitSymbol(Suit suit) => suit switch
+    {
+        Suit.Hearts => "♥",
+        Suit.Diamonds => "♦",
+        Suit.Clubs => "♣",
+        _ => "♠",
+    };
+
+
+
+    private static string RankText(Rank rank) => rank switch
+    {
+        Rank.Nine => "9",
+        Rank.Ten => "10",
+        Rank.Jack => "J",
+        Rank.Queen => "Q",
+        Rank.King => "K",
+        _ => "A",
+    };
+
+
+
+    private bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value))
+        {
+            return false;
+        }
+
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
+    }
+
+
+
+    private void OnPropertyChanged(string? propertyName) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }

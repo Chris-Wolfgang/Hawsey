@@ -7,6 +7,7 @@ public class TrickCardViewModel
 {
     public TrickCardViewModel(Card card)
     {
+        Card = card;
         RankText = card.Rank switch
         {
             Rank.Nine => "9",
@@ -25,11 +26,12 @@ public class TrickCardViewModel
             Suit.Spades => "\u2660",
             _ => "?"
         };
-        SuitColor = card.Suit.IsRed() ? Colors.Red : Colors.Black;
+        SuitColor = card.Suit.IsRed() ? TableColors.CardRed : TableColors.CardBlack;
     }
 
 
 
+    public Card Card { get; }
     public string RankText { get; }
     public string SuitSymbol { get; }
     public Color SuitColor { get; }

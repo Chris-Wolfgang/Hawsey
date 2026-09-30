@@ -51,6 +51,10 @@ public class GameViewModelBiddingTests
             {
                 vm.PlaceBidCommand.Execute("pass");
             }
+            else if (vm.IsRoundSummaryVisible)
+            {
+                vm.NextRoundCommand.Execute(null);
+            }
             else
             {
                 vm.PlayCardCommand.Execute(vm.HumanCards.First(c => c.IsLegal));
@@ -112,7 +116,7 @@ public class GameViewModelBiddingTests
 
         PlayUntilHumanBidsWith(vm, session, PlayerPosition.South);
 
-        Assert.Equal("Current high bid: 7 by North (your partner)", vm.BidPrompt);
+        Assert.Equal("Current high bid: 7 by your partner", vm.BidPrompt);
         Assert.Equal(["8", "9", "10", "11"], vm.BidOptions);
     }
 
@@ -126,7 +130,7 @@ public class GameViewModelBiddingTests
 
         PlayUntilHumanBidsWith(vm, session, PlayerPosition.South);
 
-        Assert.Equal("You're stuck as dealer: bid 6 or call Hawsey.", vm.BidPrompt);
+        Assert.Equal("You're stuck as dealer — bid 6 or call Hawsey.", vm.BidPrompt);
         Assert.Equal(["6"], vm.BidOptions);
         Assert.False(vm.CanPass);
 

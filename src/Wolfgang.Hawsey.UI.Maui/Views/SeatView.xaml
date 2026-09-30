@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- One seat, as the Blazor UI draws it (.seat): the face-down hand, the nameplate with
+     its avatar disc, the dealer puck and the bid badge. Placement (set by the page) picks
+     the layout: Top (partner: nameplate over a row of cards), Left / Right (opponents: a
+     column of cards over the nameplate) or Bottom (the human: nameplate only). -->
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Wolfgang.Hawsey.UI.Maui.ViewModels"
+             x:Class="Wolfgang.Hawsey.UI.Maui.Views.SeatView"
+             x:DataType="vm:SeatViewModel">
+
+    <Grid>
+        <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
+
+            <!-- Opponents: their cards come first, over the nameplate -->
+            <VerticalStackLayout x:Name="ColumnHand" Spacing="-58" HorizontalOptions="Center" IsVisible="False"
+                                 BindableLayout.ItemsSource="{Binding CardBacks}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="x:Int32">
+                        <Border Style="{StaticResource CardBack}" WidthRequest="110" HeightRequest="78" />
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+
+            <!-- The nameplate: a pill with the avatar disc overhanging its left end -->
+            <Grid HorizontalOptions="Center">
+                <Border x:Name="Plate"
+                        StrokeShape="RoundRectangle 18"
+                        BackgroundColor="{StaticResource PanelBackground}"
+                        StrokeThickness="1"
+                        Padding="40,4,14,4"
+                        MinimumWidthRequest="110">
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding IsActive}" Value="True">
+                            <Setter Property="Stroke" Value="{StaticResource Gold}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <VerticalStackLayout Spacing="0">
+                        <Label x:Name="NameLabel" Text="{Binding Name}" FontSize="13" FontAttributes="Bold" />
+                        <Label Text="{Binding TricksWon, StringFormat='Tricks: {0}'}"
+                               TextColor="{StaticResource TextLight}" FontSize="13" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border x:Name="Avatar"
+                        StrokeShape="Ellipse"
+                        Background="{StaticResource AvatarBrush}"
+                        StrokeThickness="2"
+                        WidthRequest="38" HeightRequest="38"
+                        HorizontalOptions="Start" VerticalOptions="Start"
+                        TranslationX="-2" TranslationY="-4" />
+            </Grid>
+
+            <!-- The partner: cards under the nameplate -->
+            <HorizontalStackLayout x:Name="RowHand" Spacing="-58" HorizontalOptions="Center" IsVisible="False"
+                                   Margin="0,6,0,0"
+                                   BindableLayout.ItemsSource="{Binding CardBacks}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="x:Int32">
+                        <Border Style="{StaticResource CardBack}" WidthRequest="78" HeightRequest="110" />
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+
+        <!-- The dealer puck, beside the seat on the table side -->
+        <Border x:Name="Puck"
+                StrokeShape="Ellipse"
+                Background="{StaticResource DealerPuckBrush}"
+                Stroke="#FF6A5314" StrokeThickness="2"
+                WidthRequest="36" HeightRequest="36"
+                IsVisible="{Binding IsDealer}">
+            <Label Text="D" TextColor="#FF4A3A0A" FontSize="15" FontAttributes="Bold"
+                   HorizontalOptions="Center" VerticalOptions="Center" />
+        </Border>
+
+        <!-- The bid badge while the bidding is on -->
+        <Border x:Name="Badge"
+                StrokeShape="RoundRectangle 12"
+                BackgroundColor="#B3000000"
+                Stroke="{StaticResource Gold}" StrokeThickness="1"
+                Padding="11,3">
+            <Border.Triggers>
+                <DataTrigger TargetType="Border" Binding="{Binding BidKind}" Value="">
+                    <Setter Property="IsVisible" Value="False" />
+                </DataTrigger>
+                <DataTrigger TargetType="Border" Binding="{Binding BidKind}" Value="pass">
+                    <Setter Property="BackgroundColor" Value="#D9282828" />
+                    <Setter Property="Stroke" Value="#FF8A8A8A" />
+                </DataTrigger>
+                <DataTrigger TargetType="Border" Binding="{Binding BidKind}" Value="number">
+                    <Setter Property="BackgroundColor" Value="#D900461E" />
+                    <Setter Property="Stroke" Value="#FF6CF06C" />
+                </DataTrigger>
+                <DataTrigger TargetType="Border" Binding="{Binding BidKind}" Value="hawsey">
+                    <Setter Property="BackgroundColor" Value="#D96E0000" />
+                    <Setter Property="Stroke" Value="{StaticResource ThemRed}" />
+                </DataTrigger>
+            </Border.Triggers>
+            <Label Text="{Binding BidText}" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource Gold}">
+                <Label.Triggers>
+                    <DataTrigger TargetType="Label" Binding="{Binding BidKind}" Value="pass">
+                        <Setter Property="TextColor" Value="#FFD8D8D8" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Label" Binding="{Binding BidKind}" Value="number">
+                        <Setter Property="TextColor" Value="#FFD4FFD4" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Label" Binding="{Binding BidKind}" Value="hawsey">
+                        <Setter Property="TextColor" Value="#FFFFD0D0" />
+                    </DataTrigger>
+                </Label.Triggers>
+            </Label>
+        </Border>
+    </Grid>
+
+</ContentView>

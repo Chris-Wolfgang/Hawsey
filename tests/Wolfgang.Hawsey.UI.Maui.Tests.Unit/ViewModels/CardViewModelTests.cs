@@ -33,7 +33,7 @@ public class CardViewModelTests
     public void Both_card_view_models_show_the_suit_symbol_and_colour(Suit suit, string symbol, bool red)
     {
         var card = new Card(Rank.Ace, suit);
-        var expectedColor = red ? Colors.Red : Colors.Black;
+        var expectedColor = red ? TableColors.CardRed : TableColors.CardBlack;
 
         var hand = new CardViewModel(card, isLegal: true);
         var trick = new TrickCardViewModel(card);

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- A card on the table, in front of the seat that played it (.trick-card). -->
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Wolfgang.Hawsey.UI.Maui.ViewModels"
+             x:Class="Wolfgang.Hawsey.UI.Maui.Views.TableCardView"
+             x:DataType="vm:TrickCardViewModel">
+
+    <Border StrokeShape="RoundRectangle 6"
+            BackgroundColor="{StaticResource CardFace}"
+            Stroke="#FF6B6B6B"
+            StrokeThickness="1"
+            WidthRequest="78" HeightRequest="110"
+            Padding="6,4"
+            HorizontalOptions="Center" VerticalOptions="Center">
+        <Grid>
+            <Label Text="{Binding RankText}" TextColor="{Binding SuitColor}"
+                   FontSize="22" FontAttributes="Bold"
+                   HorizontalOptions="Start" VerticalOptions="Start" />
+            <Label Text="{Binding SuitSymbol}" TextColor="{Binding SuitColor}"
+                   FontSize="48"
+                   HorizontalOptions="Center" VerticalOptions="Center" />
+        </Grid>
+    </Border>
+
+</ContentView>
