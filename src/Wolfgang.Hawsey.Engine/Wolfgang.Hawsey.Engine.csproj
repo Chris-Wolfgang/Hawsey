@@ -15,6 +15,9 @@
     <Authors>Chris Wolfgang</Authors>
     <Description>Game engine for the Hawsey card game — a 4-player team trick-taking game played with a pinochle deck.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/Chris-Wolfgang/Hawsey</PackageProjectUrl>
+    <PackageTags>hawsey;card-game;trick-taking;pinochle;game-engine</PackageTags>
     <!-- The engine is reflection-free, so it can promise trimming and Native AOT
          to consumers. The ILLink analyzers these switch on only exist for
          net8.0+; the netstandard2.0 slot is unaffected. -->
@@ -33,6 +36,12 @@
   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PolySharpIncludeGeneratedTypes>System.Runtime.CompilerServices.IsExternalInit</PolySharpIncludeGeneratedTypes>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The package's own readme for nuget.org, not the repository README (which
+         covers the apps, CI and the template and uses repo-relative links). -->
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="PolySharp" Version="1.16.0">

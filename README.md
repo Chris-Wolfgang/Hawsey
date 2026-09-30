@@ -20,7 +20,7 @@ A C# implementation of **Hawsey**, a four-player team trick-taking card game pla
 dotnet add package Wolfgang.Hawsey.Engine
 ```
 
-**NuGet Package:** not published yet. The engine is at version 0.1.0 and has no release. Until the first release, build it from source (see *Building from Source* below).
+**NuGet Package:** [Wolfgang.Hawsey.Engine](https://www.nuget.org/packages/Wolfgang.Hawsey.Engine)
 
 ---
 
@@ -33,7 +33,7 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
 ## 📚 Documentation
 
 - **GitHub Repository:** [https://github.com/Chris-Wolfgang/Hawsey](https://github.com/Chris-Wolfgang/Hawsey)
-- **API Documentation:** https://Chris-Wolfgang.github.io/Hawsey/ (published by the release workflow, starting with the first release)
+- **API Documentation:** https://Chris-Wolfgang.github.io/Hawsey/
 - **Formatting Guide:** [docs/README-FORMATTING.md](docs/README-FORMATTING.md)
 - **Contributing Guide:** [CONTRIBUTING.md](CONTRIBUTING.md)
 - **Code of Conduct:** [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
