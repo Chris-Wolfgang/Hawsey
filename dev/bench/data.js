@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1790779183022,
+  "lastUpdate": 1790788560729,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -94,6 +94,54 @@ window.BENCHMARK_DATA = {
             "value": 385235.53125,
             "unit": "ns",
             "range": "± 3847.9186272541947"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "1047ebee7a9595e8644563207fbd1614fe47357c",
+          "message": "docs(engine): give the NuGet package its own readme (#936)\n\nv0.1.0 went to nuget.org with no readme (the push warned \"Readme\nmissing\"), so its page is blank. The package gets src/.../README.md:\nwhat the engine is, GameSession / GameEngine / GameRunner samples, a\nshort rules summary and links. It is not the repository README, which\ncovers the apps, CI and the template and uses repo-relative links that\nbreak on nuget.org. The csproj also gains PackageProjectUrl and\nPackageTags. The repository README stops saying the package is\nunpublished.\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-09-30T13:14:50-04:00",
+          "tree_id": "9bb99ed5bc6ff19bb563e8939db81ffeb8a88304",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/1047ebee7a9595e8644563207fbd1614fe47357c"
+        },
+        "date": 1790788558045,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 472.1004063288371,
+            "unit": "ns",
+            "range": "± 2.9656715920665997"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 59.50312799215317,
+            "unit": "ns",
+            "range": "± 0.19839104821953954"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 200.13665334383646,
+            "unit": "ns",
+            "range": "± 0.3457963312479402"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 241068.83650716147,
+            "unit": "ns",
+            "range": "± 2704.348361714831"
           }
         ]
       }
