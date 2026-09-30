@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1790728269727,
+  "lastUpdate": 1790779183022,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -46,6 +46,54 @@ window.BENCHMARK_DATA = {
             "value": 384578.60563151044,
             "unit": "ns",
             "range": "± 22032.205696922458"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a77e774fa9492cbd1a8088ef9d3552f204b71faa",
+          "message": "chore: park the MAUI app on feature/maui until it's ready (#931)\n\n* chore: park the MAUI app on feature/maui until it's ready\n\nThe MAUI app isn't done, so the first release ships the engine (NuGet) and the\nBlazor web app only. main drops src/Wolfgang.Hawsey.UI.Maui and its unit tests\n(and their Hawsey.slnx entries), plus the ten maui-*.md changelog fragments, so\nthe release notes don't describe an app that isn't shipping; three engine/Blazor\nfragments no longer mention it either. The README lists the Blazor projects and\npoints at feature/maui.\n\nKept: tests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency (Coyote tests of the\nengine's GameSession - it references only the engine), coyote.yaml, and the\nengine's InternalsVisibleTo for the MAUI tests.\n\nfeature/maui reverts this commit to bring the app back.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n* chore: changelog fragment for parking the MAUI app\n\nThe Changelog Fragment Check requires an added fragment when src/ changes; this\nPR removes src/Wolfgang.Hawsey.UI.Maui.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-09-30T10:38:23-04:00",
+          "tree_id": "c0973caf7a53a2a2f547d207e35ccc9e24c029f6",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/a77e774fa9492cbd1a8088ef9d3552f204b71faa"
+        },
+        "date": 1790779182354,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 558.7125221888224,
+            "unit": "ns",
+            "range": "± 4.944845836141184"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 95.65185966094334,
+            "unit": "ns",
+            "range": "± 1.9556645199213616"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 288.50426657994586,
+            "unit": "ns",
+            "range": "± 1.8018507231478469"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 385235.53125,
+            "unit": "ns",
+            "range": "± 3847.9186272541947"
           }
         ]
       }
