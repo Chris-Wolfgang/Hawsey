@@ -1,0 +1,144 @@
+name: Release Apps
+# Ships the Hawsey app when a GitHub Release is published (release.yaml ships the
+# engine's NuGet package and the docs from the same event):
+#   - web:     the Blazor WebAssembly app, deployed to gh-pages under /play/
+#              (https://chris-wolfgang.github.io/Hawsey/play/)
+#
+# The MAUI app's Android APK and Windows zip jobs are parked with the app on the
+# feature/maui branch until it's ready.
+#
+# Versions come from the Release tag: v1.2.3 (or 1.2.3; a -suffix is dropped) sets
+# ApplicationDisplayVersion 1.2.3 and ApplicationVersion (Android versionCode)
+# 10203, so every later release installs over the previous one.
+#
+# Dry run: pull requests that change this file, and workflow_dispatch, build the
+# app exactly as a release would and upload it as a workflow artifact, but deploy
+# nothing.
+on:
+  release:
+    types: [published]
+  pull_request:
+    paths:
+      - '.github/workflows/release-apps.yaml'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to stamp on the dry-run build (nothing is published)'
+        required: false
+        default: '0.0.1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-apps-${{ github.event.release.tag_name || github.ref }}
+  cancel-in-progress: false
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_NOLOGO: 1
+  BLAZOR_PROJECT: src/Wolfgang.Hawsey.UI.Blazor/Wolfgang.Hawsey.UI.Blazor.csproj
+  # Only a published Release deploys or attaches anything.
+  PUBLISH: ${{ github.event_name == 'release' }}
+  TAG_NAME: ${{ github.event.release.tag_name }}
+  DRY_RUN_VERSION: ${{ inputs.version || '0.0.1' }}
+
+jobs:
+  version:
+    name: Work out the app version
+    runs-on: ubuntu-latest
+    outputs:
+      display: ${{ steps.version.outputs.display }}
+      code: ${{ steps.version.outputs.code }}
+    steps:
+      - name: Parse the tag
+        id: version
+        run: |
+          raw="${TAG_NAME:-$DRY_RUN_VERSION}"
+          raw="${raw#v}"
+          core="${raw%%-*}"
+          if ! [[ "$core" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            echo "::error::'$raw' is not a MAJOR.MINOR.PATCH version (tag vX.Y.Z)."
+            exit 1
+          fi
+          major=${BASH_REMATCH[1]}; minor=${BASH_REMATCH[2]}; patch=${BASH_REMATCH[3]}
+          if [ "$minor" -gt 99 ] || [ "$patch" -gt 99 ]; then
+            echo "::error::minor and patch must be 0-99 to fit the Android versionCode scheme (MAJOR*10000 + MINOR*100 + PATCH)."
+            exit 1
+          fi
+          code=$(( major * 10000 + minor * 100 + patch ))
+          [ "$code" -ge 1 ] || code=1
+          echo "App version $core, Android versionCode $code"
+          echo "display=$core" >> "$GITHUB_OUTPUT"
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+
+  web:
+    name: Web (Blazor) to gh-pages /play/
+    needs: version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # push play/ to the gh-pages branch (release only)
+    # Every gh-pages writer (docfx.yaml, benchmarks.yaml, stryker.yaml) shares this
+    # group, so two pushes never race.
+    concurrency:
+      group: gh-pages
+      cancel-in-progress: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68  # v6.0.0
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Publish the Blazor app
+        run: |
+          dotnet publish "$BLAZOR_PROJECT" -c Release -o ./web-publish
+          # Served from https://chris-wolfgang.github.io/Hawsey/play/, so the app's
+          # base URL is /Hawsey/play/ (it is / for local runs).
+          index=./web-publish/wwwroot/index.html
+          grep -q '<base href="/" />' "$index" || { echo "::error::$index has no <base href=\"/\" /> to rewrite."; exit 1; }
+          sed -i 's#<base href="/" />#<base href="/Hawsey/play/" />#' "$index"
+          grep -n '<base href' "$index"
+
+      - name: Upload the site (dry run)
+        if: env.PUBLISH != 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: hawsey-web
+          path: ./web-publish/wwwroot
+
+      - name: Deploy to gh-pages /play/
+        if: env.PUBLISH == 'true'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # Authenticate with http.extraheader rather than a token in the URL, and
+          # always remove it again.
+          auth=$(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)
+          git config --global http.https://github.com/.extraheader "AUTHORIZATION: basic $auth"
+          trap 'git config --global --unset-all http.https://github.com/.extraheader || true' EXIT
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+          git clone --depth 1 --branch gh-pages "https://github.com/$GITHUB_REPOSITORY.git" ./gh-pages
+          # Replace play/ as a whole, so nothing from an older release lingers.
+          rm -rf ./gh-pages/play
+          cp -R ./web-publish/wwwroot ./gh-pages/play
+          # GitHub Pages runs Jekyll unless the root has .nojekyll, and Jekyll drops
+          # folders starting with "_" - including Blazor's _framework/.
+          touch ./gh-pages/.nojekyll
+
+          cd ./gh-pages
+          git add -A
+          if git diff --cached --quiet; then
+            echo "gh-pages already has this build."
+            exit 0
+          fi
+          git commit -m "Deploy the web app ($TAG_NAME) to /play/"
+          git push origin HEAD:gh-pages
+          echo "Deployed: https://chris-wolfgang.github.io/Hawsey/play/"
