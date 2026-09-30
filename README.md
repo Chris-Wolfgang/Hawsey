@@ -122,12 +122,14 @@ The game's namesake bid: the bidder plays alone to take all 12 tricks. The bidde
 | Project | Purpose |
 |---------|---------|
 | `src/Wolfgang.Hawsey.Engine` | Game-logic library (cards, bidding, trick play, scoring, rules). The NuGet package. |
-| `src/Wolfgang.Hawsey.UI.Maui` | .NET MAUI app with AI opponents, built on the engine's `GameSession`. Also targets plain `net10.0` for its unit tests ([ADR 0007](docs/adr/0007-game-session-in-the-engine-and-testable-uis.md)). Not published as a package. |
+| `src/Wolfgang.Hawsey.UI.Blazor` | Blazor WebAssembly app, played at [chris-wolfgang.github.io/Hawsey/play](https://chris-wolfgang.github.io/Hawsey/play/). Its components are in `src/Wolfgang.Hawsey.UI.Shared`; the game logic is the engine's `GameSession` ([ADR 0007](docs/adr/0007-game-session-in-the-engine-and-testable-uis.md)). Not published as a package. |
+| `src/Wolfgang.Hawsey.UI.Shared` | The Blazor app's Razor components and styles. |
 | `tests/Wolfgang.Hawsey.Engine.Tests.Unit` | Engine unit tests, run on every target framework from `net462` to `net10.0`. |
-| `tests/Wolfgang.Hawsey.UI.Maui.Tests.Unit` | Unit tests for the MAUI app: view models, converters and the app host (XAML and DI). |
 | `tests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency` | Coyote concurrency tests for the engine's `GameSession`. |
 | `benchmarks/Wolfgang.Hawsey.Engine.Benchmarks` | BenchmarkDotNet benchmarks for the engine. |
 | `examples/Wolfgang.Hawsey.Engine.AotSmoke` | Native AOT smoke test that plays complete games through the engine. |
+
+The .NET MAUI app (Android, Windows, iOS and Mac Catalyst) is in development on the [`feature/maui`](https://github.com/Chris-Wolfgang/Hawsey/tree/feature/maui) branch and isn't part of `main` until it's ready. It uses the same engine.
 
 The engine is UI-agnostic. Each `GameEngine` method takes the current `GameState` and returns a new one, which makes the engine easy to unit test and replay (see [ADR 0002](docs/adr/0002-ui-agnostic-engine-with-immutable-state.md)).
 
@@ -139,8 +141,6 @@ The engine is UI-agnostic. Each `GameEngine` method takes the current `GameState
 
 - `netstandard2.0`
 - `net10.0`
-
-The MAUI app targets `net10.0-android` on every OS, plus `net10.0-windows10.0.19041.0` when built on Windows and `net10.0-ios` / `net10.0-maccatalyst` when built on macOS.
 
 Once the package is published, see the [NuGet package page](https://www.nuget.org/packages/Wolfgang.Hawsey.Engine/) for the authoritative per-TFM compatibility matrix.
 
@@ -178,7 +178,6 @@ This repository uses **`BannedSymbols.txt`** to prohibit synchronous APIs and en
 
 ### Prerequisites
 - [.NET SDK](https://dotnet.microsoft.com/download) 10.0
-- The .NET MAUI workloads, to build the MAUI app (`dotnet workload restore` installs the ones this OS needs)
 - [PowerShell 7](https://github.com/PowerShell/PowerShell) (`pwsh`) for the scripts under `scripts/`
 
 ### Build Steps
@@ -187,9 +186,6 @@ This repository uses **`BannedSymbols.txt`** to prohibit synchronous APIs and en
 # Clone the repository
 git clone https://github.com/Chris-Wolfgang/Hawsey.git
 cd Hawsey
-
-# Install the workloads the MAUI app needs
-dotnet workload restore
 
 # Restore dependencies
 dotnet restore
@@ -268,7 +264,7 @@ Contributions are welcome, especially:
 
 - **House-rule variants.** New variants belong in `HouseRules` (see [ADR 0004](docs/adr/0004-house-rules-as-an-options-object.md)).
 - **AI strategies.** Implement `IPlayerStrategy`.
-- **UI work** on the MAUI app.
+- **UI work** on the Blazor app, or on the MAUI app on the `feature/maui` branch.
 
 Please see [CONTRIBUTING.md](CONTRIBUTING.md) for:
 - Code quality standards
