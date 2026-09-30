@@ -1,3 +1,3 @@
 type: internal
 
-Removed dead bid-history state from `BiddingPhase` and tidied engine doc references and casts; no behaviour change.
+Tidied engine doc references and casts, and removed dead bidding state; no behaviour change.
