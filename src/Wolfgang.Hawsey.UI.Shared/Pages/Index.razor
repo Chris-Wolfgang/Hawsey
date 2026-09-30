@@ -376,10 +376,11 @@
     };
 
     /// <summary>
-    /// The cards on the table, as the engine decides: the current trick, or the trick
-    /// just won until the next lead. The MAUI app shows the same.
+    /// The cards on the table, as the engine's session decides: the current trick, or the
+    /// trick just won, which clears after a moment when the human is to lead. The MAUI app
+    /// shows the same.
     /// </summary>
-    private IReadOnlyList<PlayedCard> TableCards => State?.TableCards ?? Array.Empty<PlayedCard>();
+    private IReadOnlyList<PlayedCard> TableCards => Game.TableCards;
 
     /// <summary>This round so far: each bid, then each trick's winner.</summary>
     private IEnumerable<string> GameLog
@@ -573,7 +574,7 @@
     {
         get
         {
-            var winner = State?.TableWinningCard;
+            var winner = Game.TableWinningCard;
             return winner is null ? "—" : $"{RankText(winner.Value.Rank)} {SuitSymbol(winner.Value.Suit)}";
         }
     }
