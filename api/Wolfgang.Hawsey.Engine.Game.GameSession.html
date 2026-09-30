@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class GameSession | Wolfgang.Hawsey.Engine Documentation </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class GameSession | Wolfgang.Hawsey.Engine Documentation ">
+      
+      <meta name="description" content="A live game between one human, always South, and three  seats. It is what every Hawsey UI drives: the UI calls the human&#39;s moves and the AI-advance methods, and redraws on . The AI moves are paced so a person can follow them.">
+      <link rel="icon" href="../favicon.svg">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/Hawsey/new/v0.1.0/apiSpec/new?filename=Wolfgang_Hawsey_Engine_Game_GameSession.md&amp;value=---%0Auid%3A%20Wolfgang.Hawsey.Engine.Game.GameSession%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="Wolfgang.Hawsey.Engine">
+            Wolfgang.Hawsey.Engine
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+
+      <div class="content">
+        <div class="actionbar">
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Wolfgang.Hawsey.Engine.Game.GameSession">
+
+
+
+  <h1 id="Wolfgang_Hawsey_Engine_Game_GameSession" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession" class="text-break">
+Class GameSession  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L25"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Wolfgang</span>.<span class="xref">Hawsey</span>.<span class="xref">Engine</span>.<a class="xref" href="Wolfgang.Hawsey.Engine.Game.html">Game</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Wolfgang.Hawsey.Engine.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>A live game between one human, always South, and three <a class="xref" href="Wolfgang.Hawsey.Engine.Strategy.SimpleAiStrategy.html">SimpleAiStrategy</a>
+seats. It is what every Hawsey UI drives: the UI calls the human's moves and the
+AI-advance methods, and redraws on <a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameSession.html#Wolfgang_Hawsey_Engine_Game_GameSession_StateChanged">StateChanged</a>. The AI moves are
+paced so a person can follow them.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class GameSession</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">GameSession</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+  <h2 id="Wolfgang_Hawsey_Engine_Game_GameSession_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>Thread safety: the AI loops resume on thread-pool threads after their delays
+while human moves arrive on the UI thread, so two moves can race for the same
+turn. So every transition of <code>_state</code> runs under <code>_sync</code>, and
+each one re-checks, inside the lock, that it is still the right phase and
+player's turn. A stale human move (a double-tap, a tap during an AI turn)
+is ignored and reported as <code>false</code>. <code>_generation</code> increments on
+every new game, so an AI loop that wakes up after New Game stops instead of
+playing into the new game. Events are raised outside the lock.</p>
+</div>
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameSession__ctor_" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.#ctor*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameSession__ctor" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.#ctor">
+  GameSession()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L57"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameSession.html">GameSession</a> class, with the AI
+seats paced so a person can follow their moves, and a fresh random deal for
+each game.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public GameSession()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameSession_HumanPosition" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.HumanPosition">
+  HumanPosition
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L30"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The seat the human plays. The AI plays the other three.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const PlayerPosition HumanPosition = South</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Hawsey.Engine.Players.PlayerPosition.html">PlayerPosition</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameSession_Bids_" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.Bids*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameSession_Bids" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.Bids">
+  Bids
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L121"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the bids made so far in the current round, in bidding order: a snapshot, so
+a UI can show each seat's bid. Empty before the first bid of each deal.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;PlacedBid&gt; Bids { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Wolfgang.Hawsey.Engine.Bidding.PlacedBid.html">PlacedBid</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameSession_CurrentState_" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.CurrentState*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameSession_CurrentState" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.CurrentState">
+  CurrentState
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L84"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the current game state, or <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a> before the first game.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public GameState? CurrentState { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameState.html">GameState</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameSession_IsHumanTurn_" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.IsHumanTurn*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameSession_IsHumanTurn" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.IsHumanTurn">
+  IsHumanTurn
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L137"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value indicating whether the human is the next to act.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsHumanTurn { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameSession_AdvanceAiBiddingAsync_" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.AdvanceAiBiddingAsync*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameSession_AdvanceAiBiddingAsync" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.AdvanceAiBiddingAsync">
+  AdvanceAiBiddingAsync()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L248"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Advances AI bidding. Returns true if human needs to bid.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;bool&gt; AdvanceAiBiddingAsync()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameSession_AdvanceAiPlaysAsync_" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.AdvanceAiPlaysAsync*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameSession_AdvanceAiPlaysAsync" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.AdvanceAiPlaysAsync">
+  AdvanceAiPlaysAsync()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L541"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Advances AI plays. Returns true if human needs to play.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;bool&gt; AdvanceAiPlaysAsync()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameSession_AdvanceAsync_" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.AdvanceAsync*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameSession_AdvanceAsync" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.AdvanceAsync">
+  AdvanceAsync()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L173"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Plays the AI seats' moves, phase after phase, until the game needs something
+from outside: a move from the human, or the UI's go-ahead for the next round.
+This is the loop every UI runs after each human move, so they all drive the game
+the same way. The human's last card of a round is played here too, since there
+is no choice to make.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;WaitingFor&gt; AdvanceAsync()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="Wolfgang.Hawsey.Engine.Game.WaitingFor.html">WaitingFor</a>&gt;</dt>
+    <dd><p>What the session is waiting for; <a class="xref" href="Wolfgang.Hawsey.Engine.Game.WaitingFor.html#Wolfgang_Hawsey_Engine_Game_WaitingFor_Nothing">Nothing</a> when no game has
+started, or a newer move (such as a New Game) took over during an AI pause.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameSession_HandleHawseyExchangeAsync_" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.HandleHawseyExchangeAsync*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameSession_HandleHawseyExchangeAsync" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.HandleHawseyExchangeAsync">
+  HandleHawseyExchangeAsync()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L448"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns true if human needs to handle exchange.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;bool&gt; HandleHawseyExchangeAsync()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameSession_HandleTrumpSelectionAsync_" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.HandleTrumpSelectionAsync*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameSession_HandleTrumpSelectionAsync" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.HandleTrumpSelectionAsync">
+  HandleTrumpSelectionAsync()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L348"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns true if human needs to select trump.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;bool&gt; HandleTrumpSelectionAsync()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameSession_PauseBeforeNextRoundAsync_" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.PauseBeforeNextRoundAsync*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameSession_PauseBeforeNextRoundAsync" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.PauseBeforeNextRoundAsync">
+  PauseBeforeNextRoundAsync()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L677"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Pauses between a scored round and the next deal, so the player can read the
+result. Returns at once when pacing is off.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task PauseBeforeNextRoundAsync()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></dt>
+    <dd><p>A task that completes when the pause is over.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameSession_PerformHawseyExchange_" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.PerformHawseyExchange*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameSession_PerformHawseyExchange_Wolfgang_Hawsey_Engine_Cards_Card___Wolfgang_Hawsey_Engine_Cards_Card___" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.PerformHawseyExchange(Wolfgang.Hawsey.Engine.Cards.Card[],Wolfgang.Hawsey.Engine.Cards.Card[])">
+  PerformHawseyExchange(Card[], Card[])
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L391"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Applies the human's Hawsey exchange. Returns false, and changes nothing,
+unless the game is in the Hawsey exchange phase with the human as bidder.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool PerformHawseyExchange(Card[] discard, Card[] fromPartner)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>discard</code> <a class="xref" href="Wolfgang.Hawsey.Engine.Cards.Card.html">Card</a>[]</dt>
+    <dd></dd>
+    <dt><code>fromPartner</code> <a class="xref" href="Wolfgang.Hawsey.Engine.Cards.Card.html">Card</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameSession_PerformHumanHawseyExchange_" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.PerformHumanHawseyExchange*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameSession_PerformHumanHawseyExchange_Wolfgang_Hawsey_Engine_Cards_Card___" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.PerformHumanHawseyExchange(Wolfgang.Hawsey.Engine.Cards.Card[])">
+  PerformHumanHawseyExchange(Card[])
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L419"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Applies the human's Hawsey exchange from the two cards the human discards. The
+partner gives their two best cards for the trump named, chosen by the same rule
+the AI uses. Returns false, and changes nothing, unless the game is in the Hawsey
+exchange phase with the human as bidder and <code class="paramref">discard</code> is two
+cards the human holds.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool PerformHumanHawseyExchange(Card[] discard)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>discard</code> <a class="xref" href="Wolfgang.Hawsey.Engine.Cards.Card.html">Card</a>[]</dt>
+    <dd><p>The two cards the human discards.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p><a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> when the exchange was made.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></dt>
+    <dd><p><code class="paramref">discard</code> is <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a>.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameSession_PlaceHumanBid_" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.PlaceHumanBid*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameSession_PlaceHumanBid_Wolfgang_Hawsey_Engine_Bidding_BidAction_" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.PlaceHumanBid(Wolfgang.Hawsey.Engine.Bidding.BidAction)">
+  PlaceHumanBid(BidAction)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L298"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Places the human's bid. Returns false, and changes nothing, when it is
+not the human's turn to bid, or a number bid is below
+<a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameState.html#Wolfgang_Hawsey_Engine_Game_GameState_MinimumLegalBid">MinimumLegalBid</a> or above <a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameState.html#Wolfgang_Hawsey_Engine_Game_GameState_MaximumBid">MaximumBid</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool PlaceHumanBid(BidAction action)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>action</code> <a class="xref" href="Wolfgang.Hawsey.Engine.Bidding.BidAction.html">BidAction</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameSession_PlayHumanCard_" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.PlayHumanCard*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameSession_PlayHumanCard_Wolfgang_Hawsey_Engine_Cards_Card_" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.PlayHumanCard(Wolfgang.Hawsey.Engine.Cards.Card)">
+  PlayHumanCard(Card)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L500"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Plays the human's card. Returns false, and changes nothing, when it is
+not the human's turn or the card is not a legal play. When the card
+completes a trick, a round or the game, the matching events are raised,
+exactly as for an AI play.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool PlayHumanCard(Card card)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>card</code> <a class="xref" href="Wolfgang.Hawsey.Engine.Cards.Card.html">Card</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameSession_SelectTrump_" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.SelectTrump*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameSession_SelectTrump_System_Nullable_Wolfgang_Hawsey_Engine_Cards_Suit__" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.SelectTrump(System.Nullable{Wolfgang.Hawsey.Engine.Cards.Suit})">
+  SelectTrump(Suit?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L327"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Names trump for the human. Returns false, and changes nothing, when the
+human is not the one naming trump.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool SelectTrump(Suit? trumpSuit)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>trumpSuit</code> <a class="xref" href="Wolfgang.Hawsey.Engine.Cards.Suit.html">Suit</a>?</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameSession_StartNewGame_" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.StartNewGame*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameSession_StartNewGame_Wolfgang_Hawsey_Engine_Rules_HouseRules_" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.StartNewGame(Wolfgang.Hawsey.Engine.Rules.HouseRules)">
+  StartNewGame(HouseRules?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L146"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Deals a new game with North dealing. Any AI loop still running for the
+previous game stops at its next step.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void StartNewGame(HouseRules? rules = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rules</code> <a class="xref" href="Wolfgang.Hawsey.Engine.Rules.HouseRules.html">HouseRules</a></dt>
+    <dd><p>The house rules, or <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a> for <a class="xref" href="Wolfgang.Hawsey.Engine.Rules.HouseRules.html#Wolfgang_Hawsey_Engine_Rules_HouseRules_Default">Default</a>.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameSession_StartNextRound_" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.StartNextRound*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameSession_StartNextRound" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.StartNextRound">
+  StartNextRound()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L608"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Deals the next round after a round has been scored. Does nothing in any
+other phase.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void StartNextRound()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="events">Events
+</h2>
+
+
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameSession_GameOver" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.GameOver">
+  GameOver
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L113"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Raised when a team reaches the points needed to win.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event EventHandler&lt;GameOverEventArgs&gt;? GameOver</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameOverEventArgs.html">GameOverEventArgs</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameSession_RoundCompleted" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.RoundCompleted">
+  RoundCompleted
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L106"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Raised when a round has been scored and the game goes on.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event EventHandler? RoundCompleted</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler">EventHandler</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameSession_StateChanged" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.StateChanged">
+  StateChanged
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L92"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Raised after every change to <a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameSession.html#Wolfgang_Hawsey_Engine_Game_GameSession_CurrentState">CurrentState</a>. May be raised on a
+background thread.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event EventHandler? StateChanged</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler">EventHandler</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameSession_TrickCompleted" data-uid="Wolfgang.Hawsey.Engine.Game.GameSession.TrickCompleted">
+  TrickCompleted
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L99"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Raised when a trick is complete, with the player who won it.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event EventHandler&lt;TrickCompletedEventArgs&gt;? TrickCompleted</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="Wolfgang.Hawsey.Engine.Game.TrickCompletedEventArgs.html">TrickCompletedEventArgs</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameSession.cs/#L25" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Made with DocFX <script>(function(){var r='/';if(window.location.hostname.endsWith('.github.io')){var s=window.location.pathname.split('/').filter(Boolean);if(s.length)r='/'+s[0]+'/';}var t=document.createElement('script');t.src=r+'public/version-picker.js';t.async=true;document.head.appendChild(t);})();</script>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class Trick | Wolfgang.Hawsey.Engine Documentation </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class Trick | Wolfgang.Hawsey.Engine Documentation ">
+      
+      <meta name="description" content="Manages a single trick, collecting played cards and determining the winner.">
+      <link rel="icon" href="../favicon.svg">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/Hawsey/new/v0.1.0/apiSpec/new?filename=Wolfgang_Hawsey_Engine_TrickPlay_Trick.md&amp;value=---%0Auid%3A%20Wolfgang.Hawsey.Engine.TrickPlay.Trick%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="Wolfgang.Hawsey.Engine">
+            Wolfgang.Hawsey.Engine
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+
+      <div class="content">
+        <div class="actionbar">
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Wolfgang.Hawsey.Engine.TrickPlay.Trick">
+
+
+
+  <h1 id="Wolfgang_Hawsey_Engine_TrickPlay_Trick" data-uid="Wolfgang.Hawsey.Engine.TrickPlay.Trick" class="text-break">
+Class Trick  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/TrickPlay/Trick.cs/#L9"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Wolfgang</span>.<span class="xref">Hawsey</span>.<span class="xref">Engine</span>.<a class="xref" href="Wolfgang.Hawsey.Engine.TrickPlay.html">TrickPlay</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Wolfgang.Hawsey.Engine.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Manages a single trick, collecting played cards and determining the winner.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class Trick</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">Trick</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="Wolfgang_Hawsey_Engine_TrickPlay_Trick__ctor_" data-uid="Wolfgang.Hawsey.Engine.TrickPlay.Trick.#ctor*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_TrickPlay_Trick__ctor_System_Nullable_Wolfgang_Hawsey_Engine_Cards_Suit__System_Int32_" data-uid="Wolfgang.Hawsey.Engine.TrickPlay.Trick.#ctor(System.Nullable{Wolfgang.Hawsey.Engine.Cards.Suit},System.Int32)">
+  Trick(Suit?, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/TrickPlay/Trick.cs/#L25"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Hawsey.Engine.TrickPlay.Trick.html">Trick</a> class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Trick(Suit? trumpSuit, int expectedPlays = 4)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>trumpSuit</code> <a class="xref" href="Wolfgang.Hawsey.Engine.Cards.Suit.html">Suit</a>?</dt>
+    <dd><p>The trump suit, or <code>null</code> for Ace high mode.</p>
+</dd>
+    <dt><code>expectedPlays</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The number of cards expected in this trick (4 normally, 3 for Hawsey).</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Wolfgang_Hawsey_Engine_TrickPlay_Trick_IsComplete_" data-uid="Wolfgang.Hawsey.Engine.TrickPlay.Trick.IsComplete*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_TrickPlay_Trick_IsComplete" data-uid="Wolfgang.Hawsey.Engine.TrickPlay.Trick.IsComplete">
+  IsComplete
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/TrickPlay/Trick.cs/#L74"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets whether the trick is complete (all expected cards have been played).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsComplete { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_TrickPlay_Trick_LedSuit_" data-uid="Wolfgang.Hawsey.Engine.TrickPlay.Trick.LedSuit*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_TrickPlay_Trick_LedSuit" data-uid="Wolfgang.Hawsey.Engine.TrickPlay.Trick.LedSuit">
+  LedSuit
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/TrickPlay/Trick.cs/#L67"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the effective suit of the card that was led, or <code>null</code> if no cards have been played.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Suit? LedSuit { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Hawsey.Engine.Cards.Suit.html">Suit</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_TrickPlay_Trick_Plays_" data-uid="Wolfgang.Hawsey.Engine.TrickPlay.Trick.Plays*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_TrickPlay_Trick_Plays" data-uid="Wolfgang.Hawsey.Engine.TrickPlay.Trick.Plays">
+  Plays
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/TrickPlay/Trick.cs/#L81"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the cards that have been played so far.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;PlayedCard&gt; Plays { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Wolfgang.Hawsey.Engine.TrickPlay.PlayedCard.html">PlayedCard</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Wolfgang_Hawsey_Engine_TrickPlay_Trick_GetCurrentWinner_" data-uid="Wolfgang.Hawsey.Engine.TrickPlay.Trick.GetCurrentWinner*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_TrickPlay_Trick_GetCurrentWinner" data-uid="Wolfgang.Hawsey.Engine.TrickPlay.Trick.GetCurrentWinner">
+  GetCurrentWinner()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/TrickPlay/Trick.cs/#L145"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the card currently winning the trick, or <code>null</code> if no cards have been played.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Card? GetCurrentWinner()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Hawsey.Engine.Cards.Card.html">Card</a>?</dt>
+    <dd><p>The currently winning card, or <code>null</code>.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_TrickPlay_Trick_GetResult_" data-uid="Wolfgang.Hawsey.Engine.TrickPlay.Trick.GetResult*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_TrickPlay_Trick_GetResult" data-uid="Wolfgang.Hawsey.Engine.TrickPlay.Trick.GetResult">
+  GetResult()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/TrickPlay/Trick.cs/#L115"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Determines the winner of the trick. In case of duplicate cards
+(identical rank and suit), the first played wins.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TrickResult GetResult()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Hawsey.Engine.TrickPlay.TrickResult.html">TrickResult</a></dt>
+    <dd><p>The result of the completed trick.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.invalidoperationexception">InvalidOperationException</a></dt>
+    <dd><p>Thrown if the trick is not yet complete.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_TrickPlay_Trick_Play_" data-uid="Wolfgang.Hawsey.Engine.TrickPlay.Trick.Play*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_TrickPlay_Trick_Play_Wolfgang_Hawsey_Engine_Players_PlayerPosition_Wolfgang_Hawsey_Engine_Cards_Card_" data-uid="Wolfgang.Hawsey.Engine.TrickPlay.Trick.Play(Wolfgang.Hawsey.Engine.Players.PlayerPosition,Wolfgang.Hawsey.Engine.Cards.Card)">
+  Play(PlayerPosition, Card)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/TrickPlay/Trick.cs/#L91"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Plays a card into this trick.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Play(PlayerPosition player, Card card)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>player</code> <a class="xref" href="Wolfgang.Hawsey.Engine.Players.PlayerPosition.html">PlayerPosition</a></dt>
+    <dd><p>The player playing the card.</p>
+</dd>
+    <dt><code>card</code> <a class="xref" href="Wolfgang.Hawsey.Engine.Cards.Card.html">Card</a></dt>
+    <dd><p>The card being played.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.invalidoperationexception">InvalidOperationException</a></dt>
+    <dd><p>Thrown if the trick is already complete.</p>
+</dd>
+  </dl>
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/TrickPlay/Trick.cs/#L9" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Made with DocFX <script>(function(){var r='/';if(window.location.hostname.endsWith('.github.io')){var s=window.location.pathname.split('/').filter(Boolean);if(s.length)r='/'+s[0]+'/';}var t=document.createElement('script');t.src=r+'public/version-picker.js';t.async=true;document.head.appendChild(t);})();</script>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

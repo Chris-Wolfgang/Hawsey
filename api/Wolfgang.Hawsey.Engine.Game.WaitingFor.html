@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Enum WaitingFor | Wolfgang.Hawsey.Engine Documentation </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Enum WaitingFor | Wolfgang.Hawsey.Engine Documentation ">
+      
+      <meta name="description" content="What a  is waiting for once  has played every AI move it can: the move a UI must now ask the human for, or the point where the UI decides what happens next.">
+      <link rel="icon" href="../favicon.svg">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/Hawsey/new/v0.1.0/apiSpec/new?filename=Wolfgang_Hawsey_Engine_Game_WaitingFor.md&amp;value=---%0Auid%3A%20Wolfgang.Hawsey.Engine.Game.WaitingFor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="Wolfgang.Hawsey.Engine">
+            Wolfgang.Hawsey.Engine
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+
+      <div class="content">
+        <div class="actionbar">
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Wolfgang.Hawsey.Engine.Game.WaitingFor">
+
+
+
+
+  <h1 id="Wolfgang_Hawsey_Engine_Game_WaitingFor" data-uid="Wolfgang.Hawsey.Engine.Game.WaitingFor" class="text-break">
+Enum WaitingFor  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/WaitingFor.cs/#L8"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Wolfgang</span>.<span class="xref">Hawsey</span>.<span class="xref">Engine</span>.<a class="xref" href="Wolfgang.Hawsey.Engine.Game.html">Game</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Wolfgang.Hawsey.Engine.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>What a <a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameSession.html">GameSession</a> is waiting for once <a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameSession.html#Wolfgang_Hawsey_Engine_Game_GameSession_AdvanceAsync">AdvanceAsync()</a>
+has played every AI move it can: the move a UI must now ask the human for, or the
+point where the UI decides what happens next.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public enum WaitingFor</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+  <h2 id="fields">Fields
+</h2>
+  <dl class="parameters">
+    <dt id="Wolfgang_Hawsey_Engine_Game_WaitingFor_GameOver"><code>GameOver = 6</code></dt>
+  
+  <dd><p>The game is over (<a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameState.html#Wolfgang_Hawsey_Engine_Game_GameState_Winner">Winner</a>).</p>
+</dd>
+    <dt id="Wolfgang_Hawsey_Engine_Game_WaitingFor_HumanBid"><code>HumanBid = 1</code></dt>
+  
+  <dd><p>The human bids: <a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameSession.html#Wolfgang_Hawsey_Engine_Game_GameSession_PlaceHumanBid_Wolfgang_Hawsey_Engine_Bidding_BidAction_">PlaceHumanBid(BidAction)</a>.</p>
+</dd>
+    <dt id="Wolfgang_Hawsey_Engine_Game_WaitingFor_HumanCard"><code>HumanCard = 4</code></dt>
+  
+  <dd><p>The human plays a card: <a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameSession.html#Wolfgang_Hawsey_Engine_Game_GameSession_PlayHumanCard_Wolfgang_Hawsey_Engine_Cards_Card_">PlayHumanCard(Card)</a>. Never asked for
+the last card of a round, which the session plays itself (there is no choice).</p>
+</dd>
+    <dt id="Wolfgang_Hawsey_Engine_Game_WaitingFor_HumanHawseyExchange"><code>HumanHawseyExchange = 3</code></dt>
+  
+  <dd><p>The human, having bid Hawsey, picks two discards:
+<a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameSession.html#Wolfgang_Hawsey_Engine_Game_GameSession_PerformHumanHawseyExchange_Wolfgang_Hawsey_Engine_Cards_Card___">PerformHumanHawseyExchange(Card[])</a>.</p>
+</dd>
+    <dt id="Wolfgang_Hawsey_Engine_Game_WaitingFor_HumanTrump"><code>HumanTrump = 2</code></dt>
+  
+  <dd><p>The human, having won the bid, names trump: <a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameSession.html#Wolfgang_Hawsey_Engine_Game_GameSession_SelectTrump_System_Nullable_Wolfgang_Hawsey_Engine_Cards_Suit__">SelectTrump(Suit?)</a>.</p>
+</dd>
+    <dt id="Wolfgang_Hawsey_Engine_Game_WaitingFor_NextRound"><code>NextRound = 5</code></dt>
+  
+  <dd><p>The round is scored (<a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameState.html#Wolfgang_Hawsey_Engine_Game_GameState_RoundScore">RoundScore</a>); the UI starts the next
+one with <a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameSession.html#Wolfgang_Hawsey_Engine_Game_GameSession_StartNextRound">StartNextRound()</a> when it is ready.</p>
+</dd>
+    <dt id="Wolfgang_Hawsey_Engine_Game_WaitingFor_Nothing"><code>Nothing = 0</code></dt>
+  
+  <dd><p>Nothing: no game has started, or a newer move (such as a New Game) took over
+while this advance was paused. The UI has nothing to show for this call.</p>
+</dd>
+  </dl>
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/WaitingFor.cs/#L8" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Made with DocFX <script>(function(){var r='/';if(window.location.hostname.endsWith('.github.io')){var s=window.location.pathname.split('/').filter(Boolean);if(s.length)r='/'+s[0]+'/';}var t=document.createElement('script');t.src=r+'public/version-picker.js';t.async=true;document.head.appendChild(t);})();</script>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

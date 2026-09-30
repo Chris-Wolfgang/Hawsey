@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class GameState | Wolfgang.Hawsey.Engine Documentation </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class GameState | Wolfgang.Hawsey.Engine Documentation ">
+      
+      <meta name="description" content="A snapshot of the entire game state at a point in time. Each method on  returns a freshly-constructed instance rather than mutating the previous state, so callers should treat the exposed  and  collections as read-only — mutating them is unsupported and can corrupt subsequent engine transitions.">
+      <link rel="icon" href="../favicon.svg">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/Hawsey/new/v0.1.0/apiSpec/new?filename=Wolfgang_Hawsey_Engine_Game_GameState.md&amp;value=---%0Auid%3A%20Wolfgang.Hawsey.Engine.Game.GameState%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="Wolfgang.Hawsey.Engine">
+            Wolfgang.Hawsey.Engine
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+
+      <div class="content">
+        <div class="actionbar">
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Wolfgang.Hawsey.Engine.Game.GameState">
+
+
+
+  <h1 id="Wolfgang_Hawsey_Engine_Game_GameState" data-uid="Wolfgang.Hawsey.Engine.Game.GameState" class="text-break">
+Class GameState  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L23"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Wolfgang</span>.<span class="xref">Hawsey</span>.<span class="xref">Engine</span>.<a class="xref" href="Wolfgang.Hawsey.Engine.Game.html">Game</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Wolfgang.Hawsey.Engine.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>A snapshot of the entire game state at a point in time. Each method on
+<a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameEngine.html">GameEngine</a> returns a freshly-constructed instance rather than mutating
+the previous state, so callers should treat the exposed <a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameState.html#Wolfgang_Hawsey_Engine_Game_GameState_Hands">Hands</a> and
+<a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameState.html#Wolfgang_Hawsey_Engine_Game_GameState_CompletedTricks">CompletedTricks</a> collections as read-only — mutating them is unsupported
+and can corrupt subsequent engine transitions.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[SuppressMessage(&quot;Design&quot;, &quot;MA0016:Prefer using collection abstraction instead of implementation&quot;, Justification = &quot;Engine returns concrete types; callers must treat collections as read-only per the type&#39;s XML doc.&quot;)]
+public sealed class GameState</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">GameState</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState__ctor_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.#ctor*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState__ctor_Wolfgang_Hawsey_Engine_Game_GamePhase_Wolfgang_Hawsey_Engine_Players_PlayerPosition_System_Collections_Generic_Dictionary_Wolfgang_Hawsey_Engine_Players_PlayerPosition_System_Collections_Generic_List_Wolfgang_Hawsey_Engine_Cards_Card___System_Nullable_Wolfgang_Hawsey_Engine_Cards_Suit__Wolfgang_Hawsey_Engine_Rules_TrumpMode_Wolfgang_Hawsey_Engine_Bidding_BiddingResult_System_Collections_Generic_List_Wolfgang_Hawsey_Engine_TrickPlay_TrickResult__Wolfgang_Hawsey_Engine_TrickPlay_Trick_System_Int32_System_Int32_Wolfgang_Hawsey_Engine_Rules_HouseRules_System_Nullable_Wolfgang_Hawsey_Engine_Players_PlayerPosition__System_Int32_System_Boolean_System_Nullable_Wolfgang_Hawsey_Engine_Players_PlayerPosition__System_Int32_System_Nullable_Wolfgang_Hawsey_Engine_Players_PlayerPosition__Wolfgang_Hawsey_Engine_Scoring_RoundScore_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.#ctor(Wolfgang.Hawsey.Engine.Game.GamePhase,Wolfgang.Hawsey.Engine.Players.PlayerPosition,System.Collections.Generic.Dictionary{Wolfgang.Hawsey.Engine.Players.PlayerPosition,System.Collections.Generic.List{Wolfgang.Hawsey.Engine.Cards.Card}},System.Nullable{Wolfgang.Hawsey.Engine.Cards.Suit},Wolfgang.Hawsey.Engine.Rules.TrumpMode,Wolfgang.Hawsey.Engine.Bidding.BiddingResult,System.Collections.Generic.List{Wolfgang.Hawsey.Engine.TrickPlay.TrickResult},Wolfgang.Hawsey.Engine.TrickPlay.Trick,System.Int32,System.Int32,Wolfgang.Hawsey.Engine.Rules.HouseRules,System.Nullable{Wolfgang.Hawsey.Engine.Players.PlayerPosition},System.Int32,System.Boolean,System.Nullable{Wolfgang.Hawsey.Engine.Players.PlayerPosition},System.Int32,System.Nullable{Wolfgang.Hawsey.Engine.Players.PlayerPosition},Wolfgang.Hawsey.Engine.Scoring.RoundScore)">
+  GameState(GamePhase, PlayerPosition, Dictionary&lt;PlayerPosition, List&lt;Card&gt;&gt;, Suit?, TrumpMode, BiddingResult?, List&lt;TrickResult&gt;, Trick?, int, int, HouseRules, PlayerPosition?, int, bool, PlayerPosition?, int, PlayerPosition?, RoundScore?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L31"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameState.html">GameState</a> class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public GameState(GamePhase phase, PlayerPosition dealer, Dictionary&lt;PlayerPosition, List&lt;Card&gt;&gt; hands, Suit? trumpSuit, TrumpMode trumpMode, BiddingResult? biddingResult, List&lt;TrickResult&gt; completedTricks, Trick? currentTrick, int northSouthScore, int eastWestScore, HouseRules rules, PlayerPosition? nextToAct, int tricksPlayedInRound, bool isHawseyRound, PlayerPosition? hawseyBidder, int highBid = 0, PlayerPosition? highBidder = null, RoundScore? roundScore = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>phase</code> <a class="xref" href="Wolfgang.Hawsey.Engine.Game.GamePhase.html">GamePhase</a></dt>
+    <dd></dd>
+    <dt><code>dealer</code> <a class="xref" href="Wolfgang.Hawsey.Engine.Players.PlayerPosition.html">PlayerPosition</a></dt>
+    <dd></dd>
+    <dt><code>hands</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="Wolfgang.Hawsey.Engine.Players.PlayerPosition.html">PlayerPosition</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="Wolfgang.Hawsey.Engine.Cards.Card.html">Card</a>&gt;&gt;</dt>
+    <dd></dd>
+    <dt><code>trumpSuit</code> <a class="xref" href="Wolfgang.Hawsey.Engine.Cards.Suit.html">Suit</a>?</dt>
+    <dd></dd>
+    <dt><code>trumpMode</code> <a class="xref" href="Wolfgang.Hawsey.Engine.Rules.TrumpMode.html">TrumpMode</a></dt>
+    <dd></dd>
+    <dt><code>biddingResult</code> <a class="xref" href="Wolfgang.Hawsey.Engine.Bidding.BiddingResult.html">BiddingResult</a></dt>
+    <dd></dd>
+    <dt><code>completedTricks</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="Wolfgang.Hawsey.Engine.TrickPlay.TrickResult.html">TrickResult</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>currentTrick</code> <a class="xref" href="Wolfgang.Hawsey.Engine.TrickPlay.Trick.html">Trick</a></dt>
+    <dd></dd>
+    <dt><code>northSouthScore</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>eastWestScore</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>rules</code> <a class="xref" href="Wolfgang.Hawsey.Engine.Rules.HouseRules.html">HouseRules</a></dt>
+    <dd></dd>
+    <dt><code>nextToAct</code> <a class="xref" href="Wolfgang.Hawsey.Engine.Players.PlayerPosition.html">PlayerPosition</a>?</dt>
+    <dd></dd>
+    <dt><code>tricksPlayedInRound</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>isHawseyRound</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+    <dt><code>hawseyBidder</code> <a class="xref" href="Wolfgang.Hawsey.Engine.Players.PlayerPosition.html">PlayerPosition</a>?</dt>
+    <dd></dd>
+    <dt><code>highBid</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>highBidder</code> <a class="xref" href="Wolfgang.Hawsey.Engine.Players.PlayerPosition.html">PlayerPosition</a>?</dt>
+    <dd></dd>
+    <dt><code>roundScore</code> <a class="xref" href="Wolfgang.Hawsey.Engine.Scoring.RoundScore.html">RoundScore</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_MaximumBid" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.MaximumBid">
+  MaximumBid
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L234"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The highest number bid: all twelve tricks.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const int MaximumBid = 12</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_BiddingResult_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.BiddingResult*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_BiddingResult" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.BiddingResult">
+  BiddingResult
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L113"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the bidding result, or <code>null</code> if bidding has not completed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public BiddingResult? BiddingResult { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Hawsey.Engine.Bidding.BiddingResult.html">BiddingResult</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_CompletedTricks_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.CompletedTricks*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_CompletedTricks" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.CompletedTricks">
+  CompletedTricks
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L120"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the tricks completed in the current round.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public List&lt;TrickResult&gt; CompletedTricks { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="Wolfgang.Hawsey.Engine.TrickPlay.TrickResult.html">TrickResult</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_CurrentTrick_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.CurrentTrick*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_CurrentTrick" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.CurrentTrick">
+  CurrentTrick
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L127"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the current trick in progress, or <code>null</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Trick? CurrentTrick { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Hawsey.Engine.TrickPlay.Trick.html">Trick</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_Dealer_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.Dealer*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_Dealer" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.Dealer">
+  Dealer
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L85"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the current dealer's position.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public PlayerPosition Dealer { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Hawsey.Engine.Players.PlayerPosition.html">PlayerPosition</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_EastWestScore_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.EastWestScore*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_EastWestScore" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.EastWestScore">
+  EastWestScore
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L141"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the current East/West score.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int EastWestScore { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_Hands_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.Hands*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_Hands" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.Hands">
+  Hands
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L92"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the hands for each player.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;PlayerPosition, List&lt;Card&gt;&gt; Hands { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="Wolfgang.Hawsey.Engine.Players.PlayerPosition.html">PlayerPosition</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="Wolfgang.Hawsey.Engine.Cards.Card.html">Card</a>&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_HawseyBidder_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.HawseyBidder*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_HawseyBidder" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.HawseyBidder">
+  HawseyBidder
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L210"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the Hawsey bidder's position, or <code>null</code> if not a Hawsey round.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public PlayerPosition? HawseyBidder { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Hawsey.Engine.Players.PlayerPosition.html">PlayerPosition</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_HighBid_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.HighBid*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_HighBid" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.HighBid">
+  HighBid
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L219"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the highest number bid so far while <a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameState.html#Wolfgang_Hawsey_Engine_Game_GameState_Phase">Phase</a> is
+<a class="xref" href="Wolfgang.Hawsey.Engine.Game.GamePhase.html#Wolfgang_Hawsey_Engine_Game_GamePhase_Bidding">Bidding</a>, or <code>0</code> when nobody has bid yet. A bid must
+beat it. Once bidding ends, <a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameState.html#Wolfgang_Hawsey_Engine_Game_GameState_BiddingResult">BiddingResult</a> holds the winning bid.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int HighBid { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_HighBidder_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.HighBidder*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_HighBidder" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.HighBidder">
+  HighBidder
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L227"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the player holding <a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameState.html#Wolfgang_Hawsey_Engine_Game_GameState_HighBid">HighBid</a> while bidding, or <code>null</code> when
+nobody has bid yet.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public PlayerPosition? HighBidder { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Hawsey.Engine.Players.PlayerPosition.html">PlayerPosition</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_IsHawseyRound_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.IsHawseyRound*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_IsHawseyRound" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.IsHawseyRound">
+  IsHawseyRound
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L203"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets whether this is a Hawsey round.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsHawseyRound { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_IsNextBidderStuck_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.IsNextBidderStuck*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_IsNextBidderStuck" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.IsNextBidderStuck">
+  IsNextBidderStuck
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L250"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value indicating whether the next bidder is the stuck dealer: bidding is
+open, the dealer is next (the dealer bids last), and nobody has bid.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsNextBidderStuck { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_MinimumLegalBid_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.MinimumLegalBid*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_MinimumLegalBid" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.MinimumLegalBid">
+  MinimumLegalBid
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L242"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the lowest number bid the next bidder may make: the house minimum, or one
+more than <a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameState.html#Wolfgang_Hawsey_Engine_Game_GameState_HighBid">HighBid</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int MinimumLegalBid { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_NextToAct_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.NextToAct*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_NextToAct" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.NextToAct">
+  NextToAct
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L189"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the player who should act next, or <code>null</code> if no action is needed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public PlayerPosition? NextToAct { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Hawsey.Engine.Players.PlayerPosition.html">PlayerPosition</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_NorthSouthScore_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.NorthSouthScore*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_NorthSouthScore" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.NorthSouthScore">
+  NorthSouthScore
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L134"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the current North/South score.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int NorthSouthScore { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_Phase_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.Phase*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_Phase" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.Phase">
+  Phase
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L78"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the current game phase.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public GamePhase Phase { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Hawsey.Engine.Game.GamePhase.html">GamePhase</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_RoundScore_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.RoundScore*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_RoundScore" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.RoundScore">
+  RoundScore
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L260"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the round the engine has just scored: set once the last trick of a round is
+played (in the <a class="xref" href="Wolfgang.Hawsey.Engine.Game.GamePhase.html#Wolfgang_Hawsey_Engine_Game_GamePhase_RoundScoring">RoundScoring</a> and <a class="xref" href="Wolfgang.Hawsey.Engine.Game.GamePhase.html#Wolfgang_Hawsey_Engine_Game_GamePhase_GameOver">GameOver</a>
+phases), <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a> otherwise. A UI shows the round's result from it
+instead of recounting the tricks.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public RoundScore? RoundScore { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Hawsey.Engine.Scoring.RoundScore.html">RoundScore</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_Rules_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.Rules*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_Rules" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.Rules">
+  Rules
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L182"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the house rules in effect.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public HouseRules Rules { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Hawsey.Engine.Rules.HouseRules.html">HouseRules</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_TableCards_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.TableCards*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_TableCards" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.TableCards">
+  TableCards
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L270"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the cards to show on the table, in the order they were played: the current
+trick's cards, or, from the moment a trick is won until the next card is led, the
+trick just won (including the last trick of a round). Empty before the first lead
+of a round.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;PlayedCard&gt; TableCards { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Wolfgang.Hawsey.Engine.TrickPlay.PlayedCard.html">PlayedCard</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_TableWinningCard_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.TableWinningCard*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_TableWinningCard" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.TableWinningCard">
+  TableWinningCard
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L292"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the card winning the trick on the table (<a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameState.html#Wolfgang_Hawsey_Engine_Game_GameState_TableCards">TableCards</a>): the
+current trick's winning card so far, or the card that won the trick just
+completed. <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a> when the table is empty.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Card? TableWinningCard { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Hawsey.Engine.Cards.Card.html">Card</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_TricksPlayedInRound_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.TricksPlayedInRound*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_TricksPlayedInRound" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.TricksPlayedInRound">
+  TricksPlayedInRound
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L196"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the number of tricks played in the current round.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int TricksPlayedInRound { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_TrumpMode_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.TrumpMode*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_TrumpMode" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.TrumpMode">
+  TrumpMode
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L106"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the trump mode.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TrumpMode TrumpMode { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Hawsey.Engine.Rules.TrumpMode.html">TrumpMode</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_TrumpSuit_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.TrumpSuit*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_TrumpSuit" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.TrumpSuit">
+  TrumpSuit
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L99"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the trump suit, or <code>null</code> for Ace high mode.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Suit? TrumpSuit { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Hawsey.Engine.Cards.Suit.html">Suit</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_Winner_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.Winner*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_Winner" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.Winner">
+  Winner
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L151"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the team that won, once <a class="xref" href="Wolfgang.Hawsey.Engine.Game.GameState.html#Wolfgang_Hawsey_Engine_Game_GameState_Phase">Phase</a> is <a class="xref" href="Wolfgang.Hawsey.Engine.Game.GamePhase.html#Wolfgang_Hawsey_Engine_Game_GamePhase_GameOver">GameOver</a>;
+<code>null</code> while the game continues. A team wins by reaching
+<a class="xref" href="Wolfgang.Hawsey.Engine.Rules.HouseRules.html#Wolfgang_Hawsey_Engine_Rules_HouseRules_PointsToWin">PointsToWin</a>. When both teams reach it in the same round,
+the team that held the bid in that round wins.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Team? Winner { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Hawsey.Engine.Players.Team.html">Team</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Wolfgang_Hawsey_Engine_Game_GameState_GetLegalPlays_" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.GetLegalPlays*"></a>
+
+  <h3 id="Wolfgang_Hawsey_Engine_Game_GameState_GetLegalPlays" data-uid="Wolfgang.Hawsey.Engine.Game.GameState.GetLegalPlays">
+  GetLegalPlays()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L319"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the legal cards the current player can play, or an empty list if not in trick play.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;Card&gt; GetLegalPlays()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Wolfgang.Hawsey.Engine.Cards.Card.html">Card</a>&gt;</dt>
+    <dd><p>A list of legal card plays.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/Chris-Wolfgang/Hawsey/blob/v0.1.0/src/Wolfgang.Hawsey.Engine/Game/GameState.cs/#L23" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Made with DocFX <script>(function(){var r='/';if(window.location.hostname.endsWith('.github.io')){var s=window.location.pathname.split('/').filter(Boolean);if(s.length)r='/'+s[0]+'/';}var t=document.createElement('script');t.src=r+'public/version-picker.js';t.async=true;document.head.appendChild(t);})();</script>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

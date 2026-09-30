@@ -1,0 +1,743 @@
+{
+  "docfx_version": "2.81.0+ba844df625370a6bd7c1ecab0d0ec4d1d9128ac4",
+  "source_base_path": "D:/a/Hawsey/Hawsey/docfx_project",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "Resource",
+      "output": {
+        "resource": {
+          "relative_path": "index.json"
+        }
+      }
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Bidding.BidAction.HawseyBid.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Bidding.BidAction.HawseyBid.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Bidding.BidAction.HawseyBid",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Bidding.BidAction.HawseyBid.yml\" sourcestartlinenumber=\"1\">A Hawsey bid — the player will attempt to take all 12 tricks alone.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Bidding.BidAction.NumberBid.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Bidding.BidAction.NumberBid.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Bidding.BidAction.NumberBid",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Bidding.BidAction.NumberBid.yml\" sourcestartlinenumber=\"1\">A numeric bid for a specific number of tricks.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Bidding.BidAction.PassBid.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Bidding.BidAction.PassBid.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Bidding.BidAction.PassBid",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Bidding.BidAction.PassBid.yml\" sourcestartlinenumber=\"1\">A pass — the player does not bid.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Bidding.BidAction.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Bidding.BidAction.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Bidding.BidAction",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Bidding.BidAction.yml\" sourcestartlinenumber=\"1\">Represents an action a player can take during the bidding phase.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Bidding.BiddingResult.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Bidding.BiddingResult.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Bidding.BiddingResult",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Bidding.BiddingResult.yml\" sourcestartlinenumber=\"1\">Represents the outcome of a bidding phase.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Bidding.PlacedBid.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Bidding.PlacedBid.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Bidding.PlacedBid",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Bidding.PlacedBid.yml\" sourcestartlinenumber=\"1\">One bid made in the current round: who made it and what it was. A UI shows these\nas each seat's bid (&quot;Pass&quot;, &quot;8&quot;, &quot;Hawsey&quot;).</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Bidding.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Bidding.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Bidding",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Cards.Card.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Cards.Card.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Cards.Card",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Cards.Card.yml\" sourcestartlinenumber=\"1\">Represents a single playing card in a pinochle deck.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Cards.CardComparer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Cards.CardComparer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Cards.CardComparer",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Cards.CardComparer.yml\" sourcestartlinenumber=\"1\">Compares two cards in the context of a trick, taking into account\nthe trump suit and the suit that was led.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Cards.CardRanking.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Cards.CardRanking.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Cards.CardRanking",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Cards.CardRanking.yml\" sourcestartlinenumber=\"1\">Provides methods to determine the effective suit and rank of a card\ngiven the current trump context. This is the single source of truth\nfor left bower behavior.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Cards.Deck.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Cards.Deck.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Cards.Deck",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Cards.Deck.yml\" sourcestartlinenumber=\"1\">Factory for creating and shuffling a pinochle deck.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Cards.Rank.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Cards.Rank.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Cards.Rank",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Cards.Rank.yml\" sourcestartlinenumber=\"1\">Represents the ranks in a pinochle deck (9 through Ace).</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Cards.Suit.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Cards.Suit.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Cards.Suit",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Cards.Suit.yml\" sourcestartlinenumber=\"1\">Represents the four suits in a standard deck.\nSuits are paired by color: Hearts/Diamonds (red) and Clubs/Spades (black).</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Cards.SuitExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Cards.SuitExtensions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Cards.SuitExtensions",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Cards.SuitExtensions.yml\" sourcestartlinenumber=\"1\">Extension methods for <xref href=\"Wolfgang.Hawsey.Engine.Cards.Suit\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Cards.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Cards.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Cards",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Game.GameEngine.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Game.GameEngine.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Game.GameEngine",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Game.GameEngine.yml\" sourcestartlinenumber=\"1\">The core game engine that manages state transitions for a Hawsey game.\nEach method takes the current state and returns a new state.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Game.GameOverEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Game.GameOverEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Game.GameOverEventArgs",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Game.GameOverEventArgs.yml\" sourcestartlinenumber=\"1\">Payload for <xref href=\"Wolfgang.Hawsey.Engine.Game.GameSession.GameOver\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Game.GamePhase.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Game.GamePhase.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Game.GamePhase",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Game.GamePhase.yml\" sourcestartlinenumber=\"1\">Represents the current phase of a Hawsey game.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Game.GameSession.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Game.GameSession.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Game.GameSession",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Game.GameSession.yml\" sourcestartlinenumber=\"1\">A live game between one human, always South, and three <xref href=\"Wolfgang.Hawsey.Engine.Strategy.SimpleAiStrategy\" data-throw-if-not-resolved=\"false\"></xref>\nseats. It is what every Hawsey UI drives: the UI calls the human's moves and the\nAI-advance methods, and redraws on <xref href=\"Wolfgang.Hawsey.Engine.Game.GameSession.StateChanged\" data-throw-if-not-resolved=\"false\"></xref>. The AI moves are\npaced so a person can follow them.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Game.GameState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Game.GameState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Game.GameState",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Game.GameState.yml\" sourcestartlinenumber=\"1\">A snapshot of the entire game state at a point in time. Each method on\n<xref href=\"Wolfgang.Hawsey.Engine.Game.GameEngine\" data-throw-if-not-resolved=\"false\"></xref> returns a freshly-constructed instance rather than mutating\nthe previous state, so callers should treat the exposed <xref href=\"Wolfgang.Hawsey.Engine.Game.GameState.Hands\" data-throw-if-not-resolved=\"false\"></xref> and\n<xref href=\"Wolfgang.Hawsey.Engine.Game.GameState.CompletedTricks\" data-throw-if-not-resolved=\"false\"></xref> collections as read-only — mutating them is unsupported\nand can corrupt subsequent engine transitions.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Game.TrickCompletedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Game.TrickCompletedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Game.TrickCompletedEventArgs",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Game.TrickCompletedEventArgs.yml\" sourcestartlinenumber=\"1\">Payload for <xref href=\"Wolfgang.Hawsey.Engine.Game.GameSession.TrickCompleted\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Game.WaitingFor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Game.WaitingFor.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Game.WaitingFor",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Game.WaitingFor.yml\" sourcestartlinenumber=\"1\">What a <xref href=\"Wolfgang.Hawsey.Engine.Game.GameSession\" data-throw-if-not-resolved=\"false\"></xref> is waiting for once <xref href=\"Wolfgang.Hawsey.Engine.Game.GameSession.AdvanceAsync\" data-throw-if-not-resolved=\"false\"></xref>\nhas played every AI move it can: the move a UI must now ask the human for, or the\npoint where the UI decides what happens next.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Game.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Game.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Game",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Players.PlayerPosition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Players.PlayerPosition.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Players.PlayerPosition",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Players.PlayerPosition.yml\" sourcestartlinenumber=\"1\">Represents a player's position at the table.\nPartners sit across: North/South and East/West.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Players.PlayerPositionExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Players.PlayerPositionExtensions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Players.PlayerPositionExtensions",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Players.PlayerPositionExtensions.yml\" sourcestartlinenumber=\"1\">Extension methods for <xref href=\"Wolfgang.Hawsey.Engine.Players.PlayerPosition\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Players.Team.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Players.Team.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Players.Team",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Players.Team.yml\" sourcestartlinenumber=\"1\">Represents one of the two teams in a Hawsey game.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Players.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Players.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Players",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Rules.HouseRules.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Rules.HouseRules.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Rules.HouseRules",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Rules.HouseRules.yml\" sourcestartlinenumber=\"1\">Configurable house rules for a Hawsey game.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Rules.TrumpMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Rules.TrumpMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Rules.TrumpMode",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Rules.TrumpMode.yml\" sourcestartlinenumber=\"1\">Represents the trump selection for a round.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Rules.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Rules.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Rules",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Scoring.RoundScore.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Scoring.RoundScore.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Scoring.RoundScore",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Scoring.RoundScore.yml\" sourcestartlinenumber=\"1\">Computes the scoring result for a single round of Hawsey.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Scoring.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Scoring.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Scoring",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Strategy.GameRunner.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Strategy.GameRunner.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Strategy.GameRunner",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Strategy.GameRunner.yml\" sourcestartlinenumber=\"1\">Convenience wrapper that runs a full Hawsey game to completion\nusing <xref href=\"Wolfgang.Hawsey.Engine.Strategy.IPlayerStrategy\" data-throw-if-not-resolved=\"false\"></xref> for player decisions.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Strategy.IPlayerStrategy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Strategy.IPlayerStrategy.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Strategy.IPlayerStrategy",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Strategy.IPlayerStrategy.yml\" sourcestartlinenumber=\"1\">Interface for player decision-making strategies.\nImplement this for AI players, UI-driven players, or network players.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Strategy.SimpleAiStrategy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Strategy.SimpleAiStrategy.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Strategy.SimpleAiStrategy",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.Strategy.SimpleAiStrategy.yml\" sourcestartlinenumber=\"1\">The AI player every Hawsey UI uses for its computer seats (through\n<xref href=\"Wolfgang.Hawsey.Engine.Game.GameSession\" data-throw-if-not-resolved=\"false\"></xref>). It bids on hand strength (trump length, jacks in\ntrump and aces outside it), names the suit that scores best, leads a card nothing\nleft can beat when it has one, lets its partner's winning card stand, and otherwise\nwins as cheaply as it can or throws its lowest card.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.Strategy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.Strategy.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.Strategy",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.TrickPlay.FollowSuitValidator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.TrickPlay.FollowSuitValidator.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.TrickPlay.FollowSuitValidator",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.TrickPlay.FollowSuitValidator.yml\" sourcestartlinenumber=\"1\">Validates which cards in a player's hand are legal to play in the current trick,\ntaking into account follow-suit rules, trump rules, and house rules.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.TrickPlay.PlayedCard.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.TrickPlay.PlayedCard.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.TrickPlay.PlayedCard",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.TrickPlay.PlayedCard.yml\" sourcestartlinenumber=\"1\">Represents a card that has been played in a trick, along with\nwho played it and the order in which it was played.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.TrickPlay.Trick.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.TrickPlay.Trick.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.TrickPlay.Trick",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.TrickPlay.Trick.yml\" sourcestartlinenumber=\"1\">Manages a single trick, collecting played cards and determining the winner.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.TrickPlay.TrickResult.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.TrickPlay.TrickResult.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.TrickPlay.TrickResult",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Hawsey.Engine.TrickPlay.TrickResult.yml\" sourcestartlinenumber=\"1\">Represents the outcome of a completed trick.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Hawsey.Engine.TrickPlay.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Hawsey.Engine.TrickPlay.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Hawsey.Engine.TrickPlay",
+      "Summary": null
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "api/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "api/index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "api/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toc.html"
+        },
+        ".json": {
+          "relative_path": "api/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "apple-touch-icon.png",
+      "output": {
+        "resource": {
+          "relative_path": "apple-touch-icon.png"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/getting-started.md",
+      "output": {
+        ".html": {
+          "relative_path": "docs/getting-started.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "docs/index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/introduction.md",
+      "output": {
+        ".html": {
+          "relative_path": "docs/introduction.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "docs/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "docs/toc.html"
+        },
+        ".json": {
+          "relative_path": "docs/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "favicon.ico",
+      "output": {
+        "resource": {
+          "relative_path": "favicon.ico"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "favicon.svg",
+      "output": {
+        "resource": {
+          "relative_path": "favicon.svg"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "index.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "logo.svg",
+      "output": {
+        "resource": {
+          "relative_path": "logo.svg"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "public/version-picker.js",
+      "output": {
+        "resource": {
+          "relative_path": "public/version-picker.js"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toc.html"
+        },
+        ".json": {
+          "relative_path": "toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "versions.json",
+      "output": {
+        "resource": {
+          "relative_path": "versions.json"
+        }
+      },
+      "version": ""
+    }
+  ],
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}

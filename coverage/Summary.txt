@@ -1,0 +1,89 @@
+Summary
+  Generated on: 9/30/2026 - 4:05:21 PM
+  Coverage date: 9/30/2026 - 4:05:14 PM - 9/30/2026 - 4:05:20 PM
+  Parser: MultiReport (2x Cobertura)
+  Assemblies: 3
+  Classes: 63
+  Files: 62
+  Line coverage: 99.9%
+  Covered lines: 3795
+  Uncovered lines: 2
+  Coverable lines: 3797
+  Total lines: 10033
+  Branch coverage: 95% (831 of 874)
+  Covered branches: 831
+  Total branches: 874
+  Method coverage: 100% (565 of 565)
+  Full method coverage: 99.6% (563 of 565)
+  Covered methods: 565
+  Fully covered methods: 563
+  Total methods: 565
+
+Wolfgang.Hawsey.Engine                                                                  99.8%
+  Wolfgang.Hawsey.Engine.Bidding.BidAction                                               100%
+  Wolfgang.Hawsey.Engine.Bidding.BiddingResult                                           100%
+  Wolfgang.Hawsey.Engine.Bidding.PlacedBid                                               100%
+  Wolfgang.Hawsey.Engine.Cards.Card                                                      100%
+  Wolfgang.Hawsey.Engine.Cards.CardComparer                                              100%
+  Wolfgang.Hawsey.Engine.Cards.CardRanking                                               100%
+  Wolfgang.Hawsey.Engine.Cards.Deck                                                      100%
+  Wolfgang.Hawsey.Engine.Cards.SuitExtensions                                            100%
+  Wolfgang.Hawsey.Engine.Game.GameEngine                                                99.7%
+  Wolfgang.Hawsey.Engine.Game.GameOverEventArgs                                          100%
+  Wolfgang.Hawsey.Engine.Game.GameSession                                                100%
+  Wolfgang.Hawsey.Engine.Game.GameState                                                  100%
+  Wolfgang.Hawsey.Engine.Game.TrickCompletedEventArgs                                    100%
+  Wolfgang.Hawsey.Engine.Players.PlayerPositionExtensions                                100%
+  Wolfgang.Hawsey.Engine.Rules.HouseRules                                                100%
+  Wolfgang.Hawsey.Engine.Scoring.RoundScore                                              100%
+  Wolfgang.Hawsey.Engine.Strategy.GameRunner                                              97%
+  Wolfgang.Hawsey.Engine.Strategy.SimpleAiStrategy                                       100%
+  Wolfgang.Hawsey.Engine.TrickPlay.FollowSuitValidator                                   100%
+  Wolfgang.Hawsey.Engine.TrickPlay.PlayedCard                                            100%
+  Wolfgang.Hawsey.Engine.TrickPlay.Trick                                                 100%
+  Wolfgang.Hawsey.Engine.TrickPlay.TrickResult                                           100%
+
+Wolfgang.Hawsey.Engine.Tests.Unit                                                        100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Cards.CardComparerTests                              100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Cards.CardRankingTests                               100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Cards.CardTests                                      100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Cards.DeckTests                                      100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Cards.SuitExtensionsTests                            100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Game.EngineAiIntegrationTests                        100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Game.GameEngineBiddingTests                          100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Game.GameEngineRoundTests                            100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Game.GameEngineTests                                 100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Game.GameRunnerTests                                 100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Game.GameSessionAdvanceTests                         100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Game.GameSessionBidRulesTests                        100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Game.GameSessionBidsAndExchangeTests                 100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Game.GameSessionEventTests                           100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Game.GameSessionNewGameDuringPauseTests              100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Game.GameSessionTests                                100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Game.GameStateBiddingProgressTests                   100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Game.GameStateTableAndRoundScoreTests                100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Game.GameStateWinnerTests                            100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Globalization.CultureInvarianceTests                 100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Helpers.PassingAi                                    100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Helpers.PassingAiTests                               100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Helpers.RoundDriver                                  100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Helpers.TestGameSessions                             100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Helpers.TestPlayerStrategy                           100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Packaging.VersionMetadataTests                       100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Players.PlayerPositionExtensionsTests                100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.PropertyBased.EnginePropertyTests                    100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.PropertyBased.FuzzPropertyAttribute                  100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.PropertyBased.FuzzPropertyAttributeTests             100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.PropertyBased.RoundScoringPropertyTests              100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.PropertyBased.TransitionImmutabilityPropertyTests    100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Rules.HouseRulesTests                                100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Scoring.RoundScoreTests                              100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Strategy.SimpleAiStrategyBehaviourTests              100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Strategy.SimpleAiStrategyBiddingAndLeadTests         100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.Strategy.SimpleAiStrategyTests                       100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.TrickPlay.FollowSuitValidatorTests                   100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.TrickPlay.PlayedCardTests                            100%
+  Wolfgang.Hawsey.Engine.Tests.Unit.TrickPlay.TrickTests                                 100%
+
+Wolfgang.Hawsey.UI.Maui.Tests.Concurrency                                                100%
+  Wolfgang.Hawsey.UI.Maui.Tests.Concurrency.GameSessionConcurrencyTests                  100%
