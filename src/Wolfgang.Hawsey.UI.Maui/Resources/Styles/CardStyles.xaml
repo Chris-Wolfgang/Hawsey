@@ -1,9 +1,190 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!-- The table's look, taken from the Blazor UI's site.css so both UIs look the same. -->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
+    <!-- site.css :root -->
+    <Color x:Key="Gold">#FFD4AF37</Color>
+    <Color x:Key="UsBlue">#FF4A9EFF</Color>
+    <Color x:Key="ThemRed">#FFE84A4A</Color>
+    <Color x:Key="PanelBackground">#8C000000</Color>
+    <Color x:Key="PanelBorder">#99D4AF37</Color>
+    <Color x:Key="CardFace">#FFFBF6E9</Color>
+    <Color x:Key="TextLight">#FFF5F5F5</Color>
+    <Color x:Key="WinGreen">#FF6CF06C</Color>
+
     <!-- Hand card borders, read by BoolToStrokeConverter: a playable card and the rest -->
-    <Color x:Key="LegalPlayHighlight">#FF66BB6A</Color>
-    <Color x:Key="CardBorder">#FF424242</Color>
+    <Color x:Key="LegalPlayHighlight">#FF6CF06C</Color>
+    <Color x:Key="CardBorder">#FF6B6B6B</Color>
+
+    <!-- The felt: .table's radial gradient, with the wood rim around it -->
+    <RadialGradientBrush x:Key="FeltBrush" Center="0.5,0.5" Radius="0.75">
+        <GradientStop Color="#FF2A7048" Offset="0" />
+        <GradientStop Color="#FF1F5938" Offset="0.55" />
+        <GradientStop Color="#FF14391F" Offset="1" />
+    </RadialGradientBrush>
+    <Color x:Key="TableRim">#FF6B3A18</Color>
+
+    <!-- The face-down cards in the AI seats' hands (.card-back) -->
+    <LinearGradientBrush x:Key="CardBackStripes" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#1D3A8A" Offset="0.0000" />
+        <GradientStop Color="#1D3A8A" Offset="0.0294" />
+        <GradientStop Color="#2752C0" Offset="0.0294" />
+        <GradientStop Color="#2752C0" Offset="0.0588" />
+        <GradientStop Color="#1D3A8A" Offset="0.0588" />
+        <GradientStop Color="#1D3A8A" Offset="0.0882" />
+        <GradientStop Color="#2752C0" Offset="0.0882" />
+        <GradientStop Color="#2752C0" Offset="0.1176" />
+        <GradientStop Color="#1D3A8A" Offset="0.1176" />
+        <GradientStop Color="#1D3A8A" Offset="0.1471" />
+        <GradientStop Color="#2752C0" Offset="0.1471" />
+        <GradientStop Color="#2752C0" Offset="0.1765" />
+        <GradientStop Color="#1D3A8A" Offset="0.1765" />
+        <GradientStop Color="#1D3A8A" Offset="0.2059" />
+        <GradientStop Color="#2752C0" Offset="0.2059" />
+        <GradientStop Color="#2752C0" Offset="0.2353" />
+        <GradientStop Color="#1D3A8A" Offset="0.2353" />
+        <GradientStop Color="#1D3A8A" Offset="0.2647" />
+        <GradientStop Color="#2752C0" Offset="0.2647" />
+        <GradientStop Color="#2752C0" Offset="0.2941" />
+        <GradientStop Color="#1D3A8A" Offset="0.2941" />
+        <GradientStop Color="#1D3A8A" Offset="0.3235" />
+        <GradientStop Color="#2752C0" Offset="0.3235" />
+        <GradientStop Color="#2752C0" Offset="0.3529" />
+        <GradientStop Color="#1D3A8A" Offset="0.3529" />
+        <GradientStop Color="#1D3A8A" Offset="0.3824" />
+        <GradientStop Color="#2752C0" Offset="0.3824" />
+        <GradientStop Color="#2752C0" Offset="0.4118" />
+        <GradientStop Color="#1D3A8A" Offset="0.4118" />
+        <GradientStop Color="#1D3A8A" Offset="0.4412" />
+        <GradientStop Color="#2752C0" Offset="0.4412" />
+        <GradientStop Color="#2752C0" Offset="0.4706" />
+        <GradientStop Color="#1D3A8A" Offset="0.4706" />
+        <GradientStop Color="#1D3A8A" Offset="0.5000" />
+        <GradientStop Color="#2752C0" Offset="0.5000" />
+        <GradientStop Color="#2752C0" Offset="0.5294" />
+        <GradientStop Color="#1D3A8A" Offset="0.5294" />
+        <GradientStop Color="#1D3A8A" Offset="0.5588" />
+        <GradientStop Color="#2752C0" Offset="0.5588" />
+        <GradientStop Color="#2752C0" Offset="0.5882" />
+        <GradientStop Color="#1D3A8A" Offset="0.5882" />
+        <GradientStop Color="#1D3A8A" Offset="0.6176" />
+        <GradientStop Color="#2752C0" Offset="0.6176" />
+        <GradientStop Color="#2752C0" Offset="0.6471" />
+        <GradientStop Color="#1D3A8A" Offset="0.6471" />
+        <GradientStop Color="#1D3A8A" Offset="0.6765" />
+        <GradientStop Color="#2752C0" Offset="0.6765" />
+        <GradientStop Color="#2752C0" Offset="0.7059" />
+        <GradientStop Color="#1D3A8A" Offset="0.7059" />
+        <GradientStop Color="#1D3A8A" Offset="0.7353" />
+        <GradientStop Color="#2752C0" Offset="0.7353" />
+        <GradientStop Color="#2752C0" Offset="0.7647" />
+        <GradientStop Color="#1D3A8A" Offset="0.7647" />
+        <GradientStop Color="#1D3A8A" Offset="0.7941" />
+        <GradientStop Color="#2752C0" Offset="0.7941" />
+        <GradientStop Color="#2752C0" Offset="0.8235" />
+        <GradientStop Color="#1D3A8A" Offset="0.8235" />
+        <GradientStop Color="#1D3A8A" Offset="0.8529" />
+        <GradientStop Color="#2752C0" Offset="0.8529" />
+        <GradientStop Color="#2752C0" Offset="0.8824" />
+        <GradientStop Color="#1D3A8A" Offset="0.8824" />
+        <GradientStop Color="#1D3A8A" Offset="0.9118" />
+        <GradientStop Color="#2752C0" Offset="0.9118" />
+        <GradientStop Color="#2752C0" Offset="0.9412" />
+        <GradientStop Color="#1D3A8A" Offset="0.9412" />
+        <GradientStop Color="#1D3A8A" Offset="0.9706" />
+        <GradientStop Color="#2752C0" Offset="0.9706" />
+        <GradientStop Color="#2752C0" Offset="1.0000" />
+    </LinearGradientBrush>
+    <Style x:Key="CardBack" TargetType="Border">
+        <Setter Property="StrokeShape" Value="RoundRectangle 6" />
+        <Setter Property="Background" Value="{StaticResource CardBackStripes}" />
+        <Setter Property="Stroke" Value="#FF0C1C4A" />
+        <Setter Property="StrokeThickness" Value="1" />
+    </Style>
+
+    <!-- The dealer puck: a gold disc -->
+    <RadialGradientBrush x:Key="DealerPuckBrush" Center="0.32,0.3" Radius="0.7">
+        <GradientStop Color="#FFFFF8D8" Offset="0" />
+        <GradientStop Color="#FFF0D878" Offset="0.35" />
+        <GradientStop Color="#FFC8A23A" Offset="0.8" />
+        <GradientStop Color="#FF8B6F1A" Offset="1" />
+    </RadialGradientBrush>
+
+    <!-- The avatar disc on each nameplate -->
+    <LinearGradientBrush x:Key="AvatarBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#FF555555" Offset="0" />
+        <GradientStop Color="#FF222222" Offset="1" />
+    </LinearGradientBrush>
+
+    <!-- .panel: the tricks and score panels, the trick info -->
+    <Style x:Key="Panel" TargetType="Border">
+        <Setter Property="StrokeShape" Value="RoundRectangle 6" />
+        <Setter Property="BackgroundColor" Value="{StaticResource PanelBackground}" />
+        <Setter Property="Stroke" Value="{StaticResource PanelBorder}" />
+        <Setter Property="StrokeThickness" Value="1" />
+        <Setter Property="Padding" Value="14,8" />
+    </Style>
+
+    <!-- .modal-card -->
+    <Style x:Key="ModalCard" TargetType="Border">
+        <Setter Property="StrokeShape" Value="RoundRectangle 10" />
+        <Setter Property="BackgroundColor" Value="#FF1A3A26" />
+        <Setter Property="Stroke" Value="{StaticResource PanelBorder}" />
+        <Setter Property="StrokeThickness" Value="1" />
+        <Setter Property="Padding" Value="32,24" />
+        <Setter Property="MinimumWidthRequest" Value="300" />
+        <Setter Property="HorizontalOptions" Value="Center" />
+    </Style>
+    <Style x:Key="ModalTitle" TargetType="Label">
+        <Setter Property="TextColor" Value="{StaticResource Gold}" />
+        <Setter Property="FontSize" Value="21" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="HorizontalOptions" Value="Center" />
+        <Setter Property="Margin" Value="0,0,0,12" />
+    </Style>
+    <Style x:Key="ModalSub" TargetType="Label">
+        <Setter Property="TextColor" Value="#FFCFCFCF" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="HorizontalTextAlignment" Value="Center" />
+        <Setter Property="HorizontalOptions" Value="Center" />
+        <Setter Property="Margin" Value="0,0,0,12" />
+    </Style>
+
+    <!-- .btn and its variants -->
+    <Style x:Key="TableButton" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="#99000000" />
+        <Setter Property="BorderColor" Value="{StaticResource PanelBorder}" />
+        <Setter Property="BorderWidth" Value="1" />
+        <Setter Property="TextColor" Value="{StaticResource TextLight}" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="16,8" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="PointerOver">
+                        <VisualState.Setters>
+                            <Setter Property="BackgroundColor" Value="#CC000000" />
+                        </VisualState.Setters>
+                    </VisualState>
+                    <VisualState x:Name="Disabled">
+                        <VisualState.Setters>
+                            <Setter Property="Opacity" Value="0.5" />
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+    <Style x:Key="PrimaryButton" TargetType="Button" BasedOn="{StaticResource TableButton}">
+        <Setter Property="BackgroundColor" Value="#CC286E3C" />
+        <Setter Property="BorderColor" Value="#FF6CF06C" />
+        <Setter Property="TextColor" Value="#FFEAFFEA" />
+    </Style>
+    <Style x:Key="RedButton" TargetType="Button" BasedOn="{StaticResource TableButton}">
+        <Setter Property="TextColor" Value="#FFFF8A8A" />
+    </Style>
 
 </ResourceDictionary>

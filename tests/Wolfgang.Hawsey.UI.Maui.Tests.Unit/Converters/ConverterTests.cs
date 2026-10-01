@@ -36,8 +36,8 @@ public sealed class ConverterTests : IDisposable
         var converter = new BoolToOpacityConverter();
 
         Assert.Equal(1.0, Convert(converter, true));
-        Assert.Equal(0.5, Convert(converter, false));
-        Assert.Equal(0.5, Convert(converter, null));
+        Assert.Equal(0.55, Convert(converter, false));
+        Assert.Equal(0.55, Convert(converter, null));
     }
 
 

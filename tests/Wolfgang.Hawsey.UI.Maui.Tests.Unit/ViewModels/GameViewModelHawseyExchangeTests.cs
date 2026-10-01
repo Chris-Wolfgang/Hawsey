@@ -45,9 +45,9 @@ public class GameViewModelHawseyExchangeTests
 
         Assert.Equal(GamePhase.HawseyExchange, _session.CurrentState!.Phase);
         Assert.True(_vm.IsHawseyExchangeVisible);
-        Assert.Equal("Hawsey! Tap two cards to discard", _vm.StatusMessage);
+        Assert.Equal("Hawsey! Pick 2 cards to discard.", _vm.StatusMessage);
         Assert.Equal("Selected: 0 / 2", _vm.ExchangeSelectionText);
-        Assert.All(_vm.HumanCards, c => Assert.True(c.IsLegal));
+        Assert.All(_vm.HumanCards, c => Assert.True(c.IsInteractive));
         Assert.All(_vm.HumanCards, c => Assert.False(c.IsSelected));
         Assert.False(_vm.ConfirmHawseyExchangeCommand.CanExecute(null));
     }
@@ -122,7 +122,7 @@ public class GameViewModelHawseyExchangeTests
         Assert.Equal(hand.Count, newHand.Count);
         Assert.All(_vm.HumanCards, c => Assert.False(c.IsSelected));
         Assert.Equal("Selected: 0 / 2", _vm.ExchangeSelectionText);
-        Assert.Equal("Your turn to play", _vm.StatusMessage);
+        Assert.Equal("Your turn. Play a card.", _vm.StatusMessage);
     }
 
 
