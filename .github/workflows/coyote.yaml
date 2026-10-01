@@ -10,9 +10,9 @@ name: Coyote (concurrency)
 #   - monthly soak: 1,000,000 iterations per test, capped at five hours
 # HAWSEY_COYOTE_ITERATIONS drives the count. A failed scheduled run uploads the
 # test log (with Coyote's bug report) and opens an issue saying what happened: a
-# bug only when the tests ran to the end and failed; otherwise that the run did
-# not finish (the timeout hit or the runner was lost), which is not evidence of a
-# bug (#943).
+# bug only when a test failed (a failed result in the TRX); otherwise that the
+# run failed without a test failure (setup, build, timeout, crash or a lost
+# runner), which is not evidence of a bug (#943).
 
 on:
   schedule:
@@ -38,9 +38,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 330
     outputs:
-      # "true" once the tests ran to the end, passed or failed. Unset when the
-      # timeout or a lost runner stopped them first.
-      finished: ${{ steps.run.outputs.finished }}
+      # "true" only when the test results record a failed test: Coyote's bug
+      # report. Unset for every other failure.
+      test-failed: ${{ steps.run.outputs.test-failed }}
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
@@ -65,6 +65,10 @@ jobs:
       - name: Restore tools (dotnet coyote)
         run: dotnet tool restore
 
+      # Built here, so a restore or build failure fails this step, not the tests.
+      - name: Build the Coyote tests
+        run: dotnet build tests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency.csproj -c Release
+
       - name: Run Coyote tests
         id: run
         env:
@@ -74,12 +78,13 @@ jobs:
           mkdir -p coyote-results
           status=0
           timeout 300m dotnet test tests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency.csproj \
-            -c Release \
+            -c Release --no-build \
             --logger "trx;LogFileName=coyote.trx" --results-directory coyote-results \
             2>&1 | tee coyote-results/coyote.log || status=$?
-          # 124: `timeout` stopped the tests. Any other status means they ran to the end.
-          if [ "$status" -ne 124 ]; then
-            echo "finished=true" >> "$GITHUB_OUTPUT"
+          # A bug is a test the results record as failed. A timeout, a test-host
+          # crash or a logging failure fails the step without one.
+          if grep -qs '<UnitTestResult[^>]*outcome="Failed"' coyote-results/coyote.trx; then
+            echo "test-failed=true" >> "$GITHUB_OUTPUT"
           fi
           exit "$status"
 
@@ -102,26 +107,26 @@ jobs:
     steps:
       - name: Open or update the tracking issue
         # One open issue per failure stream: a repeat failure comments on it
-        # instead of opening a new issue on every scheduled run. A bug and a run
-        # that did not finish are separate streams, with separate titles.
+        # instead of opening a new issue on every scheduled run. A failed test and
+        # any other failure are separate streams, with separate titles.
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          FINISHED: ${{ needs.coyote.outputs.finished }}
+          TEST_FAILED: ${{ needs.coyote.outputs.test-failed }}
         run: |
-          if [ "$FINISHED" = "true" ]; then
+          if [ "$TEST_FAILED" = "true" ]; then
             export TITLE="Coyote: a concurrency bug was found in GameSession"
             label=bug
             body="The scheduled Coyote run failed: $RUN_URL
 
           Download the \`coyote-results\` artifact. \`coyote.log\` has Coyote's bug report and the failing schedule. Fix the race, and keep the scenario as a test in \`tests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency\`."
           else
-            export TITLE="Coyote: the scheduled run did not finish"
+            export TITLE="Coyote: the scheduled run failed without a test failure"
             label=maintenance
-            body="The scheduled Coyote run stopped before its tests finished: $RUN_URL
+            body="The scheduled Coyote run failed, but no test recorded a failure: $RUN_URL
 
-          The 300-minute timeout or a lost runner ended it, so Coyote produced no bug report, and this is not evidence of a concurrency bug. Check where the run's log stops, and whether the iteration budget still fits the runner's time and memory (#943)."
+          So Coyote produced no bug report, and this is not evidence of a concurrency bug. The run's log shows which step failed and why (#943 was a soak that ran out of runner memory)."
           fi
           existing=$(gh issue list --repo "$REPO" --state open --limit 100 --json number,title \
                        --jq '.[] | select(.title == env.TITLE) | .number' | head -1)
