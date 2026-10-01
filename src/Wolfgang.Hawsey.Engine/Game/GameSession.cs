@@ -3,6 +3,7 @@ using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Players;
 using Wolfgang.Hawsey.Engine.Rules;
 using Wolfgang.Hawsey.Engine.Strategy;
+using Wolfgang.Hawsey.Engine.TrickPlay;
 
 namespace Wolfgang.Hawsey.Engine.Game;
 
@@ -46,6 +47,11 @@ public class GameSession
     private readonly List<PlacedBid> _bids = new();
     private Random _random;
     private int _generation;
+
+    // The state whose won trick has been cleared from the table, so the human leads to
+    // an empty table. Any later state (the next lead, a new round, a new game) is a
+    // different instance, so the table shows again without resetting this.
+    private GameState? _clearedTable;
 
 
 
@@ -128,6 +134,24 @@ public class GameSession
             }
         }
     }
+
+
+
+    /// <summary>
+    /// Gets the cards to show on the table. This is <see cref="GameState.TableCards"/>, but
+    /// when the human wins a trick and is to lead, the won trick shows only for a moment:
+    /// the table then clears (with <see cref="StateChanged"/>) so the human leads to an empty
+    /// table. After an AI wins, its lead replaces the trick anyway.
+    /// </summary>
+    public IReadOnlyList<PlayedCard> TableCards => IsTableCleared(out var state) ? Array.Empty<PlayedCard>() : state?.TableCards ?? Array.Empty<PlayedCard>();
+
+
+
+    /// <summary>
+    /// Gets the card winning the trick in <see cref="TableCards"/>, or <see langword="null"/>
+    /// when the table is empty.
+    /// </summary>
+    public Card? TableWinningCard => IsTableCleared(out var state) ? null : state?.TableWinningCard;
 
 
 
@@ -541,25 +565,26 @@ public class GameSession
     public async Task<bool> AdvanceAiPlaysAsync()
     {
         var generation = CurrentGeneration();
+        var pausedAfterTrick = false;
 
         while (true)
         {
-            PlayerPosition player;
+            var step = NextPlayStep(generation);
 
-            lock (_sync)
+            // Stop: false; the human to play: true.
+            if (step.Kind is PlayStepKind.Stop or PlayStepKind.HumanPlays)
             {
-                if (generation != _generation || _state is not { Phase: GamePhase.TrickPlay, NextToAct: { } next })
-                {
-                    return false;
-                }
-
-                if (next == HumanPosition)
-                {
-                    return true;
-                }
-
-                player = next;
+                return step.Kind == PlayStepKind.HumanPlays;
             }
+
+            if (step.Kind == PlayStepKind.ClearWonTrick)
+            {
+                // Then look again: the human may have played, or a New Game started, meanwhile.
+                await ClearWonTrickAsync(generation, step.State!, pausedAfterTrick).ConfigureAwait(false);
+                continue;
+            }
+
+            var player = step.Player;
 
             await PauseAsync(400).ConfigureAwait(false);
 
@@ -576,6 +601,7 @@ public class GameSession
             {
                 TrickCompleted?.Invoke(this, outcome.TrickCompleted);
                 await PauseAsync(800).ConfigureAwait(false);
+                pausedAfterTrick = true;
 
                 // New Game during the pause: the finished game's round or game end
                 // must not be announced into the new game.
@@ -596,6 +622,92 @@ public class GameSession
                 GameOver?.Invoke(this, outcome.GameOver);
                 return false;
             }
+        }
+    }
+
+
+
+    private enum PlayStepKind
+    {
+        /// <summary>The game moved on, or it is not trick play: the loop stops.</summary>
+        Stop,
+
+        /// <summary>The human is to play, with nothing to clear from the table.</summary>
+        HumanPlays,
+
+        /// <summary>The human won the trick on the table and leads next: clear it first.</summary>
+        ClearWonTrick,
+
+        /// <summary>An AI seat is to play.</summary>
+        AiPlays,
+    }
+
+
+
+    private readonly record struct PlayStep(PlayStepKind Kind, PlayerPosition Player = default, GameState? State = null);
+
+
+
+    /// <summary>What the AI play loop does next, read under the lock.</summary>
+    private PlayStep NextPlayStep(int generation)
+    {
+        lock (_sync)
+        {
+            if (generation != _generation || _state is not { Phase: GamePhase.TrickPlay, NextToAct: { } next } state)
+            {
+                return new PlayStep(PlayStepKind.Stop);
+            }
+
+            if (next != HumanPosition)
+            {
+                return new PlayStep(PlayStepKind.AiPlays, next);
+            }
+
+            var wonTrickOnTable = state.CurrentTrick is not { Plays.Count: > 0 }
+                && state.CompletedTricks.Count > 0
+                && !ReferenceEquals(state, _clearedTable);
+
+            return wonTrickOnTable
+                ? new PlayStep(PlayStepKind.ClearWonTrick, next, state)
+                : new PlayStep(PlayStepKind.HumanPlays);
+        }
+    }
+
+
+
+    /// <summary>
+    /// The human won the trick on the table and leads next: after the pause that lets the
+    /// player see the trick (skipped when the AI loop has just paused after it), clear
+    /// the table. Nothing is cleared if the game moved on during the pause.
+    /// </summary>
+    private async Task ClearWonTrickAsync(int generation, GameState wonTrick, bool alreadyPaused)
+    {
+        if (!alreadyPaused)
+        {
+            await PauseAsync(800).ConfigureAwait(false);
+        }
+
+        lock (_sync)
+        {
+            if (generation != _generation || !ReferenceEquals(_state, wonTrick))
+            {
+                return;
+            }
+
+            _clearedTable = wonTrick;
+        }
+
+        StateChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+
+
+    private bool IsTableCleared(out GameState? state)
+    {
+        lock (_sync)
+        {
+            state = _state;
+            return state != null && ReferenceEquals(state, _clearedTable);
         }
     }
 
