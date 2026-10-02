@@ -27,21 +27,39 @@ public class GameSessionConcurrencyTests
     /// passes a <paramref name="costFactor"/> so it gets a proportionally smaller share
     /// of the iteration budget and stays quick on every PR run.
     /// </summary>
+    /// <remarks>
+    /// The iterations run in batches, each in a new <see cref="TestingEngine"/>. An engine
+    /// keeps data for every iteration it explores until it is disposed (about 0.5 MB per
+    /// whole game), so one engine for the monthly soak's budget ran a GitHub runner out of
+    /// memory (#943). Measured with a forced collection after each disposed engine, the live
+    /// heap stays flat from batch to batch: the growth is the engine's, not a leak.
+    /// </remarks>
     private static void RunSystematicTest(Func<Task> scenario, uint costFactor = 1)
     {
-        var configuration = Configuration
-            .Create()
-            .WithTestingIterations(Math.Max(10u, Iterations / costFactor))
-            .WithMaxSchedulingSteps(5000);
-        using var engine = TestingEngine.Create(configuration, scenario);
+        const uint IterationsPerEngine = 5000;
 
-        engine.Run();
+        var batch = Math.Max(1u, IterationsPerEngine / costFactor);
+        var remaining = Math.Max(10u, Iterations / costFactor);
 
-        Assert.True
-        (
-            engine.TestReport.NumOfFoundBugs == 0,
-            string.Join(Environment.NewLine, engine.TestReport.BugReports)
-        );
+        while (remaining > 0)
+        {
+            var iterations = Math.Min(batch, remaining);
+            remaining -= iterations;
+
+            var configuration = Configuration
+                .Create()
+                .WithTestingIterations(iterations)
+                .WithMaxSchedulingSteps(5000);
+            using var engine = TestingEngine.Create(configuration, scenario);
+
+            engine.Run();
+
+            Assert.True
+            (
+                engine.TestReport.NumOfFoundBugs == 0,
+                string.Join(Environment.NewLine, engine.TestReport.BugReports)
+            );
+        }
     }
 
 
