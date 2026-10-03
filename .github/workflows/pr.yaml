@@ -43,6 +43,9 @@ on:
   pull_request:
     branches:
       - main
+      # The MAUI app's development branch: its PRs get the same gates as main's, so
+      # the app is tested and coverage-gated before dev/maui merges to main.
+      - dev/maui
   # A push to main re-runs the same gates on the merged result and keeps the InspectCode
   # alert set on main current (a pull_request run attributes its SARIF to the PR ref).
   push:
