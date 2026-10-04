@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1790788560729,
+  "lastUpdate": 1791156700042,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -142,6 +142,54 @@ window.BENCHMARK_DATA = {
             "value": 241068.83650716147,
             "unit": "ns",
             "range": "± 2704.348361714831"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6d67920fc8a0e702f67badc6447fda3726d8839b",
+          "message": "Bump the dotnet-dependencies group with 8 updates (#950)\n\nBumps coverlet.collector from 10.0.1 to 10.1.0\nBumps jetbrains.resharper.globaltools from 2026.2.2 to 2026.2.3.1\nBumps Meziantou.Analyzer from 3.0.290 to 3.0.294\nBumps Microsoft.AspNetCore.Components.Web from 10.0.0 to 10.0.12\nBumps Microsoft.AspNetCore.Components.WebAssembly from 10.0.0 to 10.0.12\nBumps Microsoft.AspNetCore.Components.WebAssembly.DevServer from 10.0.0 to 10.0.12\nBumps microsoft.cst.devskim.cli from 1.0.90 to 1.0.100\nBumps SonarAnalyzer.CSharp from 10.34.0.3385 to 10.35.0.4138\n\n---\nupdated-dependencies:\n- dependency-name: coverlet.collector\n  dependency-version: 10.1.0\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: dotnet-dependencies\n- dependency-name: coverlet.collector\n  dependency-version: 10.1.0\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: dotnet-dependencies\n- dependency-name: jetbrains.resharper.globaltools\n  dependency-version: 2026.2.3.1\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Meziantou.Analyzer\n  dependency-version: 3.0.294\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Microsoft.AspNetCore.Components.Web\n  dependency-version: 10.0.12\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Microsoft.AspNetCore.Components.WebAssembly\n  dependency-version: 10.0.12\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Microsoft.AspNetCore.Components.WebAssembly.DevServer\n  dependency-version: 10.0.12\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: microsoft.cst.devskim.cli\n  dependency-version: 1.0.100\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: SonarAnalyzer.CSharp\n  dependency-version: 10.35.0.4138\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: dotnet-dependencies\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>\nCo-authored-by: Chris Wolfgang <210299580+Chris-Wolfgang@users.noreply.github.com>",
+          "timestamp": "2026-10-04T19:30:31-04:00",
+          "tree_id": "e260f5f982dad7177ea9a78cab01a70de751a147",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/6d67920fc8a0e702f67badc6447fda3726d8839b"
+        },
+        "date": 1791156698217,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 566.2644271850586,
+            "unit": "ns",
+            "range": "± 0.922463329546992"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 74.88915232817332,
+            "unit": "ns",
+            "range": "± 0.2468984095134897"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 249.02357784907022,
+            "unit": "ns",
+            "range": "± 1.0823288924679006"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 442573.40380859375,
+            "unit": "ns",
+            "range": "± 457.72083172273005"
           }
         ]
       }
