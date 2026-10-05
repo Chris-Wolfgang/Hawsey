@@ -14,367 +14,375 @@
              Shell.NavBarIsVisible="False"
              BackgroundColor="Black">
 
-    <Border Stroke="{StaticResource TableRim}" StrokeThickness="14" StrokeShape="Rectangle"
-            Background="{StaticResource FeltBrush}">
-        <Grid>
+    <!-- The table is laid out at a fixed design size and scaled to fit the screen
+         (TableScale; the code-behind sets its bounds and applies the scale). It is
+         measured against TableHost, the space the page actually has: on Android that
+         is the page less the system bars. -->
+    <AbsoluteLayout x:Name="TableHost">
+        <Border x:Name="Table"
+                AnchorX="0" AnchorY="0"
+                Stroke="{StaticResource TableRim}" StrokeThickness="14" StrokeShape="Rectangle"
+                Background="{StaticResource FeltBrush}">
+            <Grid>
 
-            <!-- Trump watermarks in the four corners of the felt -->
-            <AbsoluteLayout InputTransparent="True" IsVisible="{Binding HasTrumpSuit}">
-                <AbsoluteLayout.Resources>
-                    <Style TargetType="Label">
-                        <Setter Property="FontSize" Value="96" />
-                        <Setter Property="Opacity" Value="0.22" />
-                    </Style>
-                </AbsoluteLayout.Resources>
-                <Label AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.28,0.28,-1,-1"
-                       Text="{Binding TrumpSymbol}" TextColor="{Binding TrumpMarkColor}" />
-                <Label AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.72,0.28,-1,-1"
-                       Text="{Binding TrumpSymbol}" TextColor="{Binding TrumpMarkColor}" />
-                <Label AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.28,0.72,-1,-1"
-                       Text="{Binding TrumpSymbol}" TextColor="{Binding TrumpMarkColor}" />
-                <Label AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.72,0.72,-1,-1"
-                       Text="{Binding TrumpSymbol}" TextColor="{Binding TrumpMarkColor}" />
-            </AbsoluteLayout>
+                <!-- Trump watermarks in the four corners of the felt -->
+                <AbsoluteLayout InputTransparent="True" IsVisible="{Binding HasTrumpSuit}">
+                    <AbsoluteLayout.Resources>
+                        <Style TargetType="Label">
+                            <Setter Property="FontSize" Value="96" />
+                            <Setter Property="Opacity" Value="0.22" />
+                        </Style>
+                    </AbsoluteLayout.Resources>
+                    <Label AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.28,0.28,-1,-1"
+                           Text="{Binding TrumpSymbol}" TextColor="{Binding TrumpMarkColor}" />
+                    <Label AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.72,0.28,-1,-1"
+                           Text="{Binding TrumpSymbol}" TextColor="{Binding TrumpMarkColor}" />
+                    <Label AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.28,0.72,-1,-1"
+                           Text="{Binding TrumpSymbol}" TextColor="{Binding TrumpMarkColor}" />
+                    <Label AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.72,0.72,-1,-1"
+                           Text="{Binding TrumpSymbol}" TextColor="{Binding TrumpMarkColor}" />
+                </AbsoluteLayout>
 
-            <!-- Tricks (total) and trump, top left -->
-            <Border Style="{StaticResource Panel}" HorizontalOptions="Start" VerticalOptions="Start"
-                    Margin="16" MinimumWidthRequest="175">
-                <VerticalStackLayout Spacing="4">
-                    <Label Text="TRICKS (TOTAL)" TextColor="{StaticResource Gold}" FontSize="13" HorizontalOptions="Center" />
-                    <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="18" HorizontalOptions="Center">
-                        <VerticalStackLayout Grid.Column="0">
-                            <Label Text="US" TextColor="{StaticResource UsBlue}" FontSize="12" HorizontalOptions="Center" />
-                            <Label Text="{Binding UsTricks}" TextColor="{StaticResource TextLight}" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
-                        </VerticalStackLayout>
-                        <VerticalStackLayout Grid.Column="1">
-                            <Label Text="THEM" TextColor="{StaticResource ThemRed}" FontSize="12" HorizontalOptions="Center" />
-                            <Label Text="{Binding ThemTricks}" TextColor="{StaticResource TextLight}" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
-                        </VerticalStackLayout>
-                    </Grid>
-                    <HorizontalStackLayout Spacing="5" HorizontalOptions="Center">
-                        <Label Text="Trump:" TextColor="White" FontSize="13" VerticalOptions="Center" />
-                        <Label Text="{Binding TrumpSymbol}" TextColor="{StaticResource TextLight}" FontSize="17" VerticalOptions="Center">
-                            <Label.Triggers>
-                                <DataTrigger TargetType="Label" Binding="{Binding IsTrumpRed}" Value="True">
-                                    <Setter Property="TextColor" Value="#FFFF5A5A" />
-                                </DataTrigger>
-                            </Label.Triggers>
-                        </Label>
-                        <Label Text="{Binding TrumpSetterTeam}" TextColor="{StaticResource ThemRed}" FontSize="13" FontAttributes="Bold" VerticalOptions="Center">
-                            <Label.Triggers>
-                                <DataTrigger TargetType="Label" Binding="{Binding IsTrumpSetterUs}" Value="True">
-                                    <Setter Property="TextColor" Value="{StaticResource UsBlue}" />
-                                </DataTrigger>
-                            </Label.Triggers>
-                        </Label>
-                        <Label Text="{Binding BidAmountText}" TextColor="{StaticResource Gold}" FontSize="13" FontAttributes="Bold" VerticalOptions="Center" />
-                    </HorizontalStackLayout>
-                </VerticalStackLayout>
-            </Border>
-
-            <!-- Score, top right -->
-            <Border Style="{StaticResource Panel}" HorizontalOptions="End" VerticalOptions="Start"
-                    Margin="16" MinimumWidthRequest="175">
-                <VerticalStackLayout Spacing="4">
-                    <Label Text="SCORE" TextColor="{StaticResource Gold}" FontSize="13" HorizontalOptions="Center" />
-                    <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="18" HorizontalOptions="Center">
-                        <VerticalStackLayout Grid.Column="0">
-                            <Label Text="US" TextColor="{StaticResource UsBlue}" FontSize="12" HorizontalOptions="Center" />
-                            <Label Text="{Binding NorthSouthScore}" TextColor="{StaticResource TextLight}" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
-                        </VerticalStackLayout>
-                        <VerticalStackLayout Grid.Column="1">
-                            <Label Text="THEM" TextColor="{StaticResource ThemRed}" FontSize="12" HorizontalOptions="Center" />
-                            <Label Text="{Binding EastWestScore}" TextColor="{StaticResource TextLight}" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
-                        </VerticalStackLayout>
-                    </Grid>
-                </VerticalStackLayout>
-            </Border>
-
-            <!-- The seats -->
-            <views:SeatView BindingContext="{Binding North}" Placement="Top"
-                            HorizontalOptions="Center" VerticalOptions="Start" Margin="0,8,0,0" />
-            <views:SeatView BindingContext="{Binding West}" Placement="Left"
-                            HorizontalOptions="Start" VerticalOptions="Center" Margin="16,0,0,0" />
-            <views:SeatView BindingContext="{Binding East}" Placement="Right"
-                            HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,16,0" />
-            <views:SeatView BindingContext="{Binding South}" Placement="Bottom"
-                            HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,120" />
-
-            <!-- The trick: each card in front of the seat that played it -->
-            <Grid RowDefinitions="130,140,130" ColumnDefinitions="90,140,90"
-                  RowSpacing="10" ColumnSpacing="10"
-                  HorizontalOptions="Center" VerticalOptions="Center">
-                <Grid.Resources>
-                    <Style x:Key="TrickSlot" TargetType="Border">
-                        <Setter Property="StrokeShape" Value="RoundRectangle 8" />
-                        <Setter Property="Stroke" Value="#73D4AF37" />
-                        <Setter Property="StrokeThickness" Value="2" />
-                        <Setter Property="WidthRequest" Value="90" />
-                        <Setter Property="HeightRequest" Value="130" />
-                    </Style>
-                </Grid.Resources>
-
-                <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource TrickSlot}">
-                    <views:TableCardView BindingContext="{Binding North.TableCard}"
-                                         IsVisible="{Binding North.HasTableCard, Source={RelativeSource AncestorType={x:Type vm:GameViewModel}}, x:DataType=vm:GameViewModel}" />
-                </Border>
-                <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource TrickSlot}">
-                    <views:TableCardView BindingContext="{Binding West.TableCard}"
-                                         IsVisible="{Binding West.HasTableCard, Source={RelativeSource AncestorType={x:Type vm:GameViewModel}}, x:DataType=vm:GameViewModel}" />
-                </Border>
-                <Border Grid.Row="1" Grid.Column="2" Style="{StaticResource TrickSlot}">
-                    <views:TableCardView BindingContext="{Binding East.TableCard}"
-                                         IsVisible="{Binding East.HasTableCard, Source={RelativeSource AncestorType={x:Type vm:GameViewModel}}, x:DataType=vm:GameViewModel}" />
-                </Border>
-                <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource TrickSlot}">
-                    <views:TableCardView BindingContext="{Binding South.TableCard}"
-                                         IsVisible="{Binding South.HasTableCard, Source={RelativeSource AncestorType={x:Type vm:GameViewModel}}, x:DataType=vm:GameViewModel}" />
-                </Border>
-
-                <!-- .trick-info -->
-                <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource Panel}"
-                        Padding="10,8" MinimumWidthRequest="130" VerticalOptions="Center">
-                    <VerticalStackLayout Spacing="3">
-                        <Label Text="CURRENT TRICK" TextColor="{StaticResource Gold}" FontSize="12" HorizontalOptions="Center" />
-                        <Label Text="{Binding LedByText}" TextColor="White" FontSize="13" HorizontalOptions="Center" />
-                        <Label Text="Winning Card" TextColor="{StaticResource WinGreen}" FontSize="13" HorizontalOptions="Center" Margin="0,4,0,0" />
-                        <Label Text="{Binding WinningCardText}" TextColor="{StaticResource WinGreen}" FontSize="17" HorizontalOptions="Center" />
-                    </VerticalStackLayout>
-                </Border>
-            </Grid>
-
-            <!-- The human's hand: fanned, sorted by suit, rearranged by dragging -->
-            <HorizontalStackLayout x:Name="Hand" Spacing="-22" HeightRequest="130"
-                                   HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,12"
-                                   BindableLayout.ItemsSource="{Binding HumanCards}">
-                <BindableLayout.ItemTemplate>
-                    <DataTemplate x:DataType="vm:CardViewModel">
-                        <Border StrokeShape="RoundRectangle 6"
-                                BackgroundColor="{StaticResource CardFace}"
-                                WidthRequest="78" HeightRequest="110"
-                                VerticalOptions="End"
-                                Padding="6,4"
-                                Stroke="{Binding IsLegal, Converter={StaticResource BoolToStrokeConverter}}"
-                                StrokeThickness="1"
-                                Opacity="{Binding IsInteractive, Converter={StaticResource BoolToOpacityConverter}}">
-                            <!-- Stroke binds on the Border itself, and the Color converts to a
-                                 brush. A SolidColorBrush nested in Border.Stroke does not get the
-                                 card's BindingContext, so its Color stays null, and Windows
-                                 throws a NullReferenceException drawing it (New Game crashed). -->
-                            <Border.Triggers>
-                                <DataTrigger TargetType="Border" Binding="{Binding IsLegal}" Value="True">
-                                    <Setter Property="StrokeThickness" Value="2" />
-                                </DataTrigger>
-                                <!-- A card picked as a Hawsey-exchange discard is raised, outlined red. -->
-                                <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
-                                    <Setter Property="TranslationY" Value="-20" />
-                                    <Setter Property="Stroke" Value="{StaticResource ThemRed}" />
-                                    <Setter Property="StrokeThickness" Value="3" />
-                                    <Setter Property="Opacity" Value="0.85" />
-                                </DataTrigger>
-                            </Border.Triggers>
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer
-                                    Command="{Binding PlayCardCommand, Source={RelativeSource AncestorType={x:Type vm:GameViewModel}}, x:DataType=vm:GameViewModel}"
-                                    CommandParameter="{Binding .}" />
-                                <DragGestureRecognizer DragStarting="OnCardDragStarting" />
-                                <DropGestureRecognizer Drop="OnCardDrop" />
-                                <PointerGestureRecognizer PointerEntered="OnCardPointerEntered" PointerExited="OnCardPointerExited" />
-                            </Border.GestureRecognizers>
-                            <Grid>
-                                <Label Text="{Binding RankText}" TextColor="{Binding SuitColor}"
-                                       FontSize="22" FontAttributes="Bold"
-                                       HorizontalOptions="Start" VerticalOptions="Start" />
-                                <Label Text="{Binding SuitSymbol}" TextColor="{Binding SuitColor}"
-                                       FontSize="48"
-                                       HorizontalOptions="Center" VerticalOptions="Center" />
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </BindableLayout.ItemTemplate>
-            </HorizontalStackLayout>
-
-            <!-- Status bar, bottom centre -->
-            <Border StrokeShape="RoundRectangle 22" BackgroundColor="#B3000000"
-                    Stroke="{StaticResource PanelBorder}" StrokeThickness="1"
-                    Padding="26,6" HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,16"
-                    InputTransparent="True">
-                <Label Text="{Binding StatusMessage}" TextColor="{StaticResource Gold}" FontSize="15" />
-            </Border>
-
-            <!-- Controls, bottom left -->
-            <HorizontalStackLayout Spacing="10" HorizontalOptions="Start" VerticalOptions="End" Margin="16">
-                <Button Text="&#9776; NEW GAME" Style="{StaticResource TableButton}" Command="{Binding NewGameCommand}" />
-                <Button Text="Game log" Style="{StaticResource TableButton}" Command="{Binding ToggleLogCommand}" />
-            </HorizontalStackLayout>
-
-            <!-- Game log -->
-            <Border IsVisible="{Binding IsLogVisible}"
-                    StrokeShape="RoundRectangle 6" BackgroundColor="#D1000000"
-                    Stroke="{StaticResource PanelBorder}" StrokeThickness="1"
-                    WidthRequest="380" MaximumHeightRequest="360"
-                    HorizontalOptions="Start" VerticalOptions="End" Margin="16,0,0,64">
-                <Grid RowDefinitions="Auto,*">
-                    <Grid ColumnDefinitions="*,Auto" Padding="10,6">
-                        <Label Text="Game log" TextColor="{StaticResource Gold}" FontAttributes="Bold" VerticalOptions="Center" />
-                        <Button Grid.Column="1" Text="close" Style="{StaticResource TableButton}"
-                                Padding="7,2" FontSize="13" MinimumHeightRequest="0"
-                                Command="{Binding ToggleLogCommand}" />
-                    </Grid>
-                    <ScrollView Grid.Row="1" Padding="10,6">
-                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding GameLog}">
-                            <BindableLayout.ItemTemplate>
-                                <DataTemplate x:DataType="x:String">
-                                    <Label Text="{Binding .}" TextColor="#FFDDDDDD" FontFamily="Consolas" FontSize="12.5" Padding="0,2" />
-                                </DataTemplate>
-                            </BindableLayout.ItemTemplate>
-                        </VerticalStackLayout>
-                    </ScrollView>
-                </Grid>
-            </Border>
-
-            <!-- Bid panel: at the top, so the hand stays in view -->
-            <Grid IsVisible="{Binding IsBiddingVisible}" BackgroundColor="#59000000"
-                  InputTransparent="True" CascadeInputTransparent="False">
-                <Border Style="{StaticResource ModalCard}" VerticalOptions="Start" Margin="0,56,0,0">
-                    <VerticalStackLayout>
-                        <Label Text="Your bid" Style="{StaticResource ModalTitle}" />
-                        <Label Text="{Binding BidPrompt}" Style="{StaticResource ModalSub}" />
-                        <FlexLayout Wrap="Wrap" JustifyContent="Center" WidthRequest="300"
-                                    BindableLayout.ItemsSource="{Binding BidOptions}">
-                            <BindableLayout.ItemTemplate>
-                                <DataTemplate x:DataType="x:String">
-                                    <Button Text="{Binding ., StringFormat='Bid {0}'}" Style="{StaticResource TableButton}"
-                                            WidthRequest="92" HeightRequest="34" MinimumHeightRequest="0" Padding="0" Margin="3"
-                                            Command="{Binding PlaceBidCommand, Source={RelativeSource AncestorType={x:Type vm:GameViewModel}}, x:DataType=vm:GameViewModel}"
-                                            CommandParameter="{Binding .}" />
-                                </DataTemplate>
-                            </BindableLayout.ItemTemplate>
-                        </FlexLayout>
-                        <HorizontalStackLayout Spacing="6" HorizontalOptions="Center" Margin="0,6,0,0">
-                            <Button Text="Hawsey (24)" Style="{StaticResource RedButton}"
-                                    Command="{Binding PlaceBidCommand}" CommandParameter="hawsey" />
-                            <Button Text="Pass" Style="{StaticResource TableButton}" IsVisible="{Binding CanPass}"
-                                    Command="{Binding PlaceBidCommand}" CommandParameter="pass" />
+                <!-- Tricks (total) and trump, top left -->
+                <Border Style="{StaticResource Panel}" HorizontalOptions="Start" VerticalOptions="Start"
+                        Margin="16" MinimumWidthRequest="175">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="TRICKS (TOTAL)" TextColor="{StaticResource Gold}" FontSize="13" HorizontalOptions="Center" />
+                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="18" HorizontalOptions="Center">
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="US" TextColor="{StaticResource UsBlue}" FontSize="12" HorizontalOptions="Center" />
+                                <Label Text="{Binding UsTricks}" TextColor="{StaticResource TextLight}" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1">
+                                <Label Text="THEM" TextColor="{StaticResource ThemRed}" FontSize="12" HorizontalOptions="Center" />
+                                <Label Text="{Binding ThemTricks}" TextColor="{StaticResource TextLight}" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
+                            </VerticalStackLayout>
+                        </Grid>
+                        <HorizontalStackLayout Spacing="5" HorizontalOptions="Center">
+                            <Label Text="Trump:" TextColor="White" FontSize="13" VerticalOptions="Center" />
+                            <Label Text="{Binding TrumpSymbol}" TextColor="{StaticResource TextLight}" FontSize="17" VerticalOptions="Center">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsTrumpRed}" Value="True">
+                                        <Setter Property="TextColor" Value="#FFFF5A5A" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                            <Label Text="{Binding TrumpSetterTeam}" TextColor="{StaticResource ThemRed}" FontSize="13" FontAttributes="Bold" VerticalOptions="Center">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsTrumpSetterUs}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource UsBlue}" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                            <Label Text="{Binding BidAmountText}" TextColor="{StaticResource Gold}" FontSize="13" FontAttributes="Bold" VerticalOptions="Center" />
                         </HorizontalStackLayout>
                     </VerticalStackLayout>
                 </Border>
-            </Grid>
 
-            <!-- Trump picker -->
-            <Grid IsVisible="{Binding IsTrumpPickerVisible}" BackgroundColor="#8C000000">
-                <Border Style="{StaticResource ModalCard}" VerticalOptions="Center">
-                    <VerticalStackLayout>
-                        <Label Text="Pick trump" Style="{StaticResource ModalTitle}" />
-                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8" Margin="0,0,0,12">
-                            <Button Grid.Row="0" Grid.Column="0" Text="&#9829; Hearts" Style="{StaticResource RedButton}"
-                                    Command="{Binding SelectTrumpCommand}" CommandParameter="hearts" />
-                            <Button Grid.Row="0" Grid.Column="1" Text="&#9830; Diamonds" Style="{StaticResource RedButton}"
-                                    Command="{Binding SelectTrumpCommand}" CommandParameter="diamonds" />
-                            <Button Grid.Row="1" Grid.Column="0" Text="&#9827; Clubs" Style="{StaticResource TableButton}"
-                                    Command="{Binding SelectTrumpCommand}" CommandParameter="clubs" />
-                            <Button Grid.Row="1" Grid.Column="1" Text="&#9824; Spades" Style="{StaticResource TableButton}"
-                                    Command="{Binding SelectTrumpCommand}" CommandParameter="spades" />
+                <!-- Score, top right -->
+                <Border Style="{StaticResource Panel}" HorizontalOptions="End" VerticalOptions="Start"
+                        Margin="16" MinimumWidthRequest="175">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="SCORE" TextColor="{StaticResource Gold}" FontSize="13" HorizontalOptions="Center" />
+                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="18" HorizontalOptions="Center">
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="US" TextColor="{StaticResource UsBlue}" FontSize="12" HorizontalOptions="Center" />
+                                <Label Text="{Binding NorthSouthScore}" TextColor="{StaticResource TextLight}" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1">
+                                <Label Text="THEM" TextColor="{StaticResource ThemRed}" FontSize="12" HorizontalOptions="Center" />
+                                <Label Text="{Binding EastWestScore}" TextColor="{StaticResource TextLight}" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
+                            </VerticalStackLayout>
                         </Grid>
-                        <Button Text="Ace High (no trump)" Style="{StaticResource TableButton}"
-                                Command="{Binding SelectTrumpCommand}" CommandParameter="acehigh" />
                     </VerticalStackLayout>
                 </Border>
-            </Grid>
 
-            <!-- Hawsey exchange: at the top, so the hand stays tappable -->
-            <Grid IsVisible="{Binding IsHawseyExchangeVisible}" BackgroundColor="#59000000"
-                  InputTransparent="True" CascadeInputTransparent="False">
-                <Border Style="{StaticResource ModalCard}" VerticalOptions="Start" Margin="0,56,0,0" MaximumWidthRequest="420">
-                    <VerticalStackLayout>
-                        <Label Text="Hawsey exchange" Style="{StaticResource ModalTitle}" />
-                        <Label Style="{StaticResource ModalSub}">
-                            <Label.FormattedText>
-                                <FormattedString>
-                                    <Span Text="Click " />
-                                    <Span Text="2 cards" TextColor="{StaticResource Gold}" FontAttributes="Bold" />
-                                    <Span Text=" in your hand to discard. Your partner gives you their " />
-                                    <Span Text="2 best" TextColor="{StaticResource Gold}" FontAttributes="Bold" />
-                                    <Span Text=" for the chosen trump." />
-                                </FormattedString>
-                            </Label.FormattedText>
-                        </Label>
-                        <Label Text="{Binding ExchangeSelectionText}" Style="{StaticResource ModalSub}" TextColor="{StaticResource Gold}" FontAttributes="Bold" />
-                        <Button Text="Discard &amp; receive" Style="{StaticResource PrimaryButton}"
-                                HorizontalOptions="Center"
-                                Command="{Binding ConfirmHawseyExchangeCommand}" />
-                    </VerticalStackLayout>
+                <!-- The seats -->
+                <views:SeatView BindingContext="{Binding North}" Placement="Top"
+                                HorizontalOptions="Center" VerticalOptions="Start" Margin="0,8,0,0" />
+                <views:SeatView BindingContext="{Binding West}" Placement="Left"
+                                HorizontalOptions="Start" VerticalOptions="Center" Margin="16,0,0,0" />
+                <views:SeatView BindingContext="{Binding East}" Placement="Right"
+                                HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,16,0" />
+                <views:SeatView BindingContext="{Binding South}" Placement="Bottom"
+                                HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,120" />
+
+                <!-- The trick: each card in front of the seat that played it -->
+                <Grid RowDefinitions="130,140,130" ColumnDefinitions="90,140,90"
+                      RowSpacing="10" ColumnSpacing="10"
+                      HorizontalOptions="Center" VerticalOptions="Center">
+                    <Grid.Resources>
+                        <Style x:Key="TrickSlot" TargetType="Border">
+                            <Setter Property="StrokeShape" Value="RoundRectangle 8" />
+                            <Setter Property="Stroke" Value="#73D4AF37" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="WidthRequest" Value="90" />
+                            <Setter Property="HeightRequest" Value="130" />
+                        </Style>
+                    </Grid.Resources>
+
+                    <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource TrickSlot}">
+                        <views:TableCardView BindingContext="{Binding North.TableCard}"
+                                             IsVisible="{Binding North.HasTableCard, Source={RelativeSource AncestorType={x:Type vm:GameViewModel}}, x:DataType=vm:GameViewModel}" />
+                    </Border>
+                    <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource TrickSlot}">
+                        <views:TableCardView BindingContext="{Binding West.TableCard}"
+                                             IsVisible="{Binding West.HasTableCard, Source={RelativeSource AncestorType={x:Type vm:GameViewModel}}, x:DataType=vm:GameViewModel}" />
+                    </Border>
+                    <Border Grid.Row="1" Grid.Column="2" Style="{StaticResource TrickSlot}">
+                        <views:TableCardView BindingContext="{Binding East.TableCard}"
+                                             IsVisible="{Binding East.HasTableCard, Source={RelativeSource AncestorType={x:Type vm:GameViewModel}}, x:DataType=vm:GameViewModel}" />
+                    </Border>
+                    <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource TrickSlot}">
+                        <views:TableCardView BindingContext="{Binding South.TableCard}"
+                                             IsVisible="{Binding South.HasTableCard, Source={RelativeSource AncestorType={x:Type vm:GameViewModel}}, x:DataType=vm:GameViewModel}" />
+                    </Border>
+
+                    <!-- .trick-info -->
+                    <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource Panel}"
+                            Padding="10,8" MinimumWidthRequest="130" VerticalOptions="Center">
+                        <VerticalStackLayout Spacing="3">
+                            <Label Text="CURRENT TRICK" TextColor="{StaticResource Gold}" FontSize="12" HorizontalOptions="Center" />
+                            <Label Text="{Binding LedByText}" TextColor="White" FontSize="13" HorizontalOptions="Center" />
+                            <Label Text="Winning Card" TextColor="{StaticResource WinGreen}" FontSize="13" HorizontalOptions="Center" Margin="0,4,0,0" />
+                            <Label Text="{Binding WinningCardText}" TextColor="{StaticResource WinGreen}" FontSize="17" HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- The human's hand: fanned, sorted by suit, rearranged by dragging -->
+                <HorizontalStackLayout x:Name="Hand" Spacing="-22" HeightRequest="130"
+                                       HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,12"
+                                       BindableLayout.ItemsSource="{Binding HumanCards}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:CardViewModel">
+                            <Border StrokeShape="RoundRectangle 6"
+                                    BackgroundColor="{StaticResource CardFace}"
+                                    WidthRequest="78" HeightRequest="110"
+                                    VerticalOptions="End"
+                                    Padding="6,4"
+                                    Stroke="{Binding IsLegal, Converter={StaticResource BoolToStrokeConverter}}"
+                                    StrokeThickness="1"
+                                    Opacity="{Binding IsInteractive, Converter={StaticResource BoolToOpacityConverter}}">
+                                <!-- Stroke binds on the Border itself, and the Color converts to a
+                                     brush. A SolidColorBrush nested in Border.Stroke does not get the
+                                     card's BindingContext, so its Color stays null, and Windows
+                                     throws a NullReferenceException drawing it (New Game crashed). -->
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsLegal}" Value="True">
+                                        <Setter Property="StrokeThickness" Value="2" />
+                                    </DataTrigger>
+                                    <!-- A card picked as a Hawsey-exchange discard is raised, outlined red. -->
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                        <Setter Property="TranslationY" Value="-20" />
+                                        <Setter Property="Stroke" Value="{StaticResource ThemRed}" />
+                                        <Setter Property="StrokeThickness" Value="3" />
+                                        <Setter Property="Opacity" Value="0.85" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding PlayCardCommand, Source={RelativeSource AncestorType={x:Type vm:GameViewModel}}, x:DataType=vm:GameViewModel}"
+                                        CommandParameter="{Binding .}" />
+                                    <DragGestureRecognizer DragStarting="OnCardDragStarting" />
+                                    <DropGestureRecognizer Drop="OnCardDrop" />
+                                    <PointerGestureRecognizer PointerEntered="OnCardPointerEntered" PointerExited="OnCardPointerExited" />
+                                </Border.GestureRecognizers>
+                                <Grid>
+                                    <Label Text="{Binding RankText}" TextColor="{Binding SuitColor}"
+                                           FontSize="22" FontAttributes="Bold"
+                                           HorizontalOptions="Start" VerticalOptions="Start" />
+                                    <Label Text="{Binding SuitSymbol}" TextColor="{Binding SuitColor}"
+                                           FontSize="48"
+                                           HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </HorizontalStackLayout>
+
+                <!-- Status bar, bottom centre -->
+                <Border StrokeShape="RoundRectangle 22" BackgroundColor="#B3000000"
+                        Stroke="{StaticResource PanelBorder}" StrokeThickness="1"
+                        Padding="26,6" HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,16"
+                        InputTransparent="True">
+                    <Label Text="{Binding StatusMessage}" TextColor="{StaticResource Gold}" FontSize="15" />
                 </Border>
-            </Grid>
 
-            <!-- Round summary, and the game-over summary -->
-            <Grid IsVisible="{Binding IsRoundSummaryVisible}" BackgroundColor="#8C000000">
-                <Border Style="{StaticResource ModalCard}" VerticalOptions="Center" MinimumWidthRequest="360">
-                    <VerticalStackLayout>
-                        <Label Text="{Binding RoundSummary.Title}" Style="{StaticResource ModalTitle}">
-                            <Label.Triggers>
-                                <DataTrigger TargetType="Label" Binding="{Binding RoundSummary.IsGameOver}" Value="True">
-                                    <Setter Property="TextColor" Value="{StaticResource ThemRed}" />
-                                </DataTrigger>
-                                <DataTrigger TargetType="Label" Binding="{Binding RoundSummary.IsTitleUs}" Value="True">
-                                    <Setter Property="TextColor" Value="{StaticResource UsBlue}" />
-                                </DataTrigger>
-                            </Label.Triggers>
-                        </Label>
+                <!-- Controls, bottom left -->
+                <HorizontalStackLayout Spacing="10" HorizontalOptions="Start" VerticalOptions="End" Margin="16">
+                    <Button Text="&#9776; NEW GAME" Style="{StaticResource TableButton}" Command="{Binding NewGameCommand}" />
+                    <Button Text="Game log" Style="{StaticResource TableButton}" Command="{Binding ToggleLogCommand}" />
+                </HorizontalStackLayout>
 
-                        <Label HorizontalOptions="Center" FontSize="16" Margin="0,0,0,16" TextColor="{StaticResource TextLight}">
-                            <Label.FormattedText>
-                                <FormattedString>
-                                    <Span Text="{Binding RoundSummary.BidTeamLabel}" FontAttributes="Bold" TextColor="{Binding RoundSummary.BidTeamColor}" />
-                                    <Span Text=" bid " />
-                                    <Span Text="{Binding RoundSummary.BidText}" FontAttributes="Bold" TextColor="{StaticResource Gold}" />
-                                    <Span Text="  " />
-                                    <Span Text="{Binding RoundSummary.ResultText}" FontAttributes="Bold" TextColor="{Binding RoundSummary.ResultColor}" />
-                                </FormattedString>
-                            </Label.FormattedText>
-                        </Label>
-
-                        <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="6" Margin="0,0,0,16">
-                            <Grid.Resources>
-                                <Style x:Key="RowHeading" TargetType="Label">
-                                    <Setter Property="TextColor" Value="#FF888888" />
-                                    <Setter Property="FontSize" Value="13" />
-                                    <Setter Property="HorizontalTextAlignment" Value="End" />
-                                </Style>
-                                <Style TargetType="Label">
-                                    <Setter Property="TextColor" Value="#FFDDDDDD" />
-                                    <Setter Property="HorizontalTextAlignment" Value="Center" />
-                                </Style>
-                            </Grid.Resources>
-                            <Label Grid.Row="0" Grid.Column="1" Text="US" TextColor="{StaticResource UsBlue}" FontAttributes="Bold" />
-                            <Label Grid.Row="0" Grid.Column="2" Text="THEM" TextColor="{StaticResource ThemRed}" FontAttributes="Bold" />
-                            <Label Grid.Row="1" Grid.Column="0" Text="TRICKS" Style="{StaticResource RowHeading}" />
-                            <Label Grid.Row="1" Grid.Column="1" Text="{Binding RoundSummary.UsTricks}" />
-                            <Label Grid.Row="1" Grid.Column="2" Text="{Binding RoundSummary.ThemTricks}" />
-                            <Label Grid.Row="2" Grid.Column="0" Text="THIS ROUND" Style="{StaticResource RowHeading}" />
-                            <Label Grid.Row="2" Grid.Column="1" Text="{Binding RoundSummary.UsDeltaText}" TextColor="{Binding RoundSummary.UsDeltaColor}" />
-                            <Label Grid.Row="2" Grid.Column="2" Text="{Binding RoundSummary.ThemDeltaText}" TextColor="{Binding RoundSummary.ThemDeltaColor}" />
-                            <Label Grid.Row="3" Grid.Column="0" Text="TOTAL" Style="{StaticResource RowHeading}" />
-                            <Label Grid.Row="3" Grid.Column="1" Text="{Binding RoundSummary.UsTotal}" />
-                            <Label Grid.Row="3" Grid.Column="2" Text="{Binding RoundSummary.ThemTotal}" />
+                <!-- Game log -->
+                <Border IsVisible="{Binding IsLogVisible}"
+                        StrokeShape="RoundRectangle 6" BackgroundColor="#D1000000"
+                        Stroke="{StaticResource PanelBorder}" StrokeThickness="1"
+                        WidthRequest="380" MaximumHeightRequest="360"
+                        HorizontalOptions="Start" VerticalOptions="End" Margin="16,0,0,64">
+                    <Grid RowDefinitions="Auto,*">
+                        <Grid ColumnDefinitions="*,Auto" Padding="10,6">
+                            <Label Text="Game log" TextColor="{StaticResource Gold}" FontAttributes="Bold" VerticalOptions="Center" />
+                            <Button Grid.Column="1" Text="close" Style="{StaticResource TableButton}"
+                                    Padding="7,2" FontSize="13" MinimumHeightRequest="0"
+                                    Command="{Binding ToggleLogCommand}" />
                         </Grid>
-
-                        <Button Text="Next round" Style="{StaticResource PrimaryButton}" HorizontalOptions="Center"
-                                Command="{Binding NextRoundCommand}">
-                            <Button.Triggers>
-                                <DataTrigger TargetType="Button" Binding="{Binding RoundSummary.IsGameOver}" Value="True">
-                                    <Setter Property="IsVisible" Value="False" />
-                                </DataTrigger>
-                            </Button.Triggers>
-                        </Button>
-                        <Button Text="Play again" Style="{StaticResource PrimaryButton}" HorizontalOptions="Center"
-                                IsVisible="{Binding RoundSummary.IsGameOver}"
-                                Command="{Binding NewGameCommand}" />
-                    </VerticalStackLayout>
+                        <ScrollView Grid.Row="1" Padding="10,6">
+                            <VerticalStackLayout BindableLayout.ItemsSource="{Binding GameLog}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="x:String">
+                                        <Label Text="{Binding .}" TextColor="#FFDDDDDD" FontFamily="Consolas" FontSize="12.5" Padding="0,2" />
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </VerticalStackLayout>
+                        </ScrollView>
+                    </Grid>
                 </Border>
-            </Grid>
 
-        </Grid>
-    </Border>
+                <!-- Bid panel: at the top, so the hand stays in view -->
+                <Grid IsVisible="{Binding IsBiddingVisible}" BackgroundColor="#59000000"
+                      InputTransparent="True" CascadeInputTransparent="False">
+                    <Border Style="{StaticResource ModalCard}" VerticalOptions="Start" Margin="0,56,0,0">
+                        <VerticalStackLayout>
+                            <Label Text="Your bid" Style="{StaticResource ModalTitle}" />
+                            <Label Text="{Binding BidPrompt}" Style="{StaticResource ModalSub}" />
+                            <FlexLayout Wrap="Wrap" JustifyContent="Center" WidthRequest="300"
+                                        BindableLayout.ItemsSource="{Binding BidOptions}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="x:String">
+                                        <Button Text="{Binding ., StringFormat='Bid {0}'}" Style="{StaticResource TableButton}"
+                                                WidthRequest="92" HeightRequest="34" MinimumHeightRequest="0" Padding="0" Margin="3"
+                                                Command="{Binding PlaceBidCommand, Source={RelativeSource AncestorType={x:Type vm:GameViewModel}}, x:DataType=vm:GameViewModel}"
+                                                CommandParameter="{Binding .}" />
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </FlexLayout>
+                            <HorizontalStackLayout Spacing="6" HorizontalOptions="Center" Margin="0,6,0,0">
+                                <Button Text="Hawsey (24)" Style="{StaticResource RedButton}"
+                                        Command="{Binding PlaceBidCommand}" CommandParameter="hawsey" />
+                                <Button Text="Pass" Style="{StaticResource TableButton}" IsVisible="{Binding CanPass}"
+                                        Command="{Binding PlaceBidCommand}" CommandParameter="pass" />
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- Trump picker -->
+                <Grid IsVisible="{Binding IsTrumpPickerVisible}" BackgroundColor="#8C000000">
+                    <Border Style="{StaticResource ModalCard}" VerticalOptions="Center">
+                        <VerticalStackLayout>
+                            <Label Text="Pick trump" Style="{StaticResource ModalTitle}" />
+                            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8" Margin="0,0,0,12">
+                                <Button Grid.Row="0" Grid.Column="0" Text="&#9829; Hearts" Style="{StaticResource RedButton}"
+                                        Command="{Binding SelectTrumpCommand}" CommandParameter="hearts" />
+                                <Button Grid.Row="0" Grid.Column="1" Text="&#9830; Diamonds" Style="{StaticResource RedButton}"
+                                        Command="{Binding SelectTrumpCommand}" CommandParameter="diamonds" />
+                                <Button Grid.Row="1" Grid.Column="0" Text="&#9827; Clubs" Style="{StaticResource TableButton}"
+                                        Command="{Binding SelectTrumpCommand}" CommandParameter="clubs" />
+                                <Button Grid.Row="1" Grid.Column="1" Text="&#9824; Spades" Style="{StaticResource TableButton}"
+                                        Command="{Binding SelectTrumpCommand}" CommandParameter="spades" />
+                            </Grid>
+                            <Button Text="Ace High (no trump)" Style="{StaticResource TableButton}"
+                                    Command="{Binding SelectTrumpCommand}" CommandParameter="acehigh" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- Hawsey exchange: at the top, so the hand stays tappable -->
+                <Grid IsVisible="{Binding IsHawseyExchangeVisible}" BackgroundColor="#59000000"
+                      InputTransparent="True" CascadeInputTransparent="False">
+                    <Border Style="{StaticResource ModalCard}" VerticalOptions="Start" Margin="0,56,0,0" MaximumWidthRequest="420">
+                        <VerticalStackLayout>
+                            <Label Text="Hawsey exchange" Style="{StaticResource ModalTitle}" />
+                            <Label Style="{StaticResource ModalSub}">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Click " />
+                                        <Span Text="2 cards" TextColor="{StaticResource Gold}" FontAttributes="Bold" />
+                                        <Span Text=" in your hand to discard. Your partner gives you their " />
+                                        <Span Text="2 best" TextColor="{StaticResource Gold}" FontAttributes="Bold" />
+                                        <Span Text=" for the chosen trump." />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Label Text="{Binding ExchangeSelectionText}" Style="{StaticResource ModalSub}" TextColor="{StaticResource Gold}" FontAttributes="Bold" />
+                            <Button Text="Discard &amp; receive" Style="{StaticResource PrimaryButton}"
+                                    HorizontalOptions="Center"
+                                    Command="{Binding ConfirmHawseyExchangeCommand}" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- Round summary, and the game-over summary -->
+                <Grid IsVisible="{Binding IsRoundSummaryVisible}" BackgroundColor="#8C000000">
+                    <Border Style="{StaticResource ModalCard}" VerticalOptions="Center" MinimumWidthRequest="360">
+                        <VerticalStackLayout>
+                            <Label Text="{Binding RoundSummary.Title}" Style="{StaticResource ModalTitle}">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding RoundSummary.IsGameOver}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource ThemRed}" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Label" Binding="{Binding RoundSummary.IsTitleUs}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource UsBlue}" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+
+                            <Label HorizontalOptions="Center" FontSize="16" Margin="0,0,0,16" TextColor="{StaticResource TextLight}">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding RoundSummary.BidTeamLabel}" FontAttributes="Bold" TextColor="{Binding RoundSummary.BidTeamColor}" />
+                                        <Span Text=" bid " />
+                                        <Span Text="{Binding RoundSummary.BidText}" FontAttributes="Bold" TextColor="{StaticResource Gold}" />
+                                        <Span Text="  " />
+                                        <Span Text="{Binding RoundSummary.ResultText}" FontAttributes="Bold" TextColor="{Binding RoundSummary.ResultColor}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+
+                            <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="6" Margin="0,0,0,16">
+                                <Grid.Resources>
+                                    <Style x:Key="RowHeading" TargetType="Label">
+                                        <Setter Property="TextColor" Value="#FF888888" />
+                                        <Setter Property="FontSize" Value="13" />
+                                        <Setter Property="HorizontalTextAlignment" Value="End" />
+                                    </Style>
+                                    <Style TargetType="Label">
+                                        <Setter Property="TextColor" Value="#FFDDDDDD" />
+                                        <Setter Property="HorizontalTextAlignment" Value="Center" />
+                                    </Style>
+                                </Grid.Resources>
+                                <Label Grid.Row="0" Grid.Column="1" Text="US" TextColor="{StaticResource UsBlue}" FontAttributes="Bold" />
+                                <Label Grid.Row="0" Grid.Column="2" Text="THEM" TextColor="{StaticResource ThemRed}" FontAttributes="Bold" />
+                                <Label Grid.Row="1" Grid.Column="0" Text="TRICKS" Style="{StaticResource RowHeading}" />
+                                <Label Grid.Row="1" Grid.Column="1" Text="{Binding RoundSummary.UsTricks}" />
+                                <Label Grid.Row="1" Grid.Column="2" Text="{Binding RoundSummary.ThemTricks}" />
+                                <Label Grid.Row="2" Grid.Column="0" Text="THIS ROUND" Style="{StaticResource RowHeading}" />
+                                <Label Grid.Row="2" Grid.Column="1" Text="{Binding RoundSummary.UsDeltaText}" TextColor="{Binding RoundSummary.UsDeltaColor}" />
+                                <Label Grid.Row="2" Grid.Column="2" Text="{Binding RoundSummary.ThemDeltaText}" TextColor="{Binding RoundSummary.ThemDeltaColor}" />
+                                <Label Grid.Row="3" Grid.Column="0" Text="TOTAL" Style="{StaticResource RowHeading}" />
+                                <Label Grid.Row="3" Grid.Column="1" Text="{Binding RoundSummary.UsTotal}" />
+                                <Label Grid.Row="3" Grid.Column="2" Text="{Binding RoundSummary.ThemTotal}" />
+                            </Grid>
+
+                            <Button Text="Next round" Style="{StaticResource PrimaryButton}" HorizontalOptions="Center"
+                                    Command="{Binding NextRoundCommand}">
+                                <Button.Triggers>
+                                    <DataTrigger TargetType="Button" Binding="{Binding RoundSummary.IsGameOver}" Value="True">
+                                        <Setter Property="IsVisible" Value="False" />
+                                    </DataTrigger>
+                                </Button.Triggers>
+                            </Button>
+                            <Button Text="Play again" Style="{StaticResource PrimaryButton}" HorizontalOptions="Center"
+                                    IsVisible="{Binding RoundSummary.IsGameOver}"
+                                    Command="{Binding NewGameCommand}" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+            </Grid>
+        </Border>
+    </AbsoluteLayout>
 
 </ContentPage>

@@ -15,8 +15,21 @@ public partial class GamePage
     public GamePage(GameViewModel viewModel)
     {
         InitializeComponent();
+        AbsoluteLayout.SetLayoutBounds(Table, new Rect(0, 0, TableScale.DesignWidth, TableScale.DesignHeight));
+        TableHost.SizeChanged += (_, _) => FitTable(TableHost.Width, TableHost.Height);
         _viewModel = viewModel;
         BindingContext = viewModel;
+    }
+
+
+
+    /// <summary>Scales and centres the table to fit the space it has (<see cref="TableScale"/>).</summary>
+    private void FitTable(double width, double height)
+    {
+        var scale = TableScale.Fit(width, height);
+        Table.Scale = scale;
+        Table.TranslationX = TableScale.Centre(width, scale, TableScale.DesignWidth);
+        Table.TranslationY = TableScale.Centre(height, scale, TableScale.DesignHeight);
     }
 
 
