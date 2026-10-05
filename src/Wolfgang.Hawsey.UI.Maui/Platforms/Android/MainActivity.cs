@@ -17,11 +17,40 @@ public class MainActivity : MauiAppCompatActivity
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
+        HideSystemBars();
+    }
 
-        // Full screen, as card games usually are: the status and navigation bars are
-        // hidden (a swipe from the edge shows them for a moment), so the table is scaled
-        // to the whole screen. With the bars showing, the page reported the full screen
-        // height while drawing below the status bar, and the table's bottom was cut off.
+
+
+    // Applied again whenever the app comes back, not only in OnCreate: on Android 8.0
+    // (API 26) leaving the app and returning brought the bars back, and the table, sized
+    // for the whole screen, lost its bottom edge (the buttons and status) under them.
+    protected override void OnResume()
+    {
+        base.OnResume();
+        HideSystemBars();
+    }
+
+
+
+    public override void OnWindowFocusChanged(bool hasFocus)
+    {
+        base.OnWindowFocusChanged(hasFocus);
+
+        if (hasFocus)
+        {
+            HideSystemBars();
+        }
+    }
+
+
+
+    // Full screen, as card games usually are: the status and navigation bars are
+    // hidden (a swipe from the edge shows them for a moment), so the table is scaled to
+    // the whole screen. With the bars showing, the page reported the full screen height
+    // while drawing below the status bar, and the table's bottom was cut off.
+    private void HideSystemBars()
+    {
         if (Window is not { } window)
         {
             return;
