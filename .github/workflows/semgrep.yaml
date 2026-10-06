@@ -55,6 +55,35 @@ jobs:
         # semgrep-overrides.txt), which pip's resolver would otherwise re-apply.
         run: pip install --no-deps --require-hashes -r .github/requirements/semgrep.txt
 
+      - name: Check the overrides held
+        # semgrep.txt must be compiled with --override semgrep-overrides.txt. A
+        # regeneration without it, such as Dependabot's semgrep bump in #948, quietly
+        # puts semgrep's own pins back (pyjwt 2.13.0 and its advisories). Fail here,
+        # on that PR, instead of installing them.
+        shell: python
+        run: |
+          import re
+          import sys
+          from importlib.metadata import version
+          from packaging.specifiers import SpecifierSet
+
+          bad = []
+          with open(".github/requirements/semgrep-overrides.txt", encoding="utf-8") as overrides:
+              for line in overrides:
+                  line = line.split("#", 1)[0].strip()
+                  if not line:
+                      continue
+                  name, spec = re.match(r"([A-Za-z0-9_.-]+)(?:\[[^\]]*\])?\s*(.*)", line).groups()
+                  installed = version(name)
+                  print(f"{name} {installed} (override: {spec})")
+                  if installed not in SpecifierSet(spec):
+                      bad.append(f"{name} {installed} does not satisfy the override {spec}")
+
+          if bad:
+              for message in bad:
+                  print(f"::error::{message}. Regenerate .github/requirements/semgrep.txt with the uv command in its header, which applies semgrep-overrides.txt.")
+              sys.exit(1)
+
       - name: Run Semgrep
         # --error makes findings exit 1; they are reported through the SARIF upload, so
         # 0 and 1 both continue. Anything else (bad config, crash, network) fails the job
