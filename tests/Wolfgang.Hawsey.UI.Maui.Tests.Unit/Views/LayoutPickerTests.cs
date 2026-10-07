@@ -3,8 +3,8 @@ using Wolfgang.Hawsey.UI.Maui.Views;
 namespace Wolfgang.Hawsey.UI.Maui.Tests.Unit.Views;
 
 /// <summary>
-/// Auto picks the compact layout where the table would scale below three-quarters; the
-/// human's own choice wins whatever the size.
+/// Auto picks the compact layout where the table would scale below three-quarters, except
+/// on a desktop; the human's own choice wins whatever the size or device.
 /// </summary>
 public class LayoutPickerTests
 {
@@ -16,6 +16,16 @@ public class LayoutPickerTests
     public void UseCompact_when_Auto_picks_from_the_table_scale(double width, double height, bool expected)
     {
         Assert.Equal(expected, LayoutPicker.UseCompact(width, height, LayoutChoice.Auto));
+    }
+
+
+
+    [Theory]
+    [InlineData(915, 412)]
+    [InlineData(640, 360)]
+    public void UseCompact_when_Auto_on_a_desktop_keeps_the_table_at_any_size(double width, double height)
+    {
+        Assert.False(LayoutPicker.UseCompact(width, height, LayoutChoice.Auto, onDesktop: true));
     }
 
 
@@ -46,5 +56,6 @@ public class LayoutPickerTests
     {
         Assert.True(LayoutPicker.UseCompact(width, height, LayoutChoice.Compact));
         Assert.False(LayoutPicker.UseCompact(width, height, LayoutChoice.Table));
+        Assert.True(LayoutPicker.UseCompact(width, height, LayoutChoice.Compact, onDesktop: true));
     }
 }
