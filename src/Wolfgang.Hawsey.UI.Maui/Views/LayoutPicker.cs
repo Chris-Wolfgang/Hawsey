@@ -18,14 +18,28 @@ public static class LayoutPicker
 
 
     /// <summary>
+    /// Whether this build runs on a desktop (Windows, Mac). There
+    /// <see cref="LayoutChoice.Auto"/> keeps the table at any window size: it scales to
+    /// fit, so the hand stays in view, and a mouse needs no larger targets.
+    /// </summary>
+#if WINDOWS || MACCATALYST
+    public const bool RunsOnDesktop = true;
+#else
+    public const bool RunsOnDesktop = false;
+#endif
+
+
+
+    /// <summary>
     /// Whether the page shows the compact layout in <paramref name="width"/> by
     /// <paramref name="height"/> for the human's <paramref name="choice"/>. Before the
-    /// page has a size, <see cref="LayoutChoice.Auto"/> keeps the table.
+    /// page has a size, and on a desktop (<paramref name="onDesktop"/>),
+    /// <see cref="LayoutChoice.Auto"/> keeps the table.
     /// </summary>
-    public static bool UseCompact(double width, double height, LayoutChoice choice) => choice switch
+    public static bool UseCompact(double width, double height, LayoutChoice choice, bool onDesktop = RunsOnDesktop) => choice switch
     {
         LayoutChoice.Table => false,
         LayoutChoice.Compact => true,
-        _ => TableScale.Fit(width, height) < CompactBelowScale,
+        _ => !onDesktop && TableScale.Fit(width, height) < CompactBelowScale,
     };
 }

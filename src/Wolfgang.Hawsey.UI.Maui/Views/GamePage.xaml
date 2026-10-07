@@ -254,10 +254,11 @@
                 </Grid>
             </Border>
 
-            <!-- Bid panel: at the top, so the hand stays in view -->
+            <!-- Bid panel: centred, clear of the hand. On a phone it is centred between the
+                 compact layout's top bar (52) and its hand (100 with its margin). -->
             <Grid IsVisible="{Binding IsBiddingVisible}" BackgroundColor="#59000000"
                   InputTransparent="True" CascadeInputTransparent="False">
-                <Border Style="{StaticResource ModalCard}" VerticalOptions="Start" Margin="0,56,0,0">
+                <Border Style="{StaticResource ModalCard}" VerticalOptions="Center" Margin="{OnIdiom Phone='0,52,0,96', Default='0'}">
                     <VerticalStackLayout>
                         <Label Text="Your bid" Style="{StaticResource ModalTitle}" />
                         <Label Text="{Binding BidPrompt}" Style="{StaticResource ModalSub}" />
