@@ -38,4 +38,23 @@ public static class TableScale
     /// </summary>
     public static double Centre(double available, double scale, double designSize) =>
         (available - (designSize * scale)) / 2;
+
+
+
+    /// <summary>
+    /// Where the scaled, centred table sits in <paramref name="width"/> by
+    /// <paramref name="height"/>, in unscaled units: the area the page's panels are
+    /// placed over, so they sit where they would on the drawn table, at full size.
+    /// </summary>
+    public static Rect Bounds(double width, double height)
+    {
+        var scale = Fit(width, height);
+        return new Rect
+        (
+            Centre(width, scale, DesignWidth),
+            Centre(height, scale, DesignHeight),
+            DesignWidth * scale,
+            DesignHeight * scale
+        );
+    }
 }

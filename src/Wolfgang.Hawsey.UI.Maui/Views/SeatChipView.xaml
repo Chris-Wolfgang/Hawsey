@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- One seat in the compact layout (#952): a small nameplate in the team colour with the
+     tricks the seat has won, the cards it holds, its bid while the bidding is on and the
+     dealer mark. Outlined gold on the seat's turn, as on the table. -->
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Wolfgang.Hawsey.UI.Maui.ViewModels"
+             x:Class="Wolfgang.Hawsey.UI.Maui.Views.SeatChipView"
+             x:DataType="vm:SeatViewModel">
+
+    <Border StrokeShape="RoundRectangle 8"
+            BackgroundColor="{StaticResource PanelBackground}"
+            Stroke="{StaticResource ThemRed}" StrokeThickness="1"
+            Padding="8,3">
+        <Border.Triggers>
+            <DataTrigger TargetType="Border" Binding="{Binding IsUs}" Value="True">
+                <Setter Property="Stroke" Value="{StaticResource UsBlue}" />
+            </DataTrigger>
+            <DataTrigger TargetType="Border" Binding="{Binding IsActive}" Value="True">
+                <Setter Property="Stroke" Value="{StaticResource Gold}" />
+                <Setter Property="StrokeThickness" Value="2" />
+            </DataTrigger>
+        </Border.Triggers>
+        <VerticalStackLayout Spacing="0">
+            <HorizontalStackLayout Spacing="5">
+                <Label Text="{Binding Name}" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource ThemRed}">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label" Binding="{Binding IsUs}" Value="True">
+                            <Setter Property="TextColor" Value="{StaticResource UsBlue}" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+                <Label Text="D" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource Gold}"
+                       IsVisible="{Binding IsDealer}" />
+                <Label Text="{Binding BidText}" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource Gold}" />
+            </HorizontalStackLayout>
+            <Label FontSize="12" TextColor="{StaticResource TextLight}">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="{Binding TricksWon, StringFormat='Tricks {0}'}" />
+                        <Span Text=" · " />
+                        <Span Text="{Binding CardCount, StringFormat='Cards {0}'}" />
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+        </VerticalStackLayout>
+    </Border>
+
+</ContentView>

@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- The compact layout for a phone (#952). The table (GamePage) is drawn for a desktop
+     window and scaled to fit, which on a phone leaves its cards and buttons too small to
+     tap; this layout shows the same game at full size instead: a top bar with the
+     buttons, the tricks, the score and trump; the trick in the middle, each card beside
+     its seat's chip; the status line; and the human's hand, with 48 units of each card
+     showing to tap. The panels (bid, trump, exchange, summary, log) are the page's own,
+     shown over either layout. -->
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Wolfgang.Hawsey.UI.Maui.ViewModels"
+             xmlns:views="clr-namespace:Wolfgang.Hawsey.UI.Maui.Views"
+             x:Class="Wolfgang.Hawsey.UI.Maui.Views.CompactTableView"
+             x:DataType="vm:GameViewModel">
+
+    <ContentView.Resources>
+        <!-- A seat's place on the table, outlined, with its card in it once played -->
+        <Style x:Key="CompactTrickSlot" TargetType="Border">
+            <Setter Property="StrokeShape" Value="RoundRectangle 5" />
+            <Setter Property="Stroke" Value="#73D4AF37" />
+            <Setter Property="StrokeThickness" Value="1" />
+            <Setter Property="WidthRequest" Value="42" />
+            <Setter Property="HeightRequest" Value="58" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+            <Setter Property="VerticalOptions" Value="Center" />
+        </Style>
+        <Style x:Key="CompactTrickCard" TargetType="Border">
+            <Setter Property="StrokeShape" Value="RoundRectangle 4" />
+            <Setter Property="BackgroundColor" Value="{StaticResource CardFace}" />
+            <Setter Property="Stroke" Value="#FF6B6B6B" />
+            <Setter Property="StrokeThickness" Value="1" />
+            <Setter Property="Padding" Value="4,2" />
+        </Style>
+        <Style x:Key="CompactButton" TargetType="Button" BasedOn="{StaticResource TableButton}">
+            <Setter Property="HeightRequest" Value="48" />
+            <Setter Property="MinimumWidthRequest" Value="48" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="VerticalOptions" Value="Center" />
+        </Style>
+    </ContentView.Resources>
+
+    <Grid RowDefinitions="52,*,Auto,100" Padding="8,0" Background="{StaticResource FeltBrush}">
+
+        <!-- Top bar: the buttons, then the tricks and score, then trump -->
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+            <HorizontalStackLayout Spacing="6">
+                <Button Text="&#9776; NEW GAME" Style="{StaticResource CompactButton}" Command="{Binding NewGameCommand}" />
+                <Button Text="Log" Style="{StaticResource CompactButton}" Command="{Binding ToggleLogCommand}" />
+                <Button Text="Layout" Style="{StaticResource CompactButton}" Command="{Binding ToggleLayoutCommand}" />
+            </HorizontalStackLayout>
+
+            <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center">
+                <Label FontSize="13" TextColor="{StaticResource TextLight}">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="TRICKS  " TextColor="{StaticResource Gold}" />
+                            <Span Text="US " TextColor="{StaticResource UsBlue}" />
+                            <Span Text="{Binding UsTricks}" FontAttributes="Bold" />
+                            <Span Text="  THEM " TextColor="{StaticResource ThemRed}" />
+                            <Span Text="{Binding ThemTricks}" FontAttributes="Bold" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+                <Label FontSize="13" TextColor="{StaticResource TextLight}">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="SCORE  " TextColor="{StaticResource Gold}" />
+                            <Span Text="US " TextColor="{StaticResource UsBlue}" />
+                            <Span Text="{Binding NorthSouthScore}" FontAttributes="Bold" />
+                            <Span Text="  THEM " TextColor="{StaticResource ThemRed}" />
+                            <Span Text="{Binding EastWestScore}" FontAttributes="Bold" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+            </VerticalStackLayout>
+
+            <HorizontalStackLayout Grid.Column="2" Spacing="5" VerticalOptions="Center">
+                <Label Text="Trump" TextColor="White" FontSize="13" VerticalOptions="Center" />
+                <Label Text="{Binding TrumpSymbol}" TextColor="{StaticResource TextLight}" FontSize="20" VerticalOptions="Center">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label" Binding="{Binding IsTrumpRed}" Value="True">
+                            <Setter Property="TextColor" Value="#FFFF5A5A" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+                <Label Text="{Binding TrumpSetterTeam}" TextColor="{StaticResource ThemRed}" FontSize="13" FontAttributes="Bold" VerticalOptions="Center">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label" Binding="{Binding IsTrumpSetterUs}" Value="True">
+                            <Setter Property="TextColor" Value="{StaticResource UsBlue}" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+                <Label Text="{Binding BidAmountText}" TextColor="{StaticResource Gold}" FontSize="13" FontAttributes="Bold" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+        </Grid>
+
+        <!-- The trick: each seat's place on the table, its chip beside it -->
+        <Grid Grid.Row="1" RowDefinitions="*,*,*" ColumnDefinitions="*,Auto,*" RowSpacing="4" ColumnSpacing="8">
+
+            <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource CompactTrickSlot}">
+                <Border Style="{StaticResource CompactTrickCard}" BindingContext="{Binding North.TableCard}"
+                        IsVisible="{Binding North.HasTableCard, Source={RelativeSource AncestorType={x:Type vm:GameViewModel}}, x:DataType=vm:GameViewModel}">
+                    <Grid x:DataType="vm:TrickCardViewModel">
+                        <Label Text="{Binding RankText}" TextColor="{Binding SuitColor}" FontSize="14" FontAttributes="Bold" />
+                        <Label Text="{Binding SuitSymbol}" TextColor="{Binding SuitColor}" FontSize="22"
+                               HorizontalOptions="Center" VerticalOptions="End" />
+                    </Grid>
+                </Border>
+            </Border>
+            <views:SeatChipView Grid.Row="0" Grid.Column="2" BindingContext="{Binding North}"
+                                HorizontalOptions="Start" VerticalOptions="Center" />
+
+            <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Spacing="8" HorizontalOptions="End">
+                <views:SeatChipView BindingContext="{Binding West}" VerticalOptions="Center" />
+                <Border Style="{StaticResource CompactTrickSlot}">
+                    <Border Style="{StaticResource CompactTrickCard}" BindingContext="{Binding West.TableCard}"
+                            IsVisible="{Binding West.HasTableCard, Source={RelativeSource AncestorType={x:Type vm:GameViewModel}}, x:DataType=vm:GameViewModel}">
+                        <Grid x:DataType="vm:TrickCardViewModel">
+                            <Label Text="{Binding RankText}" TextColor="{Binding SuitColor}" FontSize="14" FontAttributes="Bold" />
+                            <Label Text="{Binding SuitSymbol}" TextColor="{Binding SuitColor}" FontSize="22"
+                                   HorizontalOptions="Center" VerticalOptions="End" />
+                        </Grid>
+                    </Border>
+                </Border>
+            </HorizontalStackLayout>
+
+            <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource Panel}" Padding="8,4" VerticalOptions="Center">
+                <VerticalStackLayout Spacing="0">
+                    <Label Text="{Binding LedByText}" TextColor="White" FontSize="12" HorizontalOptions="Center" />
+                    <Label HorizontalOptions="Center" FontSize="13" TextColor="{StaticResource WinGreen}">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Winning " />
+                                <Span Text="{Binding WinningCardText}" FontAttributes="Bold" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </VerticalStackLayout>
+            </Border>
+
+            <HorizontalStackLayout Grid.Row="1" Grid.Column="2" Spacing="8" HorizontalOptions="Start">
+                <Border Style="{StaticResource CompactTrickSlot}">
+                    <Border Style="{StaticResource CompactTrickCard}" BindingContext="{Binding East.TableCard}"
+                            IsVisible="{Binding East.HasTableCard, Source={RelativeSource AncestorType={x:Type vm:GameViewModel}}, x:DataType=vm:GameViewModel}">
+                        <Grid x:DataType="vm:TrickCardViewModel">
+                            <Label Text="{Binding RankText}" TextColor="{Binding SuitColor}" FontSize="14" FontAttributes="Bold" />
+                            <Label Text="{Binding SuitSymbol}" TextColor="{Binding SuitColor}" FontSize="22"
+                                   HorizontalOptions="Center" VerticalOptions="End" />
+                        </Grid>
+                    </Border>
+                </Border>
+                <views:SeatChipView BindingContext="{Binding East}" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource CompactTrickSlot}">
+                <Border Style="{StaticResource CompactTrickCard}" BindingContext="{Binding South.TableCard}"
+                        IsVisible="{Binding South.HasTableCard, Source={RelativeSource AncestorType={x:Type vm:GameViewModel}}, x:DataType=vm:GameViewModel}">
+                    <Grid x:DataType="vm:TrickCardViewModel">
+                        <Label Text="{Binding RankText}" TextColor="{Binding SuitColor}" FontSize="14" FontAttributes="Bold" />
+                        <Label Text="{Binding SuitSymbol}" TextColor="{Binding SuitColor}" FontSize="22"
+                               HorizontalOptions="Center" VerticalOptions="End" />
+                    </Grid>
+                </Border>
+            </Border>
+            <views:SeatChipView Grid.Row="2" Grid.Column="2" BindingContext="{Binding South}"
+                                HorizontalOptions="Start" VerticalOptions="Center" />
+        </Grid>
+
+        <!-- Status line -->
+        <Label Grid.Row="2" Text="{Binding StatusMessage}" TextColor="{StaticResource Gold}" FontSize="14"
+               HorizontalOptions="Center" Margin="0,2" InputTransparent="True" />
+
+        <!-- The human's hand: 48 units of each card show, to tap -->
+        <HorizontalStackLayout Grid.Row="3" Spacing="-12" HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,6"
+                               BindableLayout.ItemsSource="{Binding HumanCards}">
+            <BindableLayout.ItemTemplate>
+                <DataTemplate x:DataType="vm:CardViewModel">
+                    <Border StrokeShape="RoundRectangle 5"
+                            BackgroundColor="{StaticResource CardFace}"
+                            WidthRequest="60" HeightRequest="84"
+                            VerticalOptions="End"
+                            Padding="5,2"
+                            Stroke="{Binding IsLegal, Converter={StaticResource BoolToStrokeConverter}}"
+                            StrokeThickness="1"
+                            Opacity="{Binding IsInteractive, Converter={StaticResource BoolToOpacityConverter}}">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsLegal}" Value="True">
+                                <Setter Property="StrokeThickness" Value="2" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                <Setter Property="TranslationY" Value="-12" />
+                                <Setter Property="Stroke" Value="{StaticResource ThemRed}" />
+                                <Setter Property="StrokeThickness" Value="3" />
+                                <Setter Property="Opacity" Value="0.85" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding PlayCardCommand, Source={RelativeSource AncestorType={x:Type vm:GameViewModel}}, x:DataType=vm:GameViewModel}"
+                                CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <Grid>
+                            <Label Text="{Binding RankText}" TextColor="{Binding SuitColor}"
+                                   FontSize="18" FontAttributes="Bold"
+                                   HorizontalOptions="Start" VerticalOptions="Start" />
+                            <Label Text="{Binding SuitSymbol}" TextColor="{Binding SuitColor}"
+                                   FontSize="30" Margin="0,0,10,0"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </BindableLayout.ItemTemplate>
+        </HorizontalStackLayout>
+    </Grid>
+
+</ContentView>
