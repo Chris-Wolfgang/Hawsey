@@ -16,9 +16,25 @@ public partial class GamePage
     {
         InitializeComponent();
         AbsoluteLayout.SetLayoutBounds(Table, new Rect(0, 0, TableScale.DesignWidth, TableScale.DesignHeight));
-        TableHost.SizeChanged += (_, _) => FitTable(TableHost.Width, TableHost.Height);
         _viewModel = viewModel;
         BindingContext = viewModel;
+        TableHost.SizeChanged += (_, _) => OnHostSizeChanged();
+        _viewModel.PropertyChanged += (_, e) =>
+        {
+            if (string.Equals(e.PropertyName, nameof(GameViewModel.IsCompactLayout), StringComparison.Ordinal))
+            {
+                PlacePanels();
+            }
+        };
+    }
+
+
+
+    private void OnHostSizeChanged()
+    {
+        FitTable(TableHost.Width, TableHost.Height);
+        _viewModel.SetPageSize(TableHost.Width, TableHost.Height);
+        PlacePanels();
     }
 
 
@@ -30,6 +46,20 @@ public partial class GamePage
         Table.Scale = scale;
         Table.TranslationX = TableScale.Centre(width, scale, TableScale.DesignWidth);
         Table.TranslationY = TableScale.Centre(height, scale, TableScale.DesignHeight);
+    }
+
+
+
+    /// <summary>
+    /// Puts the panels over the table's area when the table shows, so they sit where they
+    /// do on the drawn table, or over the whole page in the compact layout.
+    /// </summary>
+    private void PlacePanels()
+    {
+        var bounds = _viewModel.IsCompactLayout
+            ? new Rect(0, 0, TableHost.Width, TableHost.Height)
+            : TableScale.Bounds(TableHost.Width, TableHost.Height);
+        AbsoluteLayout.SetLayoutBounds(Panels, bounds);
     }
 
 

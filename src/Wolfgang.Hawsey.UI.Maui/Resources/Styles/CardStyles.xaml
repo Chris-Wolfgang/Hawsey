@@ -126,13 +126,17 @@
         <Setter Property="Padding" Value="14,8" />
     </Style>
 
+    <!-- The height of a button in the panels: 48 on a phone or tablet, the touch-target
+         size Android and Material ask for, and the Blazor UI's 34 with a mouse. -->
+    <OnIdiom x:Key="TouchTarget" x:TypeArguments="x:Double" Phone="48" Tablet="48" Default="34" />
+
     <!-- .modal-card -->
     <Style x:Key="ModalCard" TargetType="Border">
         <Setter Property="StrokeShape" Value="RoundRectangle 10" />
         <Setter Property="BackgroundColor" Value="#FF1A3A26" />
         <Setter Property="Stroke" Value="{StaticResource PanelBorder}" />
         <Setter Property="StrokeThickness" Value="1" />
-        <Setter Property="Padding" Value="32,24" />
+        <Setter Property="Padding" Value="{OnIdiom Phone='20,12', Default='32,24'}" />
         <Setter Property="MinimumWidthRequest" Value="300" />
         <Setter Property="HorizontalOptions" Value="Center" />
     </Style>
@@ -141,14 +145,14 @@
         <Setter Property="FontSize" Value="21" />
         <Setter Property="FontAttributes" Value="Bold" />
         <Setter Property="HorizontalOptions" Value="Center" />
-        <Setter Property="Margin" Value="0,0,0,12" />
+        <Setter Property="Margin" Value="{OnIdiom Phone='0,0,0,6', Default='0,0,0,12'}" />
     </Style>
     <Style x:Key="ModalSub" TargetType="Label">
         <Setter Property="TextColor" Value="#FFCFCFCF" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="HorizontalTextAlignment" Value="Center" />
         <Setter Property="HorizontalOptions" Value="Center" />
-        <Setter Property="Margin" Value="0,0,0,12" />
+        <Setter Property="Margin" Value="{OnIdiom Phone='0,0,0,6', Default='0,0,0,12'}" />
     </Style>
 
     <!-- .btn and its variants -->

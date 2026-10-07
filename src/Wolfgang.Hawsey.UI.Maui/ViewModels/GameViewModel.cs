@@ -11,6 +11,7 @@ using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Game;
 using Wolfgang.Hawsey.Engine.Players;
 using Wolfgang.Hawsey.UI.Maui.Threading;
+using Wolfgang.Hawsey.UI.Maui.Views;
 
 namespace Wolfgang.Hawsey.UI.Maui.ViewModels;
 
@@ -51,6 +52,10 @@ public partial class GameViewModel : INotifyPropertyChanged
     private bool _canPass = true;
     private bool _isHawseyExchangeVisible;
     private string _exchangeSelectionText = "";
+    private LayoutChoice _layoutChoice = LayoutChoice.Auto;
+    private double _pageWidth;
+    private double _pageHeight;
+    private bool _isCompactLayout;
 
     // The hand in the order the human sees it: sorted by suit and rank when dealt, then
     // kept as the human rearranges it. Null until the first deal of a game.
@@ -81,6 +86,7 @@ public partial class GameViewModel : INotifyPropertyChanged
         SelectTrumpCommand = new Command<string>(s => Run(() => SelectTrumpAsync(s)));
         PlayCardCommand = new Command<CardViewModel>(c => Run(() => PlayCardAsync(c)));
         ToggleLogCommand = new Command(() => IsLogVisible = !IsLogVisible);
+        ToggleLayoutCommand = new Command(ToggleLayout);
         _confirmHawseyExchangeCommand = new Command
         (
             () => Run(ConfirmHawseyExchangeAsync),
@@ -177,6 +183,30 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
     public bool IsRoundSummaryVisible => _roundSummary != null;
+
+
+
+    /// <summary>
+    /// Whether the page shows the compact phone layout rather than the table: picked
+    /// from the page's size (<see cref="LayoutPicker"/>) until the human flips it with
+    /// <see cref="ToggleLayoutCommand"/>.
+    /// </summary>
+    public bool IsCompactLayout
+    {
+        get => _isCompactLayout;
+        private set
+        {
+            if (SetProperty(ref _isCompactLayout, value))
+            {
+                OnPropertyChanged(nameof(IsTableLayout));
+            }
+        }
+    }
+
+
+
+    /// <summary>Whether the page shows the table: the opposite of <see cref="IsCompactLayout"/>.</summary>
+    public bool IsTableLayout => !_isCompactLayout;
 
 
 
@@ -366,6 +396,24 @@ public partial class GameViewModel : INotifyPropertyChanged
     public ICommand SelectTrumpCommand { get; }
     public ICommand PlayCardCommand { get; }
     public ICommand ToggleLogCommand { get; }
+
+
+
+    /// <summary>Flips between the table and the compact layout, whatever the page's size.</summary>
+    public ICommand ToggleLayoutCommand { get; }
+
+
+
+    /// <summary>
+    /// The space the page has, in device-independent units; the page passes it on each
+    /// resize, and <see cref="LayoutChoice.Auto"/> picks the layout from it.
+    /// </summary>
+    public void SetPageSize(double width, double height)
+    {
+        _pageWidth = width;
+        _pageHeight = height;
+        UpdateLayout();
+    }
 
 
 
@@ -923,6 +971,19 @@ public partial class GameViewModel : INotifyPropertyChanged
         Rank.King => "K",
         _ => "A",
     };
+
+
+
+    private void ToggleLayout()
+    {
+        _layoutChoice = _isCompactLayout ? LayoutChoice.Table : LayoutChoice.Compact;
+        UpdateLayout();
+    }
+
+
+
+    private void UpdateLayout() =>
+        IsCompactLayout = LayoutPicker.UseCompact(_pageWidth, _pageHeight, _layoutChoice);
 
 
 

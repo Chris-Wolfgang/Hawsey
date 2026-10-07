@@ -47,9 +47,22 @@ public class TableScaleTests
 
 
     [Fact]
+    public void Bounds_is_the_scaled_table_centred_in_the_space()
+    {
+        Assert.Equal
+        (
+            new Rect((900 - (TableScale.DesignWidth / 2)) / 2, 0, TableScale.DesignWidth / 2, TableScale.DesignHeight / 2),
+            TableScale.Bounds(900, TableScale.DesignHeight / 2)
+        );
+    }
+
+
+
+    [Fact]
     public void GamePage_scales_and_centres_the_table_when_it_is_sized()
     {
-        // The page's XAML reads the app's resources.
+        // The page's XAML reads the app's resources, and its bindings need a dispatcher.
+        NoDispatchNeeded.Install();
         Application.Current = new App();
         var page = new GamePage(new GameViewModel(TestGameSessions.Unpaced(), new ImmediateDispatcher()));
         var host = Assert.IsType<AbsoluteLayout>(page.Content);
@@ -66,4 +79,63 @@ public class TableScaleTests
         Assert.Equal(0, table.TranslationY, precision: 6);
         Assert.Equal(new Rect(0, 0, TableScale.DesignWidth, TableScale.DesignHeight), AbsoluteLayout.GetLayoutBounds(table));
     }
+
+
+
+    [Fact]
+    public void GamePage_on_a_tablet_shows_the_table_with_the_panels_over_it()
+    {
+        var (page, host) = SizedGamePage(1100, 700);
+
+        Assert.True(Element<VisualElement>(page, "Table").IsVisible);
+        Assert.Equal(TableScale.Bounds(1100, 700), AbsoluteLayout.GetLayoutBounds(Element<BindableObject>(page, "Panels")));
+        Assert.False(host.Children.OfType<CompactTableView>().Single().IsVisible);
+    }
+
+
+
+    [Fact]
+    public void GamePage_on_a_phone_shows_the_compact_layout_with_the_panels_over_the_page()
+    {
+        var (page, host) = SizedGamePage(915, 412);
+
+        Assert.False(Element<VisualElement>(page, "Table").IsVisible);
+        Assert.Equal(new Rect(0, 0, 915, 412), AbsoluteLayout.GetLayoutBounds(Element<BindableObject>(page, "Panels")));
+        Assert.True(host.Children.OfType<CompactTableView>().Single().IsVisible);
+    }
+
+
+
+    [Fact]
+    public void GamePage_when_the_layout_is_flipped_moves_the_panels_onto_the_table()
+    {
+        var (page, _) = SizedGamePage(915, 412);
+
+        ((GameViewModel)page.BindingContext).ToggleLayoutCommand.Execute(null);
+
+        Assert.True(Element<VisualElement>(page, "Table").IsVisible);
+        Assert.Equal(TableScale.Bounds(915, 412), AbsoluteLayout.GetLayoutBounds(Element<BindableObject>(page, "Panels")));
+    }
+
+
+
+    private static (GamePage Page, AbsoluteLayout Host) SizedGamePage(double width, double height)
+    {
+        // The page's XAML reads the app's resources, and its bindings need a dispatcher.
+        NoDispatchNeeded.Install();
+        Application.Current = new App();
+        var page = new GamePage(new GameViewModel(TestGameSessions.Unpaced(), new ImmediateDispatcher()));
+        var host = Assert.IsType<AbsoluteLayout>(page.Content);
+
+        IView view = host;
+        view.Measure(width, height);
+        view.Arrange(new Rect(0, 0, width, height));
+        return (page, host);
+    }
+
+
+
+    private static T Element<T>(GamePage page, string name)
+        where T : class =>
+        Assert.IsAssignableFrom<T>(page.FindByName(name));
 }

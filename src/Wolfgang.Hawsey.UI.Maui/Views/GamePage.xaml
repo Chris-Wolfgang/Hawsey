@@ -20,6 +20,7 @@
          is the page less the system bars. -->
     <AbsoluteLayout x:Name="TableHost">
         <Border x:Name="Table"
+                IsVisible="{Binding IsTableLayout}"
                 AnchorX="0" AnchorY="0"
                 Stroke="{StaticResource TableRim}" StrokeThickness="14" StrokeShape="Rectangle"
                 Background="{StaticResource FeltBrush}">
@@ -213,176 +214,188 @@
                 <HorizontalStackLayout Spacing="10" HorizontalOptions="Start" VerticalOptions="End" Margin="16">
                     <Button Text="&#9776; NEW GAME" Style="{StaticResource TableButton}" Command="{Binding NewGameCommand}" />
                     <Button Text="Game log" Style="{StaticResource TableButton}" Command="{Binding ToggleLogCommand}" />
+                    <Button Text="Layout" Style="{StaticResource TableButton}" Command="{Binding ToggleLayoutCommand}" />
                 </HorizontalStackLayout>
-
-                <!-- Game log -->
-                <Border IsVisible="{Binding IsLogVisible}"
-                        StrokeShape="RoundRectangle 6" BackgroundColor="#D1000000"
-                        Stroke="{StaticResource PanelBorder}" StrokeThickness="1"
-                        WidthRequest="380" MaximumHeightRequest="360"
-                        HorizontalOptions="Start" VerticalOptions="End" Margin="16,0,0,64">
-                    <Grid RowDefinitions="Auto,*">
-                        <Grid ColumnDefinitions="*,Auto" Padding="10,6">
-                            <Label Text="Game log" TextColor="{StaticResource Gold}" FontAttributes="Bold" VerticalOptions="Center" />
-                            <Button Grid.Column="1" Text="close" Style="{StaticResource TableButton}"
-                                    Padding="7,2" FontSize="13" MinimumHeightRequest="0"
-                                    Command="{Binding ToggleLogCommand}" />
-                        </Grid>
-                        <ScrollView Grid.Row="1" Padding="10,6">
-                            <VerticalStackLayout BindableLayout.ItemsSource="{Binding GameLog}">
-                                <BindableLayout.ItemTemplate>
-                                    <DataTemplate x:DataType="x:String">
-                                        <Label Text="{Binding .}" TextColor="#FFDDDDDD" FontFamily="Consolas" FontSize="12.5" Padding="0,2" />
-                                    </DataTemplate>
-                                </BindableLayout.ItemTemplate>
-                            </VerticalStackLayout>
-                        </ScrollView>
-                    </Grid>
-                </Border>
-
-                <!-- Bid panel: at the top, so the hand stays in view -->
-                <Grid IsVisible="{Binding IsBiddingVisible}" BackgroundColor="#59000000"
-                      InputTransparent="True" CascadeInputTransparent="False">
-                    <Border Style="{StaticResource ModalCard}" VerticalOptions="Start" Margin="0,56,0,0">
-                        <VerticalStackLayout>
-                            <Label Text="Your bid" Style="{StaticResource ModalTitle}" />
-                            <Label Text="{Binding BidPrompt}" Style="{StaticResource ModalSub}" />
-                            <FlexLayout Wrap="Wrap" JustifyContent="Center" WidthRequest="300"
-                                        BindableLayout.ItemsSource="{Binding BidOptions}">
-                                <BindableLayout.ItemTemplate>
-                                    <DataTemplate x:DataType="x:String">
-                                        <Button Text="{Binding ., StringFormat='Bid {0}'}" Style="{StaticResource TableButton}"
-                                                WidthRequest="92" HeightRequest="34" MinimumHeightRequest="0" Padding="0" Margin="3"
-                                                Command="{Binding PlaceBidCommand, Source={RelativeSource AncestorType={x:Type vm:GameViewModel}}, x:DataType=vm:GameViewModel}"
-                                                CommandParameter="{Binding .}" />
-                                    </DataTemplate>
-                                </BindableLayout.ItemTemplate>
-                            </FlexLayout>
-                            <HorizontalStackLayout Spacing="6" HorizontalOptions="Center" Margin="0,6,0,0">
-                                <Button Text="Hawsey (24)" Style="{StaticResource RedButton}"
-                                        Command="{Binding PlaceBidCommand}" CommandParameter="hawsey" />
-                                <Button Text="Pass" Style="{StaticResource TableButton}" IsVisible="{Binding CanPass}"
-                                        Command="{Binding PlaceBidCommand}" CommandParameter="pass" />
-                            </HorizontalStackLayout>
-                        </VerticalStackLayout>
-                    </Border>
-                </Grid>
-
-                <!-- Trump picker -->
-                <Grid IsVisible="{Binding IsTrumpPickerVisible}" BackgroundColor="#8C000000">
-                    <Border Style="{StaticResource ModalCard}" VerticalOptions="Center">
-                        <VerticalStackLayout>
-                            <Label Text="Pick trump" Style="{StaticResource ModalTitle}" />
-                            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8" Margin="0,0,0,12">
-                                <Button Grid.Row="0" Grid.Column="0" Text="&#9829; Hearts" Style="{StaticResource RedButton}"
-                                        Command="{Binding SelectTrumpCommand}" CommandParameter="hearts" />
-                                <Button Grid.Row="0" Grid.Column="1" Text="&#9830; Diamonds" Style="{StaticResource RedButton}"
-                                        Command="{Binding SelectTrumpCommand}" CommandParameter="diamonds" />
-                                <Button Grid.Row="1" Grid.Column="0" Text="&#9827; Clubs" Style="{StaticResource TableButton}"
-                                        Command="{Binding SelectTrumpCommand}" CommandParameter="clubs" />
-                                <Button Grid.Row="1" Grid.Column="1" Text="&#9824; Spades" Style="{StaticResource TableButton}"
-                                        Command="{Binding SelectTrumpCommand}" CommandParameter="spades" />
-                            </Grid>
-                            <Button Text="Ace High (no trump)" Style="{StaticResource TableButton}"
-                                    Command="{Binding SelectTrumpCommand}" CommandParameter="acehigh" />
-                        </VerticalStackLayout>
-                    </Border>
-                </Grid>
-
-                <!-- Hawsey exchange: at the top, so the hand stays tappable -->
-                <Grid IsVisible="{Binding IsHawseyExchangeVisible}" BackgroundColor="#59000000"
-                      InputTransparent="True" CascadeInputTransparent="False">
-                    <Border Style="{StaticResource ModalCard}" VerticalOptions="Start" Margin="0,56,0,0" MaximumWidthRequest="420">
-                        <VerticalStackLayout>
-                            <Label Text="Hawsey exchange" Style="{StaticResource ModalTitle}" />
-                            <Label Style="{StaticResource ModalSub}">
-                                <Label.FormattedText>
-                                    <FormattedString>
-                                        <Span Text="Click " />
-                                        <Span Text="2 cards" TextColor="{StaticResource Gold}" FontAttributes="Bold" />
-                                        <Span Text=" in your hand to discard. Your partner gives you their " />
-                                        <Span Text="2 best" TextColor="{StaticResource Gold}" FontAttributes="Bold" />
-                                        <Span Text=" for the chosen trump." />
-                                    </FormattedString>
-                                </Label.FormattedText>
-                            </Label>
-                            <Label Text="{Binding ExchangeSelectionText}" Style="{StaticResource ModalSub}" TextColor="{StaticResource Gold}" FontAttributes="Bold" />
-                            <Button Text="Discard &amp; receive" Style="{StaticResource PrimaryButton}"
-                                    HorizontalOptions="Center"
-                                    Command="{Binding ConfirmHawseyExchangeCommand}" />
-                        </VerticalStackLayout>
-                    </Border>
-                </Grid>
-
-                <!-- Round summary, and the game-over summary -->
-                <Grid IsVisible="{Binding IsRoundSummaryVisible}" BackgroundColor="#8C000000">
-                    <Border Style="{StaticResource ModalCard}" VerticalOptions="Center" MinimumWidthRequest="360">
-                        <VerticalStackLayout>
-                            <Label Text="{Binding RoundSummary.Title}" Style="{StaticResource ModalTitle}">
-                                <Label.Triggers>
-                                    <DataTrigger TargetType="Label" Binding="{Binding RoundSummary.IsGameOver}" Value="True">
-                                        <Setter Property="TextColor" Value="{StaticResource ThemRed}" />
-                                    </DataTrigger>
-                                    <DataTrigger TargetType="Label" Binding="{Binding RoundSummary.IsTitleUs}" Value="True">
-                                        <Setter Property="TextColor" Value="{StaticResource UsBlue}" />
-                                    </DataTrigger>
-                                </Label.Triggers>
-                            </Label>
-
-                            <Label HorizontalOptions="Center" FontSize="16" Margin="0,0,0,16" TextColor="{StaticResource TextLight}">
-                                <Label.FormattedText>
-                                    <FormattedString>
-                                        <Span Text="{Binding RoundSummary.BidTeamLabel}" FontAttributes="Bold" TextColor="{Binding RoundSummary.BidTeamColor}" />
-                                        <Span Text=" bid " />
-                                        <Span Text="{Binding RoundSummary.BidText}" FontAttributes="Bold" TextColor="{StaticResource Gold}" />
-                                        <Span Text="  " />
-                                        <Span Text="{Binding RoundSummary.ResultText}" FontAttributes="Bold" TextColor="{Binding RoundSummary.ResultColor}" />
-                                    </FormattedString>
-                                </Label.FormattedText>
-                            </Label>
-
-                            <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="6" Margin="0,0,0,16">
-                                <Grid.Resources>
-                                    <Style x:Key="RowHeading" TargetType="Label">
-                                        <Setter Property="TextColor" Value="#FF888888" />
-                                        <Setter Property="FontSize" Value="13" />
-                                        <Setter Property="HorizontalTextAlignment" Value="End" />
-                                    </Style>
-                                    <Style TargetType="Label">
-                                        <Setter Property="TextColor" Value="#FFDDDDDD" />
-                                        <Setter Property="HorizontalTextAlignment" Value="Center" />
-                                    </Style>
-                                </Grid.Resources>
-                                <Label Grid.Row="0" Grid.Column="1" Text="US" TextColor="{StaticResource UsBlue}" FontAttributes="Bold" />
-                                <Label Grid.Row="0" Grid.Column="2" Text="THEM" TextColor="{StaticResource ThemRed}" FontAttributes="Bold" />
-                                <Label Grid.Row="1" Grid.Column="0" Text="TRICKS" Style="{StaticResource RowHeading}" />
-                                <Label Grid.Row="1" Grid.Column="1" Text="{Binding RoundSummary.UsTricks}" />
-                                <Label Grid.Row="1" Grid.Column="2" Text="{Binding RoundSummary.ThemTricks}" />
-                                <Label Grid.Row="2" Grid.Column="0" Text="THIS ROUND" Style="{StaticResource RowHeading}" />
-                                <Label Grid.Row="2" Grid.Column="1" Text="{Binding RoundSummary.UsDeltaText}" TextColor="{Binding RoundSummary.UsDeltaColor}" />
-                                <Label Grid.Row="2" Grid.Column="2" Text="{Binding RoundSummary.ThemDeltaText}" TextColor="{Binding RoundSummary.ThemDeltaColor}" />
-                                <Label Grid.Row="3" Grid.Column="0" Text="TOTAL" Style="{StaticResource RowHeading}" />
-                                <Label Grid.Row="3" Grid.Column="1" Text="{Binding RoundSummary.UsTotal}" />
-                                <Label Grid.Row="3" Grid.Column="2" Text="{Binding RoundSummary.ThemTotal}" />
-                            </Grid>
-
-                            <Button Text="Next round" Style="{StaticResource PrimaryButton}" HorizontalOptions="Center"
-                                    Command="{Binding NextRoundCommand}">
-                                <Button.Triggers>
-                                    <DataTrigger TargetType="Button" Binding="{Binding RoundSummary.IsGameOver}" Value="True">
-                                        <Setter Property="IsVisible" Value="False" />
-                                    </DataTrigger>
-                                </Button.Triggers>
-                            </Button>
-                            <Button Text="Play again" Style="{StaticResource PrimaryButton}" HorizontalOptions="Center"
-                                    IsVisible="{Binding RoundSummary.IsGameOver}"
-                                    Command="{Binding NewGameCommand}" />
-                        </VerticalStackLayout>
-                    </Border>
-                </Grid>
 
             </Grid>
         </Border>
+
+        <!-- The compact layout for phones (#952), at full size with touch-sized cards -->
+        <views:CompactTableView AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1"
+                                IsVisible="{Binding IsCompactLayout}" />
+
+        <!-- The panels, over whichever layout is showing and never scaled, so their
+             buttons keep a touch-sized height. Over the table they are placed on the
+             table's area (the code-behind sets their bounds), as on the drawn table. -->
+        <Grid x:Name="Panels" InputTransparent="True" CascadeInputTransparent="False">
+
+            <!-- Game log -->
+            <Border IsVisible="{Binding IsLogVisible}"
+                    StrokeShape="RoundRectangle 6" BackgroundColor="#D1000000"
+                    Stroke="{StaticResource PanelBorder}" StrokeThickness="1"
+                    WidthRequest="380" MaximumHeightRequest="{OnIdiom Phone=280, Default=360}"
+                    HorizontalOptions="Start" VerticalOptions="End" Margin="{OnIdiom Phone='8,0,0,8', Default='16,0,0,64'}">
+                <Grid RowDefinitions="Auto,*">
+                    <Grid ColumnDefinitions="*,Auto" Padding="10,6">
+                        <Label Text="Game log" TextColor="{StaticResource Gold}" FontAttributes="Bold" VerticalOptions="Center" />
+                        <Button Grid.Column="1" Text="close" Style="{StaticResource TableButton}"
+                                Padding="12,2" FontSize="13" MinimumHeightRequest="0" HeightRequest="{StaticResource TouchTarget}"
+                                Command="{Binding ToggleLogCommand}" />
+                    </Grid>
+                    <ScrollView Grid.Row="1" Padding="10,6">
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding GameLog}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="x:String">
+                                    <Label Text="{Binding .}" TextColor="#FFDDDDDD" FontFamily="Consolas" FontSize="12.5" Padding="0,2" />
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </ScrollView>
+                </Grid>
+            </Border>
+
+            <!-- Bid panel: at the top, so the hand stays in view -->
+            <Grid IsVisible="{Binding IsBiddingVisible}" BackgroundColor="#59000000"
+                  InputTransparent="True" CascadeInputTransparent="False">
+                <Border Style="{StaticResource ModalCard}" VerticalOptions="Start" Margin="0,56,0,0">
+                    <VerticalStackLayout>
+                        <Label Text="Your bid" Style="{StaticResource ModalTitle}" />
+                        <Label Text="{Binding BidPrompt}" Style="{StaticResource ModalSub}" />
+                        <FlexLayout Wrap="Wrap" JustifyContent="Center" WidthRequest="{OnIdiom Phone=480, Default=300}"
+                                    BindableLayout.ItemsSource="{Binding BidOptions}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="x:String">
+                                    <Button Text="{Binding ., StringFormat='Bid {0}'}" Style="{StaticResource TableButton}"
+                                            WidthRequest="{OnIdiom Phone=74, Default=92}" HeightRequest="{StaticResource TouchTarget}" MinimumHeightRequest="0" Padding="0" Margin="3"
+                                            Command="{Binding PlaceBidCommand, Source={RelativeSource AncestorType={x:Type vm:GameViewModel}}, x:DataType=vm:GameViewModel}"
+                                            CommandParameter="{Binding .}" />
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </FlexLayout>
+                        <HorizontalStackLayout Spacing="6" HorizontalOptions="Center" Margin="0,6,0,0">
+                            <Button HeightRequest="{StaticResource TouchTarget}" Text="Hawsey (24)" Style="{StaticResource RedButton}"
+                                    Command="{Binding PlaceBidCommand}" CommandParameter="hawsey" />
+                            <Button HeightRequest="{StaticResource TouchTarget}" Text="Pass" Style="{StaticResource TableButton}" IsVisible="{Binding CanPass}"
+                                    Command="{Binding PlaceBidCommand}" CommandParameter="pass" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <!-- Trump picker -->
+            <Grid IsVisible="{Binding IsTrumpPickerVisible}" BackgroundColor="#8C000000">
+                <Border Style="{StaticResource ModalCard}" VerticalOptions="Center">
+                    <VerticalStackLayout>
+                        <Label Text="Pick trump" Style="{StaticResource ModalTitle}" />
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8" Margin="0,0,0,12">
+                            <Button HeightRequest="{StaticResource TouchTarget}" Grid.Row="0" Grid.Column="0" Text="&#9829; Hearts" Style="{StaticResource RedButton}"
+                                    Command="{Binding SelectTrumpCommand}" CommandParameter="hearts" />
+                            <Button HeightRequest="{StaticResource TouchTarget}" Grid.Row="0" Grid.Column="1" Text="&#9830; Diamonds" Style="{StaticResource RedButton}"
+                                    Command="{Binding SelectTrumpCommand}" CommandParameter="diamonds" />
+                            <Button HeightRequest="{StaticResource TouchTarget}" Grid.Row="1" Grid.Column="0" Text="&#9827; Clubs" Style="{StaticResource TableButton}"
+                                    Command="{Binding SelectTrumpCommand}" CommandParameter="clubs" />
+                            <Button HeightRequest="{StaticResource TouchTarget}" Grid.Row="1" Grid.Column="1" Text="&#9824; Spades" Style="{StaticResource TableButton}"
+                                    Command="{Binding SelectTrumpCommand}" CommandParameter="spades" />
+                        </Grid>
+                        <Button HeightRequest="{StaticResource TouchTarget}" Text="Ace High (no trump)" Style="{StaticResource TableButton}"
+                                Command="{Binding SelectTrumpCommand}" CommandParameter="acehigh" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <!-- Hawsey exchange: at the top, so the hand stays tappable -->
+            <Grid IsVisible="{Binding IsHawseyExchangeVisible}" BackgroundColor="#59000000"
+                  InputTransparent="True" CascadeInputTransparent="False">
+                <Border Style="{StaticResource ModalCard}" VerticalOptions="Start" Margin="0,56,0,0" MaximumWidthRequest="{OnIdiom Phone=600, Default=420}">
+                    <VerticalStackLayout>
+                        <Label Text="Hawsey exchange" Style="{StaticResource ModalTitle}" />
+                        <Label Style="{StaticResource ModalSub}">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="Click " />
+                                    <Span Text="2 cards" TextColor="{StaticResource Gold}" FontAttributes="Bold" />
+                                    <Span Text=" in your hand to discard. Your partner gives you their " />
+                                    <Span Text="2 best" TextColor="{StaticResource Gold}" FontAttributes="Bold" />
+                                    <Span Text=" for the chosen trump." />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <Label Text="{Binding ExchangeSelectionText}" Style="{StaticResource ModalSub}" TextColor="{StaticResource Gold}" FontAttributes="Bold" />
+                        <Button HeightRequest="{StaticResource TouchTarget}" Text="Discard &amp; receive" Style="{StaticResource PrimaryButton}"
+                                HorizontalOptions="Center"
+                                Command="{Binding ConfirmHawseyExchangeCommand}" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <!-- Round summary, and the game-over summary -->
+            <Grid IsVisible="{Binding IsRoundSummaryVisible}" BackgroundColor="#8C000000">
+                <Border Style="{StaticResource ModalCard}" VerticalOptions="Center" MinimumWidthRequest="360">
+                    <VerticalStackLayout>
+                        <Label Text="{Binding RoundSummary.Title}" Style="{StaticResource ModalTitle}">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding RoundSummary.IsGameOver}" Value="True">
+                                    <Setter Property="TextColor" Value="{StaticResource ThemRed}" />
+                                </DataTrigger>
+                                <DataTrigger TargetType="Label" Binding="{Binding RoundSummary.IsTitleUs}" Value="True">
+                                    <Setter Property="TextColor" Value="{StaticResource UsBlue}" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+
+                        <Label HorizontalOptions="Center" FontSize="16" Margin="0,0,0,16" TextColor="{StaticResource TextLight}">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="{Binding RoundSummary.BidTeamLabel}" FontAttributes="Bold" TextColor="{Binding RoundSummary.BidTeamColor}" />
+                                    <Span Text=" bid " />
+                                    <Span Text="{Binding RoundSummary.BidText}" FontAttributes="Bold" TextColor="{StaticResource Gold}" />
+                                    <Span Text="  " />
+                                    <Span Text="{Binding RoundSummary.ResultText}" FontAttributes="Bold" TextColor="{Binding RoundSummary.ResultColor}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+
+                        <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="6" Margin="0,0,0,16">
+                            <Grid.Resources>
+                                <Style x:Key="RowHeading" TargetType="Label">
+                                    <Setter Property="TextColor" Value="#FF888888" />
+                                    <Setter Property="FontSize" Value="13" />
+                                    <Setter Property="HorizontalTextAlignment" Value="End" />
+                                </Style>
+                                <Style TargetType="Label">
+                                    <Setter Property="TextColor" Value="#FFDDDDDD" />
+                                    <Setter Property="HorizontalTextAlignment" Value="Center" />
+                                </Style>
+                            </Grid.Resources>
+                            <Label Grid.Row="0" Grid.Column="1" Text="US" TextColor="{StaticResource UsBlue}" FontAttributes="Bold" />
+                            <Label Grid.Row="0" Grid.Column="2" Text="THEM" TextColor="{StaticResource ThemRed}" FontAttributes="Bold" />
+                            <Label Grid.Row="1" Grid.Column="0" Text="TRICKS" Style="{StaticResource RowHeading}" />
+                            <Label Grid.Row="1" Grid.Column="1" Text="{Binding RoundSummary.UsTricks}" />
+                            <Label Grid.Row="1" Grid.Column="2" Text="{Binding RoundSummary.ThemTricks}" />
+                            <Label Grid.Row="2" Grid.Column="0" Text="THIS ROUND" Style="{StaticResource RowHeading}" />
+                            <Label Grid.Row="2" Grid.Column="1" Text="{Binding RoundSummary.UsDeltaText}" TextColor="{Binding RoundSummary.UsDeltaColor}" />
+                            <Label Grid.Row="2" Grid.Column="2" Text="{Binding RoundSummary.ThemDeltaText}" TextColor="{Binding RoundSummary.ThemDeltaColor}" />
+                            <Label Grid.Row="3" Grid.Column="0" Text="TOTAL" Style="{StaticResource RowHeading}" />
+                            <Label Grid.Row="3" Grid.Column="1" Text="{Binding RoundSummary.UsTotal}" />
+                            <Label Grid.Row="3" Grid.Column="2" Text="{Binding RoundSummary.ThemTotal}" />
+                        </Grid>
+
+                        <Button HeightRequest="{StaticResource TouchTarget}" Text="Next round" Style="{StaticResource PrimaryButton}" HorizontalOptions="Center"
+                                Command="{Binding NextRoundCommand}">
+                            <Button.Triggers>
+                                <DataTrigger TargetType="Button" Binding="{Binding RoundSummary.IsGameOver}" Value="True">
+                                    <Setter Property="IsVisible" Value="False" />
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
+                        <Button HeightRequest="{StaticResource TouchTarget}" Text="Play again" Style="{StaticResource PrimaryButton}" HorizontalOptions="Center"
+                                IsVisible="{Binding RoundSummary.IsGameOver}"
+                                Command="{Binding NewGameCommand}" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+        </Grid>
     </AbsoluteLayout>
 
 </ContentPage>
