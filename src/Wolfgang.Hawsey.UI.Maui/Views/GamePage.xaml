@@ -261,7 +261,7 @@
                     <VerticalStackLayout>
                         <Label Text="Your bid" Style="{StaticResource ModalTitle}" />
                         <Label Text="{Binding BidPrompt}" Style="{StaticResource ModalSub}" />
-                        <FlexLayout Wrap="Wrap" JustifyContent="Center" WidthRequest="{OnIdiom Phone=500, Default=300}"
+                        <FlexLayout Wrap="{OnIdiom Phone=NoWrap, Default=Wrap}" JustifyContent="Center" WidthRequest="{OnIdiom Phone=500, Default=300}"
                                     BindableLayout.ItemsSource="{Binding BidOptions}">
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate x:DataType="x:String">
