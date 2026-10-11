@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791101567945,
+  "lastUpdate": 1791699839130,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "Mutation score": [
@@ -48,6 +48,33 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/41a0e9a8ea5d84dbfc77823e880c4ba13efe9498"
         },
         "date": 1791101560781,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "Mutation score (tests/Wolfgang.Hawsey.Engine.Tests.Unit)",
+            "value": 91.76,
+            "unit": "%"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]",
+            "email": "49699333+dependabot[bot]@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "4735400b44fc9304d46f6dd44c7f25292e508af4",
+          "message": "Bump the dotnet-dependencies group with 2 updates (#989)\n\nBumps Meziantou.Analyzer from 3.0.294 to 3.0.297\nBumps Roslynator.Analyzers from 5.0.0 to 5.0.1\n\n---\nupdated-dependencies:\n- dependency-name: Meziantou.Analyzer\n  dependency-version: 3.0.297\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Roslynator.Analyzers\n  dependency-version: 5.0.1\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>\nCo-authored-by: Chris Wolfgang <210299580+Chris-Wolfgang@users.noreply.github.com>",
+          "timestamp": "2026-10-10T23:03:02Z",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/4735400b44fc9304d46f6dd44c7f25292e508af4"
+        },
+        "date": 1791699832330,
         "tool": "customBiggerIsBetter",
         "benches": [
           {
