@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791156700042,
+  "lastUpdate": 1792368929124,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -190,6 +190,54 @@ window.BENCHMARK_DATA = {
             "value": 442573.40380859375,
             "unit": "ns",
             "range": "± 457.72083172273005"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "47bebf17056611e2e2c9be2e3fe06b75f75cab80",
+          "message": "Bump the dotnet-dependencies group with 8 updates (#996)\n\nBumps cyclonedx from 6.2.0 to 6.3.1\nBumps FsCheck.Xunit from 3.4.0 to 3.5.0\nBumps Meziantou.Analyzer from 3.0.297 to 3.0.303\nBumps Microsoft.AspNetCore.Components.Web from 10.0.12 to 10.0.13\nBumps Microsoft.AspNetCore.Components.WebAssembly from 10.0.12 to 10.0.13\nBumps Microsoft.AspNetCore.Components.WebAssembly.DevServer from 10.0.12 to 10.0.13\nBumps Microsoft.SourceLink.GitHub from 10.0.401 to 10.0.402\nBumps Microsoft.VisualStudio.Threading.Analyzers from 18.7.23 to 18.12.1\n\n---\nupdated-dependencies:\n- dependency-name: cyclonedx\n  dependency-version: 6.3.1\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: dotnet-dependencies\n- dependency-name: FsCheck.Xunit\n  dependency-version: 3.5.0\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: dotnet-dependencies\n- dependency-name: Meziantou.Analyzer\n  dependency-version: 3.0.303\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Microsoft.AspNetCore.Components.Web\n  dependency-version: 10.0.13\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Microsoft.AspNetCore.Components.WebAssembly\n  dependency-version: 10.0.13\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Microsoft.AspNetCore.Components.WebAssembly.DevServer\n  dependency-version: 10.0.13\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Microsoft.SourceLink.GitHub\n  dependency-version: 10.0.402\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Microsoft.VisualStudio.Threading.Analyzers\n  dependency-version: 18.12.1\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: dotnet-dependencies\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2026-10-18T20:14:10-04:00",
+          "tree_id": "c2157208e25fce9a0caafc0f7e3f5050f2529af5",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/47bebf17056611e2e2c9be2e3fe06b75f75cab80"
+        },
+        "date": 1792368927752,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 554.4286193847656,
+            "unit": "ns",
+            "range": "± 3.4385079218888204"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 91.18012611071269,
+            "unit": "ns",
+            "range": "± 0.08456875909705427"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 300.0522295633952,
+            "unit": "ns",
+            "range": "± 3.394366122407741"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 375716.2360026042,
+            "unit": "ns",
+            "range": "± 3803.182138553726"
           }
         ]
       }
