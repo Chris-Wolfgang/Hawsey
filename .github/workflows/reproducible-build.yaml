@@ -4,17 +4,19 @@ name: Reproducible Build
 #
 # Builds the engine twice per OS - on separate runners, in different checkout
 # paths - and requires the SHA-256 of every assembly (.dll) and portable PDB
-# (.pdb) to be byte-identical within each OS. CI builds set
-# ContinuousIntegrationBuild (GitHub exports CI=true), which with Deterministic
-# normalises source paths to /_/, so machine and path must not matter.
+# (.pdb), for every TFM, to be byte-identical: within each OS, and between Linux
+# and Windows. CI builds set ContinuousIntegrationBuild (GitHub exports CI=true),
+# which with Deterministic normalises source paths to /_/, so machine and path
+# must not matter.
 #
-# Why per OS and not Linux vs Windows: MSBuild writes the sources it generates
-# (AssemblyInfo.cs, GlobalUsings.g.cs, the TFM attributes file) with the OS
-# newline - CRLF on Windows, LF elsewhere. Their checksums are recorded in the
-# PDB and the DLL embeds the PDB id, so one commit legitimately yields different
-# bytes on the two OSes (verified: identical paths and IL, only those checksums
-# differ). Releases are built on windows-latest, so Windows is the reference a
-# third party rebuilds on; Linux is checked too so a regression shows on either.
+# Cross-OS: MSBuild writes the sources it generates (AssemblyInfo.cs,
+# GlobalUsings.g.cs, the TFM attributes file) with the OS newline - CRLF on
+# Windows, LF elsewhere. Their checksums are recorded in the PDB and the DLL
+# embeds the PDB id, so those files alone made the bytes differ per OS.
+# Directory.Build.targets rewrites them to LF before compiling, and the
+# repository's own sources are LF on checkout (.gitattributes), so a difference
+# between the OSes now fails the run. If it does, diff the PDB documents in the
+# uploaded binaries first.
 #
 # The .nupkg is deliberately NOT compared: NuGet writes per-pack zip metadata, so
 # two packs of identical assemblies hash differently. The published contract is
@@ -130,3 +132,17 @@ jobs:
             fi
           done
           exit $status
+
+      - name: Diff across operating systems
+        run: |
+          a="hashes-windows-latest-a"; b="hashes-ubuntu-latest-a"
+          echo "== Windows vs Linux: SDK $(cat "$a.sdk") vs $(cat "$b.sdk")"
+          if ! cmp -s "$a.sdk" "$b.sdk"; then
+            echo "::warning::Windows and Linux resolved different SDKs; their hashes are only comparable for the same compiler."
+          fi
+          if diff -u "$a.txt" "$b.txt"; then
+            echo "✅ $(wc -l < "$a.txt") assemblies/PDBs byte-identical on Windows and Linux."
+          else
+            echo "::error::Assemblies or PDBs differ between Windows and Linux - the build is not byte-identical across operating systems."
+            exit 1
+          fi
