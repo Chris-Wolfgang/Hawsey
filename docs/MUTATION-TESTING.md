@@ -20,6 +20,7 @@ dotnet tool restore && dotnet stryker
 | 2026-09-27 | 90.06% | 88 | `GameSession` and `SimpleAiStrategy` moved into the engine; their behaviour tests added (#859) |
 | 2026-09-27 | 90.43% | 88 | The Blazor UI's AI becomes the engine's (#879); bidding progress on `GameState` (#878); session bids and the human Hawsey exchange (#882) |
 | 2026-09-28 | 91.54% | 88 | After #884–#897 and #907 (stateless bidding, unused types removed, the #897 killing tests); four more gaps killed (#875) |
+| 2026-10-18 | 91.76% | 88 | Weekly run on `main` (ecf84fa); one more gap killed, one new equivalent (#875) |
 
 ## Triage of the surviving mutants (2026-09-25)
 
@@ -109,3 +110,14 @@ A scoped run over `GameEngine.cs`, `GameSession.cs` and `TrickCompletedEventArgs
 all four killed. The `random` null guards in `StartGame` and `StartNextRound` remain, and are
 equivalent as listed above.
 
+## Weekly run on `main` (2026-10-18)
+
+Run 39102848455 on ecf84fa: **91.76%**, with 580 killed, 10 timeouts, 51 survived and 2
+without coverage. 49 of the survivors are in the accepted categories above. The other two:
+
+| Location | Mutation | Outcome |
+|---|---|---|
+| `GameSession.PlayHumanCard`: `GameOver?.Invoke` | Statement removed | Killed: a game that ends on the **human's** card (seed 3) must announce game over exactly once, from `PlayHumanCard`. The game-over tests only ended games on an AI card, which raises it from `AdvanceAiPlaysAsync`. |
+| `GameState.TableWinningCard`: `First` | `FirstOrDefault` | Equivalent: a completed trick always holds one card from its winner, so the lookup always finds it. |
+
+The killing test was checked by applying the mutant by hand: only that test fails.
