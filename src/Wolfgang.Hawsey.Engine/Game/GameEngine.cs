@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Wolfgang.Hawsey.Engine.Bidding;
 using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Players;
@@ -17,11 +18,22 @@ namespace Wolfgang.Hawsey.Engine.Game;
 // tests, external callers). The instance form is also DI-friendly — consumers can
 // register a single GameEngine in their service container even though no instance
 // state is currently held.
-[System.Diagnostics.CodeAnalysis.SuppressMessage(
-    "Performance", "S2325:Methods and properties that don't access instance data should be static",
-    Justification = "Instance API preserved to avoid CS0176 breaks at existing call sites and to keep the type DI-friendly.")]
+[SuppressMessage
+(
+    "Performance",
+    "S2325:Methods and properties that don't access instance data should be static",
+    Justification = "Instance API preserved to avoid CS0176 breaks at existing call sites and to keep the type DI-friendly."
+)]
 public sealed class GameEngine
 {
+    /// <summary>The cards in a normal trick: one from each of the four players.</summary>
+    private const int PlaysPerTrick = 4;
+
+    /// <summary>The cards in a Hawsey-round trick: the bidder's partner sits out.</summary>
+    private const int PlaysPerHawseyTrick = 3;
+
+
+
     /// <summary>
     /// Starts a new game by dealing the first hand.
     /// </summary>
@@ -244,8 +256,7 @@ public sealed class GameEngine
             );
         }
 
-        var expectedPlays = 4;
-        var trick = new Trick(trumpSuit, expectedPlays);
+        var trick = new Trick(trumpSuit, PlaysPerTrick);
 
         return new GameState
         (
@@ -291,7 +302,7 @@ public sealed class GameEngine
 
         var bidder = state.HawseyBidder!.Value;
         var hands = PerformHawseyExchange(state, bidder, cardsToDiscard, cardsFromPartner);
-        var trick = new Trick(state.TrumpSuit, expectedPlays: 3);
+        var trick = new Trick(state.TrumpSuit, PlaysPerHawseyTrick);
 
         return new GameState
         (
@@ -595,7 +606,7 @@ public sealed class GameEngine
             return ScoreRound(state, hands, completedTricks, tricksPlayed);
         }
 
-        var expectedPlays = state.IsHawseyRound ? 3 : 4;
+        var expectedPlays = state.IsHawseyRound ? PlaysPerHawseyTrick : PlaysPerTrick;
         var nextTrick = new Trick(state.TrumpSuit, expectedPlays);
 
         return new GameState

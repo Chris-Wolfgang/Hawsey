@@ -27,7 +27,7 @@ public abstract class BidAction
     /// <summary>
     /// A numeric bid for a specific number of tricks.
     /// </summary>
-    public sealed class NumberBid : BidAction
+    public sealed class NumberBid : BidAction, IEquatable<NumberBid>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="BidAction.NumberBid"/> class.
@@ -44,6 +44,25 @@ public abstract class BidAction
         /// Gets the number of tricks being bid.
         /// </summary>
         public int Amount { get; }
+
+
+
+        /// <summary>
+        /// Determines whether <paramref name="other"/> bids the same <see cref="Amount"/>.
+        /// </summary>
+        /// <param name="other">The bid to compare with.</param>
+        /// <returns><see langword="true"/> when both bid the same amount.</returns>
+        public bool Equals(NumberBid? other) => other is not null && other.Amount == Amount;
+
+
+
+        /// <inheritdoc/>
+        public override bool Equals(object? obj) => Equals(obj as NumberBid);
+
+
+
+        /// <inheritdoc/>
+        public override int GetHashCode() => Amount;
     }
 
 
