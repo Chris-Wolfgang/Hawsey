@@ -86,6 +86,37 @@ public sealed class Trick
 
 
     /// <summary>
+    /// Gets the play currently winning the trick, or <c>null</c> if no cards have been
+    /// played. Of two identical cards, the first played wins.
+    /// </summary>
+    public PlayedCard? CurrentWinningPlay
+    {
+        get
+        {
+            if (_plays.Count == 0)
+            {
+                return null;
+            }
+
+            var comparer = new CardComparer(_trumpSuit, _ledSuit!.Value);
+            var winningPlay = _plays[0];
+
+            for (var i = 1; i < _plays.Count; i++)
+            {
+                // Strictly greater: a tie stays with the card played first.
+                if (comparer.Compare(_plays[i].Card, winningPlay.Card) > 0)
+                {
+                    winningPlay = _plays[i];
+                }
+            }
+
+            return winningPlay;
+        }
+    }
+
+
+
+    /// <summary>
     /// Plays a card into this trick.
     /// </summary>
     /// <param name="player">The player playing the card.</param>
@@ -122,21 +153,9 @@ public sealed class Trick
             throw new InvalidOperationException("The trick is not yet complete.");
         }
 
-        var comparer = new CardComparer(_trumpSuit, _ledSuit!.Value);
-        var winningPlay = _plays[0];
-
-        for (var i = 1; i < _plays.Count; i++)
-        {
-            var comparison = comparer.Compare(_plays[i].Card, winningPlay.Card);
-
-            // Strictly greater — ties go to the first played (current winner)
-            if (comparison > 0)
-            {
-                winningPlay = _plays[i];
-            }
-        }
-
-        return new TrickResult(winningPlay.Player, _plays);
+        // A complete trick has at least two plays, so it has a winner. The result gets
+        // its own copy of the plays rather than this trick's list.
+        return new TrickResult(CurrentWinningPlay!.Player, _plays.ToArray());
     }
 
 
@@ -145,24 +164,5 @@ public sealed class Trick
     /// Gets the card currently winning the trick, or <c>null</c> if no cards have been played.
     /// </summary>
     /// <returns>The currently winning card, or <c>null</c>.</returns>
-    public Card? GetCurrentWinner()
-    {
-        if (_plays.Count == 0)
-        {
-            return null;
-        }
-
-        var comparer = new CardComparer(_trumpSuit, _ledSuit!.Value);
-        var winningPlay = _plays[0];
-
-        for (var i = 1; i < _plays.Count; i++)
-        {
-            if (comparer.Compare(_plays[i].Card, winningPlay.Card) > 0)
-            {
-                winningPlay = _plays[i];
-            }
-        }
-
-        return winningPlay.Card;
-    }
+    public Card? GetCurrentWinner() => CurrentWinningPlay?.Card;
 }
