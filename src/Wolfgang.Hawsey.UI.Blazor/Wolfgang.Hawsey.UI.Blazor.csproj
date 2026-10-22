@@ -6,9 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Wolfgang.Hawsey.UI.Blazor</RootNamespace>
     <Version>0.1.0</Version>
-    <Authors>Chris Wolfgang</Authors>
     <Description>Blazor WebAssembly host for the Hawsey card game.</Description>
-    <Copyright>Copyright (c) Chris Wolfgang</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <!-- An app, not a NuGet package (the SourceLink job skips non-packable projects),
          and its Razor components are not a documented API: opt out of the src/
