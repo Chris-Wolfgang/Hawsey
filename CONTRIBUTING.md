@@ -155,7 +155,6 @@ var now = DateTimeOffset.UtcNow;
 
 ### Prerequisites
 - .NET 10.0 SDK or later (required for the repo's net10.0 target; older SDKs cannot load the csproj)
-- The .NET MAUI workloads, to build the MAUI app: run `dotnet workload restore` once. Without them, build the engine alone with `dotnet build src/Wolfgang.Hawsey.Engine`.
 - PowerShell Core (optional, for formatting scripts)
 
 ### Build the Project

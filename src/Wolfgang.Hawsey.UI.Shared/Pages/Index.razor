@@ -377,7 +377,7 @@
 
     /// <summary>
     /// The cards on the table, as the engine decides: the current trick, or the trick
-    /// just won until the next lead. The MAUI app shows the same.
+    /// just won until the next lead.
     /// </summary>
     private IReadOnlyList<PlayedCard> TableCards => State?.TableCards ?? Array.Empty<PlayedCard>();
 
@@ -745,7 +745,7 @@
     /// <summary>
     /// Lets the engine play the AI seats until it waits for the human (or for the next
     /// round), then shows what the human must do. The loop itself is the engine's
-    /// (<see cref="GameSession.AdvanceAsync"/>), shared with the MAUI app; this page only
+    /// (<see cref="GameSession.AdvanceAsync"/>), shared by every UI; this page only
     /// shows the result, and waits for "Next round" after each round's summary.
     /// </summary>
     private async Task DriveLoopAsync()

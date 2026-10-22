@@ -12,13 +12,13 @@ Last full sync: template `e5e665a` (2026-09-26, Hawsey #24).
 
 | File | Difference | Why |
 |---|---|---|
-| `.github/workflows/pr.yaml` | InspectCode `timeout-minutes: 35` (template 20) | The MAUI app's `dotnet workload restore` alone takes minutes (#844). |
-| `.github/workflows/codeql.yaml` | `timeout-minutes: 45` (template 30) | Same MAUI workload restore (#844). |
+| `.github/workflows/pr.yaml` | InspectCode `timeout-minutes: 35` (template 20) | Set while the MAUI app (and its `dotnet workload restore`) was on `main`. The app now lives on `dev/maui`, so this can return to the template value. |
+| `.github/workflows/codeql.yaml` | `timeout-minutes: 45` (template 30) | Same history as the InspectCode timeout; can return to the template value. |
 | `.github/workflows/release.yaml` | Builds and attaches a reproducible-build manifest | See [REPRODUCIBLE-BUILD.md](REPRODUCIBLE-BUILD.md) (#91). |
 | `.github/workflows/benchmarks.yaml`, `BannedSymbols.txt` | Template placeholders filled in | Project path and namespace are Hawsey's. |
 | `.config/dotnet-tools.json` | Adds `microsoft.coyote.cli` | Concurrency tests for the engine's `GameSession` (#843). |
 | `.editorconfig` | Trimming, AOT and single-file analyzers at `warning` | The engine is AOT- and trim-compatible (#844). A candidate to feed back to the template. |
-| `docfx_project/docfx.json` | API metadata from the engine only, at `TargetFramework` net10.0; placeholders filled in | The MAUI project can't be built without workloads, and the engine doesn't target the template's old net8.0. |
+| `docfx_project/docfx.json` | API metadata from the engine only, at `TargetFramework` net10.0; placeholders filled in | The engine is the only documented API (the apps are not packages), and it doesn't target the template's old net8.0. |
 | `docs/WORKFLOW_SECURITY.md`, `docs/RELEASE-WORKFLOW-SETUP.md`, `.github/copilot-instructions.md`, `README.md`, `CONTRIBUTING.md` | Hawsey's own text | These describe this repository, not the template (#37, #40, #41). |
 | `scripts/Setup-GitHubPages.ps1` | Kept, although the template marks it template-only | Added deliberately in #810 for this repository's Pages setup. |
 | `.gitignore`, and trailing whitespace in several workflows | Order and whitespace only | Cosmetic (#814, #822). No behavioural difference. |
@@ -26,8 +26,8 @@ Last full sync: template `e5e665a` (2026-09-26, Hawsey #24).
 ## Workflows only Hawsey has
 
 `aot-smoke.yaml`, `coyote.yaml`, `cross-platform-differential.yaml`, `fuzz.yaml`,
-`maui-build.yaml`, `pr-benchmarks.yaml` and `reproducible-build.yaml`. These cover engine- and
-MAUI-specific checks that the template has no equivalent for.
+`pr-benchmarks.yaml`, `release-apps.yaml` and `reproducible-build.yaml`. These cover engine- and
+app-specific checks and the Blazor app's deployment, which the template has no equivalent for.
 
 ## Template files Hawsey doesn't have
 

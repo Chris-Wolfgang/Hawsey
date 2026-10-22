@@ -2,7 +2,7 @@
 
 ## Repository Summary
 
-Hawsey is a C# implementation of a four-player team trick-taking card game played with a pinochle deck. The repository contains a game-engine library, a .NET MAUI app, their tests, benchmarks, and a Native AOT smoke example. It was generated from `Chris-Wolfgang/repo-template` (`.template-version` records the template commit).
+Hawsey is a C# implementation of a four-player team trick-taking card game played with a pinochle deck. The repository contains a game-engine library, a Blazor WebAssembly app, their tests, benchmarks, and a Native AOT smoke example. The .NET MAUI app is developed on the `dev/maui` branch and is not on `main`. It was generated from `Chris-Wolfgang/repo-template` (`.template-version` records the template commit).
 
 **Primary Language**: C#
 **Solution**: `Hawsey.slnx`
@@ -10,9 +10,9 @@ Hawsey is a C# implementation of a four-player team trick-taking card game playe
 | Project | Target frameworks |
 |---|---|
 | `src/Wolfgang.Hawsey.Engine` | `netstandard2.0;net10.0` |
-| `src/Wolfgang.Hawsey.UI.Maui` | `net10.0` (unit-test target, no platform head) and `net10.0-android`, plus `net10.0-windows10.0.19041.0` on Windows and `net10.0-ios;net10.0-maccatalyst` on macOS |
+| `src/Wolfgang.Hawsey.UI.Blazor` | `net10.0` (Blazor WebAssembly host) |
+| `src/Wolfgang.Hawsey.UI.Shared` | `net10.0` (the Blazor app's Razor components) |
 | `tests/Wolfgang.Hawsey.Engine.Tests.Unit` | `net462` through `net10.0` (13 TFMs) |
-| `tests/Wolfgang.Hawsey.UI.Maui.Tests.Unit` | `net10.0` |
 | `tests/Wolfgang.Hawsey.Engine.Tests.Concurrency` | `net10.0` (Coyote) |
 | `benchmarks/Wolfgang.Hawsey.Engine.Benchmarks` | `net10.0` |
 | `examples/Wolfgang.Hawsey.Engine.AotSmoke` | `net10.0` |
@@ -21,19 +21,17 @@ Hawsey is a C# implementation of a four-player team trick-taking card game playe
 
 ### Prerequisites
 - .NET 10 SDK
-- The MAUI workloads for the MAUI app: `dotnet workload restore`
 - Local tools pinned in `.config/dotnet-tools.json`: `dotnet tool restore`
 
 ### Build and test
 
 ```powershell
-dotnet workload restore
 dotnet restore
 dotnet build --configuration Release
 dotnet test --configuration Release
 ```
 
-To build only the engine without workloads: `dotnet build src/Wolfgang.Hawsey.Engine --configuration Release`.
+To build only the engine: `dotnet build src/Wolfgang.Hawsey.Engine --configuration Release`.
 
 To run the Windows stage of the PR workflow locally (build, tests on every TFM, coverage gates, DevSkim, gitleaks):
 
@@ -52,7 +50,7 @@ pwsh ./scripts/build-pr.ps1
 
 - The engine (`src/Wolfgang.Hawsey.Engine`) is UI-agnostic and does no I/O. Each `GameEngine` method takes the current `GameState` and returns the next one. Namespaces follow folders: `Bidding`, `Cards`, `Game`, `Players`, `Rules`, `Scoring`, `Strategy`, `TrickPlay` under `Wolfgang.Hawsey.Engine`.
 - Card comparisons go through `CardRanking` (bowers change a card's effective suit and rank). See `docs/adr/` for the design decisions.
-- The MAUI app (`src/Wolfgang.Hawsey.UI.Maui`) uses the engine by project reference. Game logic that needs no UI framework (the AI, the human-vs-AI `GameSession`) belongs in the engine, not in a UI (ADR 0007).
+- The Blazor app (`src/Wolfgang.Hawsey.UI.Blazor`, components in `src/Wolfgang.Hawsey.UI.Shared`) uses the engine by project reference, as does the MAUI app on `dev/maui`. Game logic that needs no UI framework (the AI, the human-vs-AI `GameSession`) belongs in the engine, not in a UI (ADR 0007).
 
 ### Key Configuration Files
 - `.editorconfig`: code style and analyzer severities
@@ -66,7 +64,7 @@ pwsh ./scripts/build-pr.ps1
 - `.github/workflows/protected-files.yaml`: protected-files guard
 - `.github/workflows/release.yaml`: release on a published GitHub Release
 - `.github/workflows/docfx.yaml`: documentation build and deploy
-- Other workflows cover CodeQL, Semgrep, Scorecard, Stryker mutation testing, Coyote, fuzzing, benchmarks, the MAUI build, the AOT smoke test and reproducible builds.
+- Other workflows cover CodeQL, Semgrep, Scorecard, Stryker mutation testing, Coyote, fuzzing, benchmarks, the AOT smoke test, reproducible builds, and `release-apps.yaml` (deploys the Blazor app).
 - `ISSUE_TEMPLATE/`, `pull_request_template.md`, `CODEOWNERS`, `dependabot.yml`
 
 ## Agent Guidelines

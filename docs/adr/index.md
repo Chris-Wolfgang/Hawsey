@@ -3,7 +3,7 @@
 This folder records the non-obvious design decisions behind Hawsey: the *why*
 that the code and type signatures can't show. See
 [ADR-0001](0001-record-architecture-decisions.md) for the practice, and
-[`TEMPLATE.md`](TEMPLATE.md) to add a new one. The next number is **0007**.
+[`TEMPLATE.md`](TEMPLATE.md) to add a new one. The next number is **0008**.
 
 Once an ADR is **Accepted**, its content doesn't change. To reverse a decision,
 write a *new* ADR. The only edit allowed on the old one is its **Status** line
