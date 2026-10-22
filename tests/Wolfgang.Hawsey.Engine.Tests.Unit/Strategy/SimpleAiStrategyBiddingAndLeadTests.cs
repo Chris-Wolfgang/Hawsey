@@ -27,9 +27,8 @@ public class SimpleAiStrategyBiddingAndLeadTests
 
 
 
-    /// <summary>A bid has no value equality, so compare the amount.</summary>
     private static void AssertBids(int amount, BidAction bid) =>
-        Assert.Equal(amount, Assert.IsType<BidAction.NumberBid>(bid).Amount);
+        Assert.Equal(new BidAction.NumberBid(amount), Assert.IsType<BidAction.NumberBid>(bid));
 
 
 
