@@ -10,12 +10,14 @@ public static class Deck
     /// </summary>
     public const int CardCount = 48;
 
-    private static readonly Rank[] PinochleRanks = new[]
+    /// <summary>The six ranks of a pinochle deck, lowest first.</summary>
+    internal static readonly Rank[] PinochleRanks = new[]
     {
         Rank.Nine, Rank.Ten, Rank.Jack, Rank.Queen, Rank.King, Rank.Ace
     };
 
-    private static readonly Suit[] AllSuits = new[]
+    /// <summary>The four suits.</summary>
+    internal static readonly Suit[] AllSuits = new[]
     {
         Suit.Hearts, Suit.Diamonds, Suit.Clubs, Suit.Spades
     };

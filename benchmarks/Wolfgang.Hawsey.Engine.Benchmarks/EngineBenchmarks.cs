@@ -85,6 +85,16 @@ public class EngineBenchmarks
 
 
 
+    /// <summary>
+    /// A whole game with every seat played by <see cref="SimpleAiStrategy"/>, the AI the
+    /// UIs use, so its bidding and lead analysis are measured too.
+    /// </summary>
+    [Benchmark]
+    public GameState PlayFullGameWithSimpleAi() =>
+        _runner.RunGame(new SimpleAiStrategy(), _rules, PlayerPosition.South, Seeded(7));
+
+
+
     /// <summary>Passes every bid, names hearts, plays the first legal card.</summary>
     private sealed class FirstLegalCardStrategy : IPlayerStrategy
     {
