@@ -96,7 +96,7 @@ public class SimpleAiStrategy : IPlayerStrategy
 
         // Following. The trick has a card, so it has a led suit and a winner.
         var comparer = new CardComparer(state.TrumpSuit, state.CurrentTrick.LedSuit!.Value);
-        var winning = WinningPlay(state.CurrentTrick, comparer);
+        var winning = state.CurrentTrick.CurrentWinningPlay!;
 
         // If the partner is winning, don't overtake: throw low. Otherwise win as
         // cheaply as possible, or throw low.
@@ -254,27 +254,6 @@ public class SimpleAiStrategy : IPlayerStrategy
     {
         counts.TryGetValue(card, out var count);
         counts[card] = count + 1;
-    }
-
-
-
-    /// <summary>
-    /// The play currently winning <paramref name="trick"/>, which must hold at least one
-    /// card. The first of two equal cards keeps the lead.
-    /// </summary>
-    private static PlayedCard WinningPlay(Trick trick, CardComparer comparer)
-    {
-        var winner = trick.Plays[0];
-
-        for (var i = 1; i < trick.Plays.Count; i++)
-        {
-            if (comparer.Compare(trick.Plays[i].Card, winner.Card) > 0)
-            {
-                winner = trick.Plays[i];
-            }
-        }
-
-        return winner;
     }
 
 
