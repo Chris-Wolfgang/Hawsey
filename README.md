@@ -125,7 +125,7 @@ The game's namesake bid: the bidder plays alone to take all 12 tricks. The bidde
 | `src/Wolfgang.Hawsey.UI.Blazor` | Blazor WebAssembly app, played at [chris-wolfgang.github.io/Hawsey/play](https://chris-wolfgang.github.io/Hawsey/play/). Its components are in `src/Wolfgang.Hawsey.UI.Shared`; the game logic is the engine's `GameSession` ([ADR 0007](docs/adr/0007-game-session-in-the-engine-and-testable-uis.md)). Not published as a package. |
 | `src/Wolfgang.Hawsey.UI.Shared` | The Blazor app's Razor components and styles. |
 | `tests/Wolfgang.Hawsey.Engine.Tests.Unit` | Engine unit tests, run on every target framework from `net462` to `net10.0`. |
-| `tests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency` | Coyote concurrency tests for the engine's `GameSession`. |
+| `tests/Wolfgang.Hawsey.Engine.Tests.Concurrency` | Coyote concurrency tests for the engine's `GameSession`. |
 | `benchmarks/Wolfgang.Hawsey.Engine.Benchmarks` | BenchmarkDotNet benchmarks for the engine. |
 | `examples/Wolfgang.Hawsey.Engine.AotSmoke` | Native AOT smoke test that plays complete games through the engine. |
 

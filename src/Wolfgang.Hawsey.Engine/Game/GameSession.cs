@@ -35,7 +35,7 @@ public class GameSession
     private readonly Func<Random> _randomFactory;
     private readonly IPlayerStrategy _aiStrategy;
     // MA0158 (use System.Threading.Lock) does not apply here: the Coyote concurrency tests
-    // (tests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency) control lock ordering by rewriting
+    // (tests/Wolfgang.Hawsey.Engine.Tests.Concurrency) control lock ordering by rewriting
     // Monitor, which `lock (object)` compiles to. Coyote 1.7.11 cannot see
     // System.Threading.Lock: with it, both tests fail with "Potential deadlock or hang
     // detected" (verified). Keep the Monitor-based lock while the tests rely on Coyote.
