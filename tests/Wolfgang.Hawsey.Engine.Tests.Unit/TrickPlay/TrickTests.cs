@@ -275,6 +275,47 @@ public class TrickTests
 
 
     [Fact]
+    public void CurrentWinningPlay_when_no_plays_returns_null()
+    {
+        var trick = new Trick(Suit.Hearts);
+
+        Assert.Null(trick.CurrentWinningPlay);
+    }
+
+
+
+    [Fact]
+    public void CurrentWinningPlay_when_duplicate_cards_returns_the_first_played()
+    {
+        var trick = new Trick(Suit.Hearts);
+        var ace = new Card(Rank.Ace, Suit.Clubs);
+
+        trick.Play(PlayerPosition.North, new Card(Rank.Ten, Suit.Clubs));
+        trick.Play(PlayerPosition.East, ace);
+        trick.Play(PlayerPosition.South, ace);
+
+        var winning = trick.CurrentWinningPlay!;
+
+        Assert.Equal(PlayerPosition.East, winning.Player);
+        Assert.Equal(ace, winning.Card);
+    }
+
+
+
+    [Fact]
+    public void GetResult_returns_a_snapshot_of_the_plays_not_the_tricks_list()
+    {
+        var trick = new Trick(Suit.Hearts, expectedPlays: 2);
+
+        trick.Play(PlayerPosition.North, new Card(Rank.Ten, Suit.Clubs));
+        trick.Play(PlayerPosition.East, new Card(Rank.Ace, Suit.Clubs));
+
+        Assert.NotSame(trick.Plays, trick.GetResult().Cards);
+    }
+
+
+
+    [Fact]
     public void LedSuit_when_no_plays_returns_null()
     {
         var trick = new Trick(Suit.Hearts);

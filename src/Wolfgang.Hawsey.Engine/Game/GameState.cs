@@ -340,7 +340,14 @@ public sealed class GameState
             var won = CompletedTricks[CompletedTricks.Count - 1];
 
             // The winner played exactly one card in the trick.
-            return won.Cards.First(p => p.Player == won.Winner).Card;
+            var i = 0;
+
+            while (won.Cards[i].Player != won.Winner)
+            {
+                i++;
+            }
+
+            return won.Cards[i].Card;
         }
     }
 
