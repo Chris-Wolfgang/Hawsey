@@ -67,12 +67,7 @@ public static class Deck
             throw new ArgumentNullException(nameof(random));
         }
 
-        var shuffled = new Card[cards.Count];
-
-        for (var i = 0; i < cards.Count; i++)
-        {
-            shuffled[i] = cards[i];
-        }
+        var shuffled = cards.ToArray();
 
         for (var i = shuffled.Length - 1; i > 0; i--)
         {
