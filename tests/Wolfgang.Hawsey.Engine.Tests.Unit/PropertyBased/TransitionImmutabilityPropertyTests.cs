@@ -89,7 +89,7 @@ public class TransitionImmutabilityPropertyTests
 
 
     [Fact]
-    public void PlayCard_twice_from_the_same_state_gives_the_same_result()
+    public void PlayCard_when_called_twice_from_the_same_state_gives_the_same_result()
     {
         var state = _engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
 

@@ -54,7 +54,7 @@ public class GameEngineRoundTests
 
 
     [Fact]
-    public void StartGame_is_not_a_Hawsey_round()
+    public void StartGame_when_called_is_not_a_Hawsey_round()
     {
         Assert.False(StartAtNorth().IsHawseyRound);
     }
@@ -62,7 +62,7 @@ public class GameEngineRoundTests
 
 
     [Fact]
-    public void PlaceBid_while_bidding_continues_is_not_a_Hawsey_round()
+    public void PlaceBid_when_bidding_continues_is_not_a_Hawsey_round()
     {
         var state = StartAtNorth();
 
@@ -92,7 +92,7 @@ public class GameEngineRoundTests
 
 
     [Fact]
-    public void SelectTrump_in_a_Hawsey_round_keeps_the_Hawsey_flag()
+    public void SelectTrump_when_the_round_is_Hawsey_keeps_the_Hawsey_flag()
     {
         var state = ReachHawseyExchange();
 
@@ -131,7 +131,7 @@ public class GameEngineRoundTests
 
 
     [Fact]
-    public void StartGame_deals_every_card_of_the_deck_exactly_once()
+    public void StartGame_when_called_deals_every_card_of_the_deck_exactly_once()
     {
         var state = StartAtNorth();
 
@@ -144,7 +144,7 @@ public class GameEngineRoundTests
 
 
     [Fact]
-    public void Normal_round_has_four_card_tricks_and_no_Hawsey_state()
+    public void PlayCard_when_the_round_is_normal_plays_four_card_tricks_with_no_Hawsey_state()
     {
         var state = RoundDriver.PlayOneRound(StartAtNorth(), new TestPlayerStrategy());
 
@@ -156,7 +156,7 @@ public class GameEngineRoundTests
 
 
     [Fact]
-    public void Hawsey_round_has_three_card_tricks_and_records_the_bidder()
+    public void PlayCard_when_the_round_is_Hawsey_plays_three_card_tricks_and_records_the_bidder()
     {
         var state = RoundDriver.PlayOneRound(StartAtNorth(), FirstBidderCallsHawsey());
 
@@ -169,7 +169,7 @@ public class GameEngineRoundTests
 
 
     [Fact]
-    public void StartNextRound_after_a_Hawsey_round_clears_the_Hawsey_state()
+    public void StartNextRound_when_the_round_was_Hawsey_clears_the_Hawsey_state()
     {
         var scored = RoundDriver.PlayOneRound(StartAtNorth(), FirstBidderCallsHawsey());
         Assert.Equal(GamePhase.RoundScoring, scored.Phase);

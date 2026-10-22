@@ -35,7 +35,7 @@ public class GameSessionBidRulesTests
 
 
     [Fact]
-    public void Before_any_bid_the_minimum_legal_bid_is_the_house_minimum()
+    public void MinimumLegalBid_when_nobody_has_bid_is_the_house_minimum()
     {
         var state = new GameEngine().StartGame(HouseRules.Default, PlayerPosition.North, new Random(1));
 
@@ -46,7 +46,7 @@ public class GameSessionBidRulesTests
 
 
     [Fact]
-    public async Task After_a_bid_the_minimum_legal_bid_is_one_more()
+    public async Task MinimumLegalBid_when_a_bid_was_made_is_one_more()
     {
         var session = await AtHumanBidAfterEastBidsAsync(8);
 
@@ -57,7 +57,7 @@ public class GameSessionBidRulesTests
 
 
     [Fact]
-    public async Task PlaceHumanBid_refuses_a_bid_that_does_not_beat_the_high_bid()
+    public async Task PlaceHumanBid_when_the_bid_does_not_beat_the_high_bid_returns_false()
     {
         var session = await AtHumanBidAfterEastBidsAsync(8);
         var before = session.CurrentState;
@@ -73,7 +73,7 @@ public class GameSessionBidRulesTests
 
 
     [Fact]
-    public void The_dealer_facing_no_bid_is_stuck()
+    public void IsNextBidderStuck_when_the_dealer_faces_no_bid_is_true()
     {
         // North deals; East, South and West pass, so North (the dealer) is next and stuck.
         var engine = new GameEngine();
@@ -92,7 +92,7 @@ public class GameSessionBidRulesTests
 
 
     [Fact]
-    public void The_dealer_facing_a_bid_is_not_stuck()
+    public void IsNextBidderStuck_when_the_dealer_faces_a_bid_is_false()
     {
         var engine = new GameEngine();
         var state = engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(1));

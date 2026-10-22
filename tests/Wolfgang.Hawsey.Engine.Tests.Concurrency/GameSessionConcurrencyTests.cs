@@ -132,7 +132,7 @@ public class GameSessionConcurrencyTests
 
 
     [Fact]
-    public void Human_double_tap_plays_exactly_one_card()
+    public void PlayHumanCard_when_the_human_double_taps_plays_exactly_one_card()
     {
         RunSystematicTest(async () =>
         {
@@ -154,7 +154,7 @@ public class GameSessionConcurrencyTests
 
 
     [Fact]
-    public void New_game_during_an_AI_turn_does_not_let_the_old_loop_touch_the_new_game()
+    public void StartNewGame_when_an_AI_turn_is_running_keeps_the_old_loop_out_of_the_new_game()
     {
         RunSystematicTest(async () =>
         {
@@ -185,7 +185,7 @@ public class GameSessionConcurrencyTests
 
 
     [Fact]
-    public void Full_game_reports_every_trick_winner_and_announces_game_over_exactly_once()
+    public void AdvanceAsync_when_a_whole_game_runs_reports_every_trick_winner_and_game_over_once()
     {
         RunSystematicTest(async () =>
         {

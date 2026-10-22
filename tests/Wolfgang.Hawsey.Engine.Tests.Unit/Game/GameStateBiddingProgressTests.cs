@@ -23,7 +23,7 @@ public class GameStateBiddingProgressTests
 
 
     [Fact]
-    public void A_new_deal_has_no_high_bid()
+    public void HighBid_when_a_deal_starts_is_zero()
     {
         var state = Deal();
 
@@ -34,7 +34,7 @@ public class GameStateBiddingProgressTests
 
 
     [Fact]
-    public void The_high_bid_follows_each_bid_and_survives_passes()
+    public void HighBid_when_bids_and_passes_follow_tracks_the_highest_bid()
     {
         var state = Deal();
 
@@ -51,7 +51,7 @@ public class GameStateBiddingProgressTests
 
 
     [Fact]
-    public void When_bidding_ends_the_result_holds_the_winning_bid()
+    public void BiddingResult_when_bidding_ends_holds_the_winning_bid()
     {
         var state = Deal();
         state = _engine.PlaceBid(state, PlayerPosition.East, new BidAction.NumberBid(8));
@@ -70,7 +70,7 @@ public class GameStateBiddingProgressTests
 
 
     [Fact]
-    public void A_Hawsey_bid_ends_the_bidding_with_the_Hawsey_bidder_as_winner()
+    public void BiddingResult_when_Hawsey_is_bid_names_the_Hawsey_bidder_the_winner()
     {
         var state = Deal();
         state = _engine.PlaceBid(state, PlayerPosition.East, new BidAction.NumberBid(7));
@@ -86,7 +86,7 @@ public class GameStateBiddingProgressTests
 
 
     [Fact]
-    public void The_next_deal_starts_with_no_high_bid()
+    public void HighBid_when_the_next_deal_starts_is_zero()
     {
         var scored = RoundDriver.PlayOneRound(Deal(), new TestPlayerStrategy());
         Assert.Equal(GamePhase.RoundScoring, scored.Phase);
