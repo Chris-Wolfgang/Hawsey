@@ -9,8 +9,8 @@ namespace Wolfgang.Hawsey.Engine.Tests.Unit.PropertyBased;
 
 /// <summary>
 /// Every <see cref="GameEngine"/> transition returns a new <see cref="GameState"/> and
-/// leaves its input exactly as it was (#870). <c>PlayCard</c> used to append the card
-/// to the input state's trick (#861), which broke replaying from an earlier state.
+/// leaves its input exactly as it was. <c>PlayCard</c> used to append the card
+/// to the input state's trick, which broke replaying from an earlier state.
 /// </summary>
 public class TransitionImmutabilityPropertyTests
 {

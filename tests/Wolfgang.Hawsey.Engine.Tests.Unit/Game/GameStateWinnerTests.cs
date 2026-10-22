@@ -8,7 +8,7 @@ using Wolfgang.Hawsey.Engine.Tests.Unit.PropertyBased;
 namespace Wolfgang.Hawsey.Engine.Tests.Unit.Game;
 
 /// <summary>
-/// <see cref="GameState.Winner"/> (#862): the team that reached
+/// <see cref="GameState.Winner"/>: the team that reached
 /// <see cref="HouseRules.PointsToWin"/>, and the bidding team when both reached it in
 /// the same round.
 /// </summary>
@@ -66,7 +66,7 @@ public class GameStateWinnerTests
         // With a target of 1, both teams reach it whenever the bidding team makes its
         // bid and the defenders take a trick. Search a fixed range of seeds for a round
         // where the stuck dealer's team is East/West, so North/South is NOT the answer,
-        // which is what the old UI rule always said (#862).
+        // which is what the old UI rule always said.
         var state = Enumerable
             .Range(0, 500)
             .Select

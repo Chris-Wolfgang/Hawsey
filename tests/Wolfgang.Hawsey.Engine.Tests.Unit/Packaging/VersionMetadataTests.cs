@@ -4,7 +4,7 @@ using Wolfgang.Hawsey.Engine.Game;
 namespace Wolfgang.Hawsey.Engine.Tests.Unit.Packaging;
 
 /// <summary>
-/// Pins the engine's version attributes to one source, <c>&lt;Version&gt;</c> (#27):
+/// Pins the engine's version attributes to one source, <c>&lt;Version&gt;</c>:
 /// FileVersion and InformationalVersion follow it, and AssemblyVersion stays at the
 /// 1.0.0.0 pin recorded in ADR 0006.
 /// </summary>
