@@ -22,6 +22,9 @@ public sealed class Trick
     /// <param name="expectedPlays">
     /// The number of cards expected in this trick (4 normally, 3 for Hawsey).
     /// </param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="expectedPlays"/> is less than 2 or greater than 4.
+    /// </exception>
     public Trick(Suit? trumpSuit, int expectedPlays = 4)
     {
         if (expectedPlays < 2 || expectedPlays > 4)

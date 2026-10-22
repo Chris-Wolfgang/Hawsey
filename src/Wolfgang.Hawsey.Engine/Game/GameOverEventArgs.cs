@@ -1,4 +1,3 @@
-
 using Wolfgang.Hawsey.Engine.Players;
 
 namespace Wolfgang.Hawsey.Engine.Game;
@@ -16,6 +15,8 @@ public sealed class GameOverEventArgs : EventArgs
     {
         Winner = winner;
     }
+
+
 
     /// <summary>Gets the team that won the game.</summary>
     public Team Winner { get; }
