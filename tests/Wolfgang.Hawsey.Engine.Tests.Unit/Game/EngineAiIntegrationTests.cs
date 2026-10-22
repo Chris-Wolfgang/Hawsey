@@ -19,7 +19,7 @@ public class EngineAiIntegrationTests
 
 
     [Fact]
-    public void Full_bidding_round_with_ai_completes()
+    public void PlaceBid_when_every_seat_is_the_AI_completes_the_bidding()
     {
         var state = _engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
 
@@ -36,7 +36,7 @@ public class EngineAiIntegrationTests
 
 
     [Fact]
-    public void Full_round_with_ai_completes()
+    public void PlayCard_when_every_seat_is_the_AI_completes_the_round()
     {
         var state = _engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
 
@@ -70,7 +70,7 @@ public class EngineAiIntegrationTests
 
 
     [Fact]
-    public void Multiple_rounds_with_ai_reach_game_over()
+    public void StartNextRound_when_the_AI_plays_several_rounds_reaches_game_over()
     {
         var random = new Random(42);
         var rules = new HouseRules { PointsToWin = 15 };
@@ -113,7 +113,7 @@ public class EngineAiIntegrationTests
 
 
     [Fact]
-    public void Human_interleaved_with_ai_works()
+    public void PlayCard_when_a_human_seat_is_interleaved_with_the_AI_completes_the_round()
     {
         // Simulate a game where human is South and AI plays the other 3
         var state = _engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));

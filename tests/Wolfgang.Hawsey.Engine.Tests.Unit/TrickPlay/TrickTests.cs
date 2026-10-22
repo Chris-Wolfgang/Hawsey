@@ -195,7 +195,7 @@ public class TrickTests
 
 
     [Fact]
-    public void GetResult_returns_all_played_cards()
+    public void GetResult_when_complete_returns_all_played_cards()
     {
         var trick = new Trick(Suit.Hearts);
 
@@ -262,7 +262,7 @@ public class TrickTests
 
 
     [Fact]
-    public void GetCurrentWinner_returns_winning_card_mid_trick()
+    public void GetCurrentWinner_when_mid_trick_returns_the_winning_card()
     {
         var trick = new Trick(Suit.Hearts);
 

@@ -38,7 +38,7 @@ public class CardTests
 
 
     [Fact]
-    public void ToString_returns_rank_of_suit()
+    public void ToString_when_called_returns_rank_of_suit()
     {
         var card = new Card(Rank.Queen, Suit.Diamonds);
 
