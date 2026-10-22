@@ -385,14 +385,36 @@ public class GameSession
 
 
     /// <summary>
-    /// Applies the human's Hawsey exchange. Returns false, and changes nothing,
-    /// unless the game is in the Hawsey exchange phase with the human as bidder.
+    /// Applies the human's Hawsey exchange. Returns false, and changes nothing, unless
+    /// the game is in the Hawsey exchange phase with the human as bidder,
+    /// <paramref name="discard"/> is two cards the human holds and
+    /// <paramref name="fromPartner"/> is two cards the human's partner holds.
     /// </summary>
+    /// <param name="discard">The two cards the human discards.</param>
+    /// <param name="fromPartner">The two cards the human's partner gives.</param>
+    /// <returns><see langword="true"/> when the exchange was made.</returns>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="discard"/> or <paramref name="fromPartner"/> is <see langword="null"/>.
+    /// </exception>
     public bool PerformHawseyExchange(Card[] discard, Card[] fromPartner)
     {
+        if (discard == null)
+        {
+            throw new ArgumentNullException(nameof(discard));
+        }
+
+        if (fromPartner == null)
+        {
+            throw new ArgumentNullException(nameof(fromPartner));
+        }
+
         lock (_sync)
         {
-            if (_state is not { Phase: GamePhase.HawseyExchange, HawseyBidder: HumanPosition })
+            if (_state is not { Phase: GamePhase.HawseyExchange, HawseyBidder: HumanPosition }
+                || discard.Length != 2
+                || fromPartner.Length != 2
+                || !Holds(_state.Hands[HumanPosition], discard)
+                || !Holds(_state.Hands[HumanPosition.Partner()], fromPartner))
             {
                 return false;
             }

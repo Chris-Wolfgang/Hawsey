@@ -1,3 +1,4 @@
+using Wolfgang.Hawsey.Engine.Game;
 using Wolfgang.Hawsey.Engine.Players;
 
 namespace Wolfgang.Hawsey.Engine.Scoring;
@@ -77,7 +78,9 @@ public sealed class RoundScore
         {
             if (IsHawsey)
             {
-                return BiddingTeamTricks == 12 ? 24 : -24;
+                return BiddingTeamTricks == GameState.TricksPerRound
+                    ? GameState.HawseyBidAmount
+                    : -GameState.HawseyBidAmount;
             }
 
             return BiddingTeamTricks >= BidAmount

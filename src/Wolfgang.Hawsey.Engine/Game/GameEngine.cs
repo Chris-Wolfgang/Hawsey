@@ -22,9 +22,6 @@ namespace Wolfgang.Hawsey.Engine.Game;
     Justification = "Instance API preserved to avoid CS0176 breaks at existing call sites and to keep the type DI-friendly.")]
 public sealed class GameEngine
 {
-    /// <summary>The bid amount a Hawsey bid records: 24.</summary>
-    private const int HawseyBidAmount = 24;
-
     /// <summary>
     /// Starts a new game by dealing the first hand.
     /// </summary>
@@ -112,7 +109,7 @@ public sealed class GameEngine
                 break;
 
             case BidAction.HawseyBid:
-                return CreateTrumpSelectionState(state, new BiddingResult(player, HawseyBidAmount, isHawsey: true, isStuck: false));
+                return CreateTrumpSelectionState(state, new BiddingResult(player, GameState.HawseyBidAmount, isHawsey: true, isStuck: false));
 
             default:
                 throw new InvalidOperationException($"Unknown bid action type: {action.GetType().Name}");
@@ -590,7 +587,7 @@ public sealed class GameEngine
         var completedTricks = new List<TrickResult>(state.CompletedTricks) { trickResult };
         var tricksPlayed = state.TricksPlayedInRound + 1;
 
-        if (tricksPlayed >= 12)
+        if (tricksPlayed >= GameState.TricksPerRound)
         {
             return ScoreRound(state, hands, completedTricks, tricksPlayed);
         }
