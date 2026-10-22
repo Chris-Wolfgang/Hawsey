@@ -78,7 +78,7 @@ public sealed class GameEngine
     /// <param name="player">The player placing the bid.</param>
     /// <param name="action">The bid action.</param>
     /// <returns>The updated game state: still bidding, or trump selection once bidding is over.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="action"/> is <c>null</c>.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="state"/> or <paramref name="action"/> is <c>null</c>.</exception>
     /// <exception cref="InvalidOperationException">
     /// Thrown when the game is not in the bidding phase, it is not the specified player's
     /// turn, or a number bid is below <see cref="HouseRules.MinimumBid"/>, above
@@ -205,9 +205,11 @@ public sealed class GameEngine
     /// <param name="state">The current game state.</param>
     /// <param name="trumpSuit">The trump suit, or <c>null</c> for Ace high.</param>
     /// <returns>The updated game state.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="state"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentOutOfRangeException">
     /// <paramref name="trumpSuit"/> is not a defined <see cref="Suit"/>.
     /// </exception>
+    /// <exception cref="InvalidOperationException">Thrown when the game is not in the trump selection phase.</exception>
     public GameState SelectTrump(GameState state, Suit? trumpSuit)
     {
         ValidatePhase(state, GamePhase.TrumpSelection);
@@ -275,7 +277,7 @@ public sealed class GameEngine
     /// <param name="cardsToDiscard">The 2 cards the bidder discards.</param>
     /// <param name="cardsFromPartner">The 2 cards the partner gives.</param>
     /// <returns>The updated game state.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="cardsToDiscard"/> or <paramref name="cardsFromPartner"/> is <c>null</c>.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="state"/>, <paramref name="cardsToDiscard"/> or <paramref name="cardsFromPartner"/> is <c>null</c>.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the game is not in the Hawsey exchange phase, the wrong number of cards is provided, or a card is not in the expected hand.</exception>
     public GameState ExchangeHawseyCards
     (
@@ -320,6 +322,7 @@ public sealed class GameEngine
     /// <param name="player">The player playing the card.</param>
     /// <param name="card">The card to play.</param>
     /// <returns>The updated game state.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="state"/> is <c>null</c>.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the game is not in the trick play phase, it is not the specified player's turn, or the card is not a legal play.</exception>
     public GameState PlayCard(GameState state, PlayerPosition player, Card card)
     {
@@ -376,7 +379,7 @@ public sealed class GameEngine
     /// <param name="state">The current game state (must be in RoundScoring phase).</param>
     /// <param name="random">The random number generator for shuffling.</param>
     /// <returns>The updated game state ready for bidding.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="random"/> is <c>null</c>.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="state"/> or <paramref name="random"/> is <c>null</c>.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the game is not in the round scoring phase.</exception>
     public GameState StartNextRound(GameState state, Random random)
     {

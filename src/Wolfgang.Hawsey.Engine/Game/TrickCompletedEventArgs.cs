@@ -1,4 +1,3 @@
-
 using Wolfgang.Hawsey.Engine.Players;
 
 namespace Wolfgang.Hawsey.Engine.Game;
@@ -16,6 +15,8 @@ public sealed class TrickCompletedEventArgs : EventArgs
     {
         Winner = winner;
     }
+
+
 
     /// <summary>Gets the player who won the trick.</summary>
     public PlayerPosition Winner { get; }
