@@ -29,7 +29,7 @@ For this to work, nuget.org needs a **Trusted Publishing policy** for this repos
 
 **Location:** Settings → Rules → Rulesets
 
-This repository has no setup script for branch protection; the `main` ruleset is configured by hand. It has these rules:
+This repository does not carry the template's `Setup-BranchRuleset.ps1`; the `main` ruleset is configured by hand. (`scripts/Fix-BranchRuleset.ps1` is template-synced and calls `Setup-BranchRuleset.ps1`, so it does not run here as is.) It has these rules:
 
 - ✅ **Require a pull request before merging**
 - ✅ **Require status checks to pass before merging**:

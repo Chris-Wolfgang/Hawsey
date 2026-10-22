@@ -1,6 +1,6 @@
 # Stacked pull requests with linear history
 
-Repositories that enable **Require linear history** on `main` (baseline item 9; `Setup-BranchRuleset.ps1 -RequireLinearHistory`)
+Repositories that enable **Require linear history** on `main` (baseline item 9; in template repositories `Setup-BranchRuleset.ps1 -RequireLinearHistory`, while Hawsey sets its ruleset by hand)
 accept only squash or rebase merges. That keeps `main` a straight line, one commit per PR, at the cost of one
 extra step when PRs are stacked. This page is the whole workflow.
 

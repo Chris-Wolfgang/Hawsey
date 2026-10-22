@@ -43,7 +43,7 @@ control of the process.
 | D1 | Denial of service | A strategy that keeps returning illegal moves stalls a game | Illegal moves throw immediately; `GameRunner` has no retry loop | Mitigated |
 | D2 | Denial of service | Oversized inputs | Normal play only ever deals 48 cards. The public API doesn't validate collection sizes, though: a host can pass `Deck.Shuffle` any `IReadOnlyList<Card>` or construct a `GameState` with arbitrarily large hands or trick lists. There's no parsing of external data | **Accepted:** under the trusted-host boundary, the host only affects its own process |
 | E1 | Elevation of privilege | Code execution through the engine | By code review: the engine has no deserialization, `Process`, file access or dynamic code, and its only reflection is `GetType().Name` in a `GameEngine.PlaceBid` error message. The trim/AOT analyzers flag *trim-unsafe* reflection and dynamic code, but no automated control bans the other categories | Not applicable today; re-check at each review |
-| E2 | Elevation / fairness | Shuffles are predictable if the `Random` seed is known | Seeding is the caller's choice: `System.Random` is fine for casual play (S2245 note in `GameService`) | **Accepted:** anything with stakes must pass a `Random` backed by a cryptographic RNG |
+| E2 | Elevation / fairness | Shuffles are predictable if the `Random` seed is known | Seeding is the caller's choice: `System.Random` is fine for casual play (S2245 note in `GameSession`) | **Accepted:** anything with stakes must pass a `Random` backed by a cryptographic RNG |
 
 ## Accepted risks
 

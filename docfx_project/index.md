@@ -22,8 +22,6 @@ The engine is a UI-agnostic .NET library. It models the pinochle deck, bidding, 
 dotnet add package Wolfgang.Hawsey.Engine
 ```
 
-The package has not been published to NuGet yet. Until the first release, build it from source.
-
 ## Documentation Sections
 
 ### 📖 [Documentation](docs/getting-started.md)
