@@ -1,4 +1,3 @@
-
 using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Rules;
 using Wolfgang.Hawsey.Engine.TrickPlay;

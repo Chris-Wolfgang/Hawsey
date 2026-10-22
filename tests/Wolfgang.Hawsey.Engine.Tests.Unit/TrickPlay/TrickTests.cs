@@ -1,4 +1,3 @@
-
 using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Players;
 using Wolfgang.Hawsey.Engine.TrickPlay;
@@ -242,11 +241,12 @@ public class TrickTests
 
 
 
-    [Fact]
-    public void Constructor_when_expected_plays_out_of_range_throws()
+    [Theory]
+    [InlineData(1)]
+    [InlineData(5)]
+    public void Constructor_when_expected_plays_out_of_range_throws(int expectedPlays)
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => new Trick(Suit.Hearts, 1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => new Trick(Suit.Hearts, 5));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new Trick(Suit.Hearts, expectedPlays));
     }
 
 

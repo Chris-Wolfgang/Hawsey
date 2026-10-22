@@ -133,13 +133,20 @@ public class SimpleAiStrategyBiddingAndLeadTests
 
 
     [Fact]
-    public void DecideBid_beats_a_lower_high_bid_and_passes_otherwise()
+    public void DecideBid_when_the_high_bid_is_lower_than_the_hands_worth_beats_it()
     {
         AssertBids
         (
             9,
             _ai.DecideBid(Bidding(PlayerPosition.South, NineTrickHand, highBid: 8, highBidder: PlayerPosition.East), PlayerPosition.South)
         );
+    }
+
+
+
+    [Fact]
+    public void DecideBid_when_the_high_bid_already_matches_the_hands_worth_passes()
+    {
         Assert.IsType<BidAction.PassBid>
         (
             _ai.DecideBid(Bidding(PlayerPosition.South, NineTrickHand, highBid: 9, highBidder: PlayerPosition.East), PlayerPosition.South)

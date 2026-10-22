@@ -10,7 +10,7 @@ namespace Wolfgang.Hawsey.Engine.Tests.Unit.Game;
 
 public class GameEngineTests
 {
-    private readonly GameEngine _engine = new GameEngine();
+    private readonly GameEngine _engine = new();
 
 
 
@@ -292,33 +292,14 @@ public class GameEngineTests
 
         var bidderHand = state.Hands[bidder];
 
-        // Find a card NOT in bidder's hand
-        Card? notInHand = null;
-        foreach (var suit in new[] { Suit.Hearts, Suit.Diamonds, Suit.Clubs, Suit.Spades })
-        {
-            foreach (var rank in new[] { Rank.Nine, Rank.Ten, Rank.Jack, Rank.Queen, Rank.King, Rank.Ace })
-            {
-                var card = new Card(rank, suit);
-                if (!bidderHand.Contains(card))
-                {
-                    notInHand = card;
-                    break;
-                }
-            }
-            if (notInHand.HasValue)
-            {
-                break;
-            }
-        }
-
-        Assert.True(notInHand.HasValue, "Test setup: failed to find a card outside the bidder's hand.");
+        var notInHand = Deck.CreatePinochleDeck().First(c => !bidderHand.Contains(c));
 
         Assert.Throws<InvalidOperationException>
         (
             () => _engine.ExchangeHawseyCards
             (
                 state,
-                new[] { notInHand.Value, state.Hands[bidder][0] },
+                new[] { notInHand, state.Hands[bidder][0] },
                 new[] { state.Hands[partner][0], state.Hands[partner][1] }
             )
         );
