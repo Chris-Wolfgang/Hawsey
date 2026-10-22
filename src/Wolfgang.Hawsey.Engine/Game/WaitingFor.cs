@@ -38,5 +38,5 @@ public enum WaitingFor
     NextRound,
 
     /// <summary>The game is over (<see cref="GameState.Winner"/>).</summary>
-    GameOver,
+    GameOver
 }
