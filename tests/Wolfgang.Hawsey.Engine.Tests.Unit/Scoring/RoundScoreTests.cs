@@ -1,4 +1,3 @@
-
 using Wolfgang.Hawsey.Engine.Players;
 using Wolfgang.Hawsey.Engine.Scoring;
 
