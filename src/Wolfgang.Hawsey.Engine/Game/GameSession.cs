@@ -304,7 +304,7 @@ public class GameSession
                 return false;
             }
 
-            // A number bid must beat the high bid, and at least meet the minimum (#867).
+            // A number bid must beat the high bid, and at least meet the minimum.
             if (action is BidAction.NumberBid { Amount: var amount } && (amount < state.MinimumLegalBid || amount > GameState.MaximumBid))
             {
                 return false;
@@ -661,7 +661,7 @@ public class GameSession
             ? new TrickCompletedEventArgs(state.CompletedTricks[state.CompletedTricks.Count - 1].Winner)
             : null;
         // GameState decides the winner, including the bidding-team rule when both
-        // teams reach the target in the same round (#862).
+        // teams reach the target in the same round.
         var gameOver = state.Winner is { } winner ? new GameOverEventArgs(winner) : null;
 
         return new PlayOutcome(trickCompleted, state.Phase == GamePhase.RoundScoring, gameOver);

@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- Coyote systematic-concurrency tests for the engine's GameSession (#73, #834).
+  <!-- Coyote systematic-concurrency tests for the engine's GameSession.
        After every build `dotnet coyote rewrite` instruments this assembly AND the
        copy of Wolfgang.Hawsey.Engine.dll in the output folder (GameSession lives
        there), so Coyote's TestingEngine controls the session's tasks and locks and
@@ -9,7 +9,7 @@
        .config/dotnet-tools.json (`dotnet tool restore`).
 
        coverlet.collector records this assembly's coverage like every other test
-       assembly's (#909: all test code at 100%). It works on top of Coyote's rewrite:
+       assembly's (all test code is held at 100%). It works on top of Coyote's rewrite:
        with coverage collected, removing GameSession's turn check still fails
        Human_double_tap_plays_exactly_one_card. -->
   <PropertyGroup>

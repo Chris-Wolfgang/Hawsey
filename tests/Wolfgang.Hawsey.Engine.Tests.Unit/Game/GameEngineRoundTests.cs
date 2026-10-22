@@ -9,7 +9,7 @@ namespace Wolfgang.Hawsey.Engine.Tests.Unit.Game;
 
 /// <summary>
 /// Whole-round and guard-clause behaviour of <see cref="GameEngine"/> that the
-/// Stryker run (#36) showed was not pinned by any test: trick sizes and flags in
+/// Stryker run showed was not pinned by any test: trick sizes and flags in
 /// normal vs Hawsey rounds, the deal, and the phase / legality guards.
 /// </summary>
 public class GameEngineRoundTests

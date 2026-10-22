@@ -359,7 +359,8 @@ public sealed class GameEngine
     private GameState ApplyPlay(GameState state, PlayerPosition player, Card card)
     {
         var hands = RemoveCardFromHand(state.Hands, player, card);
-        // Play into a copy: the input state keeps its trick unchanged (#861).
+        // Play into a copy: the input state keeps its trick unchanged, so an
+        // earlier state can be replayed.
         var trick = state.CurrentTrick!.Copy();
         trick.Play(player, card);
 
