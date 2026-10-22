@@ -1,4 +1,3 @@
-
 using Wolfgang.Hawsey.Engine.Cards;
 
 namespace Wolfgang.Hawsey.Engine.Tests.Unit.Cards;
@@ -89,7 +88,7 @@ public class CardRankingTests
 
 
     [Fact]
-    public void GetEffectiveRank_right_bower_beats_left_bower()
+    public void GetEffectiveRank_when_card_is_the_right_bower_ranks_above_the_left_bower()
     {
         var rightBower = new Card(Rank.Jack, Suit.Clubs);
         var leftBower = new Card(Rank.Jack, Suit.Spades);
@@ -104,7 +103,7 @@ public class CardRankingTests
 
 
     [Fact]
-    public void GetEffectiveRank_left_bower_beats_ace_of_trump()
+    public void GetEffectiveRank_when_card_is_the_left_bower_ranks_above_the_ace_of_trump()
     {
         var leftBower = new Card(Rank.Jack, Suit.Spades);
         var aceOfTrump = new Card(Rank.Ace, Suit.Clubs);

@@ -11,7 +11,7 @@ namespace Wolfgang.Hawsey.Engine.Tests.Unit.Game;
 public class GameRunnerTests
 {
     [Fact]
-    public void RunGame_completes_to_game_over()
+    public void RunGame_when_called_completes_to_game_over()
     {
         var runner = new GameRunner();
         var strategy = new TestPlayerStrategy(preferredTrump: Suit.Clubs);
@@ -42,7 +42,7 @@ public class GameRunnerTests
 
 
     [Fact]
-    public void RunGame_with_ace_high_completes()
+    public void RunGame_when_ace_high_completes()
     {
         var runner = new GameRunner();
         var strategy = new TestPlayerStrategy(aceHigh: true);
@@ -56,7 +56,7 @@ public class GameRunnerTests
 
 
     [Fact]
-    public void RunGame_with_must_beat_and_must_trump_completes()
+    public void RunGame_when_must_beat_and_must_trump_are_on_completes()
     {
         var runner = new GameRunner();
         var strategy = new TestPlayerStrategy(preferredTrump: Suit.Spades);
@@ -116,7 +116,7 @@ public class GameRunnerTests
 
 
     [Fact]
-    public void RunGame_with_hawsey_bid_completes()
+    public void RunGame_when_a_hawsey_bid_is_made_completes()
     {
         var bidQueue = new Queue<BidAction>();
         bidQueue.Enqueue(BidAction.HawseyBid.Instance);
@@ -137,7 +137,7 @@ public class GameRunnerTests
 
 
     [Fact]
-    public void RunGame_deterministic_with_same_seed()
+    public void RunGame_when_seeds_match_plays_the_same_game()
     {
         var runner = new GameRunner();
         var strategy1 = new TestPlayerStrategy(preferredTrump: Suit.Hearts);

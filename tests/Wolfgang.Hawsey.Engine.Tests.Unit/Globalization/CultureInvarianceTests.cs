@@ -97,7 +97,7 @@ public class CultureInvarianceTests
 
     [Theory]
     [MemberData(nameof(Cultures))]
-    public void Card_ToString_in_any_culture_matches_the_invariant_culture(string culture)
+    public void ToString_when_the_culture_varies_matches_the_invariant_culture(string culture)
     {
         var expected = InCulture(CultureInfo.InvariantCulture.Name, FullDeckText);
 
@@ -110,7 +110,7 @@ public class CultureInvarianceTests
 
     [Theory]
     [MemberData(nameof(Cultures))]
-    public void RunGame_in_any_culture_plays_the_same_game_as_the_invariant_culture(string culture)
+    public void RunGame_when_the_culture_varies_plays_the_invariant_game(string culture)
     {
         var expected = InCulture(CultureInfo.InvariantCulture.Name, PlayGame);
 
@@ -123,7 +123,7 @@ public class CultureInvarianceTests
 
     [Theory]
     [MemberData(nameof(Cultures))]
-    public void PlaceBid_error_message_in_any_culture_matches_the_invariant_culture(string culture)
+    public void PlaceBid_when_the_culture_varies_throws_the_invariant_message(string culture)
     {
         var expected = InCulture(CultureInfo.InvariantCulture.Name, BelowMinimumMessage);
 
@@ -136,7 +136,7 @@ public class CultureInvarianceTests
 
     [Theory]
     [MemberData(nameof(Cultures))]
-    public void InCulture_applies_both_cultures_inside_the_action(string culture)
+    public void InCulture_when_called_applies_both_cultures_inside_the_action(string culture)
     {
         var applied = InCulture(culture, () => (CultureInfo.CurrentCulture.Name, CultureInfo.CurrentUICulture.Name));
 

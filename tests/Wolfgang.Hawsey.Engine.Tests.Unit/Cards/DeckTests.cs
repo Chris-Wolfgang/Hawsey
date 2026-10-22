@@ -1,4 +1,3 @@
-
 using Wolfgang.Hawsey.Engine.Cards;
 
 namespace Wolfgang.Hawsey.Engine.Tests.Unit.Cards;
@@ -6,7 +5,7 @@ namespace Wolfgang.Hawsey.Engine.Tests.Unit.Cards;
 public class DeckTests
 {
     [Fact]
-    public void CreatePinochleDeck_returns_48_cards()
+    public void CreatePinochleDeck_when_called_returns_48_cards()
     {
         var deck = Deck.CreatePinochleDeck();
 
@@ -16,7 +15,7 @@ public class DeckTests
 
 
     [Fact]
-    public void CreatePinochleDeck_contains_two_of_each_card()
+    public void CreatePinochleDeck_when_called_contains_two_of_each_card()
     {
         var deck = Deck.CreatePinochleDeck();
 
@@ -30,7 +29,7 @@ public class DeckTests
 
 
     [Fact]
-    public void CreatePinochleDeck_contains_only_pinochle_ranks()
+    public void CreatePinochleDeck_when_called_contains_only_pinochle_ranks()
     {
         var deck = Deck.CreatePinochleDeck();
         var validRanks = new[] { Rank.Nine, Rank.Ten, Rank.Jack, Rank.Queen, Rank.King, Rank.Ace };
@@ -41,7 +40,7 @@ public class DeckTests
 
 
     [Fact]
-    public void CreatePinochleDeck_contains_all_four_suits()
+    public void CreatePinochleDeck_when_called_contains_all_four_suits()
     {
         var deck = Deck.CreatePinochleDeck();
         var suits = deck.Select(c => c.Suit).Distinct().OrderBy(s => s).ToArray();
@@ -56,7 +55,7 @@ public class DeckTests
 
 
     [Fact]
-    public void Shuffle_returns_same_count()
+    public void Shuffle_when_called_returns_the_same_count()
     {
         var deck = Deck.CreatePinochleDeck();
         var shuffled = Deck.Shuffle(deck, new Random(42));
@@ -67,7 +66,7 @@ public class DeckTests
 
 
     [Fact]
-    public void Shuffle_contains_same_cards()
+    public void Shuffle_when_called_returns_the_same_cards()
     {
         var deck = Deck.CreatePinochleDeck();
         var shuffled = Deck.Shuffle(deck, new Random(42));
@@ -82,7 +81,7 @@ public class DeckTests
 
 
     [Fact]
-    public void Shuffle_with_same_seed_produces_same_order()
+    public void Shuffle_when_seeds_match_produces_the_same_order()
     {
         var deck = Deck.CreatePinochleDeck();
         var shuffled1 = Deck.Shuffle(deck, new Random(42));
@@ -94,7 +93,7 @@ public class DeckTests
 
 
     [Fact]
-    public void Shuffle_with_different_seed_produces_different_order()
+    public void Shuffle_when_seeds_differ_produces_different_orders()
     {
         var deck = Deck.CreatePinochleDeck();
         var shuffled1 = Deck.Shuffle(deck, new Random(42));
@@ -124,7 +123,7 @@ public class DeckTests
 
 
     [Fact]
-    public void Shuffle_of_two_cards_produces_both_orders_across_seeds()
+    public void Shuffle_when_given_two_cards_produces_both_orders_across_seeds()
     {
         var first = new Card(Rank.Nine, Suit.Hearts);
         var second = new Card(Rank.Ace, Suit.Spades);

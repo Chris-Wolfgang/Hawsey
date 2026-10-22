@@ -99,7 +99,7 @@ public class SimpleAiStrategyBiddingAndLeadTests
 
 
     [Fact]
-    public void DecideBid_with_a_weak_hand_passes()
+    public void DecideBid_when_the_hand_is_weak_passes()
     {
         Assert.IsType<BidAction.PassBid>(_ai.DecideBid(Bidding(PlayerPosition.East, WeakHand), PlayerPosition.East));
     }
@@ -107,7 +107,7 @@ public class SimpleAiStrategyBiddingAndLeadTests
 
 
     [Fact]
-    public void DecideBid_bids_what_the_hand_is_worth()
+    public void DecideBid_when_nobody_has_bid_bids_what_the_hand_is_worth()
     {
         var bid = _ai.DecideBid(Bidding(PlayerPosition.East, NineTrickHand), PlayerPosition.East);
 
@@ -117,7 +117,7 @@ public class SimpleAiStrategyBiddingAndLeadTests
 
 
     [Fact]
-    public void DecideBid_never_bids_more_than_eleven()
+    public void DecideBid_when_the_hand_is_worth_more_bids_at_most_eleven()
     {
         // 8 spades + 2 jacks + 4 outside aces - 1 = 13, capped at 11.
         Card[] hand =
@@ -133,13 +133,20 @@ public class SimpleAiStrategyBiddingAndLeadTests
 
 
     [Fact]
-    public void DecideBid_beats_a_lower_high_bid_and_passes_otherwise()
+    public void DecideBid_when_the_high_bid_is_lower_than_the_hands_worth_beats_it()
     {
         AssertBids
         (
             9,
             _ai.DecideBid(Bidding(PlayerPosition.South, NineTrickHand, highBid: 8, highBidder: PlayerPosition.East), PlayerPosition.South)
         );
+    }
+
+
+
+    [Fact]
+    public void DecideBid_when_the_high_bid_already_matches_the_hands_worth_passes()
+    {
         Assert.IsType<BidAction.PassBid>
         (
             _ai.DecideBid(Bidding(PlayerPosition.South, NineTrickHand, highBid: 9, highBidder: PlayerPosition.East), PlayerPosition.South)
@@ -149,7 +156,7 @@ public class SimpleAiStrategyBiddingAndLeadTests
 
 
     [Fact]
-    public void DecideBid_as_the_stuck_dealer_bids_only_the_minimum()
+    public void DecideBid_when_the_dealer_is_stuck_bids_only_the_minimum()
     {
         var bid = _ai.DecideBid(Bidding(PlayerPosition.North, NineTrickHand, dealer: PlayerPosition.North), PlayerPosition.North);
 
@@ -159,7 +166,7 @@ public class SimpleAiStrategyBiddingAndLeadTests
 
 
     [Fact]
-    public void DecideBid_as_the_dealer_facing_a_bid_competes_normally()
+    public void DecideBid_when_the_dealer_faces_a_bid_competes_normally()
     {
         var bid = _ai.DecideBid
         (
@@ -173,7 +180,7 @@ public class SimpleAiStrategyBiddingAndLeadTests
 
 
     [Fact]
-    public void DecideBid_as_the_dealer_with_a_weak_hand_passes_and_is_left_stuck()
+    public void DecideBid_when_the_dealer_has_a_weak_hand_passes_and_is_left_stuck()
     {
         Assert.IsType<BidAction.PassBid>(_ai.DecideBid(Bidding(PlayerPosition.North, WeakHand, dealer: PlayerPosition.North), PlayerPosition.North));
     }
@@ -181,7 +188,7 @@ public class SimpleAiStrategyBiddingAndLeadTests
 
 
     [Fact]
-    public void DecideTrump_names_the_best_scoring_suit_not_just_the_longest()
+    public void DecideTrump_when_the_longest_suit_scores_less_names_the_best_scoring_suit()
     {
         // Clubs is longest (5, scores 4); spades has both jacks (4 + 2 - 1 = 5).
         Card[] hand =
@@ -197,7 +204,7 @@ public class SimpleAiStrategyBiddingAndLeadTests
 
 
     [Fact]
-    public void DecidePlay_does_not_overtake_a_partner_who_is_winning()
+    public void DecidePlay_when_the_partner_is_winning_does_not_overtake()
     {
         // West (East's partner) leads the queen of spades and is winning; East could win
         // with the ace but throws the ten.
@@ -214,7 +221,7 @@ public class SimpleAiStrategyBiddingAndLeadTests
 
 
     [Fact]
-    public void DecidePlay_leads_a_trump_nothing_can_beat_over_a_higher_side_ace()
+    public void DecidePlay_when_leading_prefers_an_unbeatable_trump_to_a_higher_side_ace()
     {
         // Hearts are trump, and both bowers and both aces of hearts are gone, so the king
         // of hearts can't be beaten. The ace of spades is higher, but trumps are still out
@@ -234,7 +241,7 @@ public class SimpleAiStrategyBiddingAndLeadTests
 
 
     [Fact]
-    public void DecidePlay_counts_the_left_bowers_as_trumps_still_out()
+    public void DecidePlay_when_left_bowers_are_out_counts_them_as_trumps()
     {
         // Hearts are trump. All twelve hearts are gone, and so are both aces and kings of
         // clubs, so the queen of clubs is the best club left. But the two left bowers
@@ -290,7 +297,7 @@ public class SimpleAiStrategyBiddingAndLeadTests
 
 
     [Fact]
-    public void DecidePlay_with_two_sure_winners_leads_the_higher()
+    public void DecidePlay_when_holding_two_sure_winners_leads_the_higher()
     {
         // No trump. Both aces of clubs are gone, so the king of clubs can't be beaten, and
         // neither can the ace of spades: the AI leads the higher of the two.
@@ -308,7 +315,7 @@ public class SimpleAiStrategyBiddingAndLeadTests
 
 
     [Fact]
-    public void DecidePlay_does_not_count_the_other_copy_of_the_winning_card_as_winning()
+    public void DecidePlay_when_the_other_copy_of_the_winning_card_is_held_does_not_count_it_as_winning()
     {
         // North (an opponent) led the king of spades. East's own king of spades only ties,
         // and the first copy keeps the trick, so East can't win and throws the nine.
@@ -342,7 +349,7 @@ public class SimpleAiStrategyBiddingAndLeadTests
 
 
     [Fact]
-    public void DecideHawseyExchange_keeps_a_low_trump_and_discards_side_cards()
+    public void DecideHawseyExchange_when_holding_a_low_trump_keeps_it_and_discards_side_cards()
     {
         // Hearts are trump. The nine of hearts is the bidder's lowest card by rank, but it
         // is trump, so the two lowest side cards go instead.
@@ -428,7 +435,7 @@ public class SimpleAiStrategyBiddingAndLeadTests
 
 
     [Fact]
-    public void DecidePlay_leads_a_lower_sure_winner_over_a_higher_card_that_can_be_beaten()
+    public void DecidePlay_when_leading_prefers_a_lower_sure_winner_to_a_higher_beatable_card()
     {
         // No trump. Both kings and both aces of spades are gone, so the queen of spades
         // can't be beaten; the king of clubs can, by either ace of clubs still out. The AI

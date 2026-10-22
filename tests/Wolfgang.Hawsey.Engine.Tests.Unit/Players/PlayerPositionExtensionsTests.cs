@@ -1,4 +1,3 @@
-
 using Wolfgang.Hawsey.Engine.Players;
 
 namespace Wolfgang.Hawsey.Engine.Tests.Unit.Players;

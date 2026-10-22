@@ -10,12 +10,12 @@ namespace Wolfgang.Hawsey.Engine.Tests.Unit.Game;
 
 public class GameEngineTests
 {
-    private readonly GameEngine _engine = new GameEngine();
+    private readonly GameEngine _engine = new();
 
 
 
     [Fact]
-    public void StartGame_returns_bidding_phase()
+    public void StartGame_when_called_returns_bidding_phase()
     {
         var state = _engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
 
@@ -25,7 +25,7 @@ public class GameEngineTests
 
 
     [Fact]
-    public void StartGame_deals_12_cards_to_each_player()
+    public void StartGame_when_called_deals_12_cards_to_each_player()
     {
         var state = _engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
 
@@ -38,7 +38,7 @@ public class GameEngineTests
 
 
     [Fact]
-    public void StartGame_first_bidder_is_left_of_dealer()
+    public void StartGame_when_called_makes_the_first_bidder_the_dealers_left()
     {
         var state = _engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
 
@@ -70,7 +70,7 @@ public class GameEngineTests
 
 
     [Fact]
-    public void PlaceBid_advances_to_next_bidder()
+    public void PlaceBid_when_bidding_continues_advances_to_the_next_bidder()
     {
         var state = _engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
 
@@ -185,7 +185,7 @@ public class GameEngineTests
 
 
     [Fact]
-    public void ExchangeHawseyCards_moves_to_trick_play()
+    public void ExchangeHawseyCards_when_valid_moves_to_trick_play()
     {
         var state = CreateHawseyStateAtExchange();
         var bidder = state.HawseyBidder!.Value;
@@ -292,33 +292,14 @@ public class GameEngineTests
 
         var bidderHand = state.Hands[bidder];
 
-        // Find a card NOT in bidder's hand
-        Card? notInHand = null;
-        foreach (var suit in new[] { Suit.Hearts, Suit.Diamonds, Suit.Clubs, Suit.Spades })
-        {
-            foreach (var rank in new[] { Rank.Nine, Rank.Ten, Rank.Jack, Rank.Queen, Rank.King, Rank.Ace })
-            {
-                var card = new Card(rank, suit);
-                if (!bidderHand.Contains(card))
-                {
-                    notInHand = card;
-                    break;
-                }
-            }
-            if (notInHand.HasValue)
-            {
-                break;
-            }
-        }
-
-        Assert.True(notInHand.HasValue, "Test setup: failed to find a card outside the bidder's hand.");
+        var notInHand = Deck.CreatePinochleDeck().First(c => !bidderHand.Contains(c));
 
         Assert.Throws<InvalidOperationException>
         (
             () => _engine.ExchangeHawseyCards
             (
                 state,
-                new[] { notInHand.Value, state.Hands[bidder][0] },
+                new[] { notInHand, state.Hands[bidder][0] },
                 new[] { state.Hands[partner][0], state.Hands[partner][1] }
             )
         );
@@ -422,7 +403,7 @@ public class GameEngineTests
 
 
     [Fact]
-    public void StartNextRound_advances_dealer()
+    public void StartNextRound_when_called_advances_the_dealer()
     {
         var state = CreateStateAtRoundScoring();
         var oldDealer = state.Dealer;
@@ -435,7 +416,7 @@ public class GameEngineTests
 
 
     [Fact]
-    public void Full_round_plays_to_completion()
+    public void PlayCard_when_a_whole_round_is_played_reaches_round_scoring()
     {
         var strategy = new TestPlayerStrategy(preferredTrump: Suit.Hearts);
         var runner = new GameRunner();
@@ -534,7 +515,7 @@ public class GameEngineTests
 
 
     [Fact]
-    public void TryPlayCard_plays_a_legal_card_like_PlayCard()
+    public void TryPlayCard_when_the_card_is_legal_plays_it_like_PlayCard()
     {
         var state = _engine.SelectTrump(CreateStateAtTrumpSelection(), Suit.Hearts);
         var player = state.NextToAct!.Value;
@@ -550,7 +531,7 @@ public class GameEngineTests
 
 
     [Fact]
-    public void TryPlayCard_refuses_an_illegal_card_the_wrong_player_or_the_wrong_phase()
+    public void TryPlayCard_when_the_card_player_or_phase_is_wrong_returns_null()
     {
         var trumpSelection = CreateStateAtTrumpSelection();
         var state = _engine.SelectTrump(trumpSelection, Suit.Hearts);

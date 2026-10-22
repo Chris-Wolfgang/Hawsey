@@ -1,4 +1,3 @@
-
 using Wolfgang.Hawsey.Engine.Players;
 using Wolfgang.Hawsey.Engine.Scoring;
 
@@ -57,7 +56,7 @@ public class RoundScoreTests
 
 
     [Fact]
-    public void DefendingTeamDelta_always_returns_tricks_won()
+    public void DefendingTeamDelta_when_read_returns_the_tricks_won()
     {
         var score = new RoundScore(Team.NorthSouth, bidAmount: 7, biddingTeamTricks: 6, defendingTeamTricks: 6, isHawsey: false);
 
@@ -77,7 +76,7 @@ public class RoundScoreTests
 
 
     [Fact]
-    public void DeltaFor_and_TricksFor_give_each_team_its_own_side_of_the_round()
+    public void DeltaFor_when_asked_for_each_team_gives_its_own_side_of_the_round()
     {
         // East/West bid 8 and took 5: set, -8; North/South took the other 7.
         var score = new RoundScore(Team.EastWest, 8, 5, 7, false);

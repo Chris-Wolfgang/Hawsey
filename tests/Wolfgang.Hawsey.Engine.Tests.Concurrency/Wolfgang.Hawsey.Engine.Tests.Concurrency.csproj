@@ -11,7 +11,7 @@
        coverlet.collector records this assembly's coverage like every other test
        assembly's (all test code is held at 100%). It works on top of Coyote's rewrite:
        with coverage collected, removing GameSession's turn check still fails
-       Human_double_tap_plays_exactly_one_card. -->
+       PlayHumanCard_when_the_human_double_taps_plays_exactly_one_card. -->
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
