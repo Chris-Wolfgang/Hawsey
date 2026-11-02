@@ -7,3 +7,14 @@
 # semgrep.yaml installs with --no-deps so pip does not re-apply semgrep's pin. Delete
 # this line once a semgrep release allows mcp 1.30.
 mcp>=1.30.0,<2
+#
+# opentelemetry: every semgrep release (1.180.0 through 1.183.0) pins the
+# opentelemetry 1.37 / 0.58b0 family, and opentelemetry-api before 1.45.1 is affected by
+# GHSA-xcq7-p3pf-p88h. Overriding only opentelemetry-api would mix 1.45 with a 1.37 SDK,
+# so the whole 1.x family is lifted together; uv then resolves the matching 0.66b
+# instrumentation packages. Delete these lines once a semgrep release allows 1.45.1.
+opentelemetry-api>=1.45.1,<2
+opentelemetry-sdk>=1.45.1,<2
+opentelemetry-proto>=1.45.1,<2
+opentelemetry-exporter-otlp-proto-common>=1.45.1,<2
+opentelemetry-exporter-otlp-proto-http>=1.45.1,<2
