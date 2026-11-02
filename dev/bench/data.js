@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1792368929124,
+  "lastUpdate": 1793645624644,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -238,6 +238,54 @@ window.BENCHMARK_DATA = {
             "value": 375716.2360026042,
             "unit": "ns",
             "range": "± 3803.182138553726"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b3bf1415bb6c3e0ee837bea6ceb2267f7101089a",
+          "message": "build(deps): bump ASP.NET Core to 10.0.14 and FsCheck.Xunit to 3.6.0 (non-protected half of #1028) (#1034)\n\n- Microsoft.AspNetCore.Components.WebAssembly / .DevServer 10.0.13 -> 10.0.14 (UI.Blazor)\n- Microsoft.AspNetCore.Components.Web 10.0.13 -> 10.0.14 (UI.Shared)\n- FsCheck.Xunit 3.5.0 -> 3.6.0 (Engine.Tests.Unit)\n- changelog/unreleased fragment (type: internal)\n\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-02T13:38:23-05:00",
+          "tree_id": "71765e5dade9e13965f0dec370a450c22cd4d29d",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/b3bf1415bb6c3e0ee837bea6ceb2267f7101089a"
+        },
+        "date": 1793645623198,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 369.0159918467204,
+            "unit": "ns",
+            "range": "± 5.685552358944154"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 36.2522241572539,
+            "unit": "ns",
+            "range": "± 0.18415315657457973"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 137.3709487915039,
+            "unit": "ns",
+            "range": "± 1.8708449525732236"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 162950.89778645834,
+            "unit": "ns",
+            "range": "± 1037.7718261728162"
           }
         ]
       }
