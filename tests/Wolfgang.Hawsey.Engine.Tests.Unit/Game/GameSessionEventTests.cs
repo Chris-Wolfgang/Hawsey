@@ -280,18 +280,41 @@ public class GameSessionEventTests
         // the game ends on an AI's card, so AdvanceAiPlaysAsync raises GameOver.
         var session = TestGameSessions.Unpaced(seed: 1);
 
-        Assert.True(await EndsOnAnAiCard(session));
+        var (byAi, byHuman) = await PlayToGameOverCountingAnnouncements(session);
+
         Assert.Equal(GamePhase.GameOver, session.CurrentState!.Phase);
+        Assert.Equal((1, 0), (byAi, byHuman));
     }
 
 
 
-    private static async Task<bool> EndsOnAnAiCard(GameSession session)
+    [Fact]
+    public async Task A_game_can_end_on_the_humans_card_and_the_session_announces_it()
     {
-        // The handler only counts; the loop reads the count around each AI call to see
-        // whether that call is the one that ended the game.
+        // Seed 3, a target of 12, the human passing and playing its first legal card:
+        // the game ends on the human's card, so PlayHumanCard raises GameOver.
+        var session = TestGameSessions.Unpaced(seed: 3);
+
+        var (byAi, byHuman) = await PlayToGameOverCountingAnnouncements(session);
+
+        Assert.Equal(GamePhase.GameOver, session.CurrentState!.Phase);
+        Assert.Equal((0, 1), (byAi, byHuman));
+    }
+
+
+
+    /// <summary>
+    /// Plays a game to its end, the human passing every bid and playing its first legal
+    /// card, and counts the GameOver announcements raised by the AI's moves and by the
+    /// human's.
+    /// </summary>
+    private static async Task<(int ByAi, int ByHuman)> PlayToGameOverCountingAnnouncements(GameSession session)
+    {
+        // The handler only counts; the loop reads the count around each move to see
+        // which move ended the game.
         var gameOvers = 0;
-        var endedByAi = false;
+        var byAi = 0;
+        var byHuman = 0;
         session.GameOver += (_, _) => gameOvers++;
         session.StartNewGame(new HouseRules { PointsToWin = 12 });
 
@@ -317,19 +340,21 @@ public class GameSessionEventTests
                     break;
 
                 default:
-                    var before = gameOvers;
+                    var beforeAi = gameOvers;
                     var humanPlays = await session.AdvanceAiPlaysAsync();
-                    endedByAi |= gameOvers > before;
+                    byAi += gameOvers - beforeAi;
 
                     if (humanPlays)
                     {
+                        var beforeHuman = gameOvers;
                         session.PlayHumanCard(session.CurrentState.GetLegalPlays()[0]);
+                        byHuman += gameOvers - beforeHuman;
                     }
 
                     break;
             }
         }
 
-        return endedByAi;
+        return (byAi, byHuman);
     }
 }
