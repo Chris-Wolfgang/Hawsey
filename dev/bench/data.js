@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793645624644,
+  "lastUpdate": 1793827287903,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -286,6 +286,54 @@ window.BENCHMARK_DATA = {
             "value": 162950.89778645834,
             "unit": "ns",
             "range": "± 1037.7718261728162"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "988361d88090be05e6416761a0c99c2a208f9873",
+          "message": "chore: drop issue-number references from code comments and project files (#1007) (#1010)\n\nA comment states the rule; the incident that led to it lives in the commit\nmessage and PR body. Each parenthesised issue number is removed, and where the\nsentence relied on it the reason is kept in words. No code changes.\n\nHawsey.slnx.DotSettings is left alone: it is template-synced, so the change\nbelongs in repo-template first.\n\nCo-authored-by: Claude Fable 5.1 <noreply@anthropic.com>",
+          "timestamp": "2026-11-04T16:20:06-05:00",
+          "tree_id": "90c79bb57d81a85daf216deca142c2aa512aca7a",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/988361d88090be05e6416761a0c99c2a208f9873"
+        },
+        "date": 1793827286702,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 548.654569307963,
+            "unit": "ns",
+            "range": "± 3.1794588557565584"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 92.9927312930425,
+            "unit": "ns",
+            "range": "± 1.7357768097020958"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 285.4967101414998,
+            "unit": "ns",
+            "range": "± 1.2594831794680903"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 380261.52913411456,
+            "unit": "ns",
+            "range": "± 1432.2590744472463"
           }
         ]
       }
