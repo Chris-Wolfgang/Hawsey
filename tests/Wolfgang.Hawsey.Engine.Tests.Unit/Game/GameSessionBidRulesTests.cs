@@ -11,7 +11,7 @@ namespace Wolfgang.Hawsey.Engine.Tests.Unit.Game;
 /// <summary>
 /// The bid rules a UI reads from the engine: <see cref="GameState.MinimumLegalBid"/>,
 /// <see cref="GameState.IsNextBidderStuck"/>, and <see cref="GameSession.PlaceHumanBid"/>
-/// refusing a bid the engine would reject (#867), instead of throwing.
+/// refusing a bid the engine would reject, instead of throwing.
 /// </summary>
 public class GameSessionBidRulesTests
 {

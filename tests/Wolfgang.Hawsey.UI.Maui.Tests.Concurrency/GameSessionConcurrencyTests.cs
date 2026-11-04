@@ -31,7 +31,7 @@ public class GameSessionConcurrencyTests
     /// The iterations run in batches, each in a new <see cref="TestingEngine"/>. An engine
     /// keeps data for every iteration it explores until it is disposed (about 0.5 MB per
     /// whole game), so one engine for the monthly soak's budget ran a GitHub runner out of
-    /// memory (#943). Measured with a forced collection after each disposed engine, the live
+    /// memory. Measured with a forced collection after each disposed engine, the live
     /// heap stays flat from batch to batch: the growth is the engine's, not a leak.
     /// </remarks>
     private static void RunSystematicTest(Func<Task> scenario, uint costFactor = 1)
