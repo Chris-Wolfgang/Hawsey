@@ -10,7 +10,7 @@ namespace Wolfgang.Hawsey.Engine.Tests.Unit.Game;
 /// <summary>
 /// <see cref="GameState.HighBid"/> and <see cref="GameState.HighBidder"/>: the bidding
 /// progress a UI shows ("current high bid: 8 by West") and a strategy needs to make a
-/// legal bid (#863). North deals, so East, South, West and North bid in that order.
+/// legal bid. North deals, so East, South, West and North bid in that order.
 /// </summary>
 public class GameStateBiddingProgressTests
 {

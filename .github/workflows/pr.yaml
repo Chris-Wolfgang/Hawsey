@@ -430,7 +430,7 @@ jobs:
 
       - name: Upload SARIF to Code Scanning
         if: steps.sarif.outcome == 'success' && hashFiles('inspect.sarif') != ''
-        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d  # v4.38.3
+        uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370  # v4.39.1
         with:
           sarif_file: inspect.sarif
 
@@ -439,7 +439,9 @@ jobs:
   # ============================================================================
   test-linux-core:
     name: "Stage 1: Linux Tests (.NET 5.0-10.0) + Coverage Gate"
-    runs-on:  ubuntu-latest
+    # Pinned to 24.04: on ubuntu-latest (26.04) the netcoreapp3.1 test host finds no ICU it can
+    # load and aborts. Keep the pin until the netcoreapp3.1 slot is handled another way.
+    runs-on: ubuntu-24.04
     needs: detect-projects
     if: github.repository != 'Chris-Wolfgang/repo-template' && needs.detect-projects.outputs.has-projects == 'true'
 
@@ -768,7 +770,7 @@ jobs:
             -targetdir:"CoverageReport" \
             -reporttypes:"Html;TextSummary;MarkdownSummaryGithub;CsvSummary"
 
-      - name: Enforce 90% coverage threshold
+      - name: Enforce coverage thresholds
         if: steps.check-coverage.outputs.has-coverage == 'true'
         run: |
           if [ ! -f CoverageReport/Summary.txt ]; then
@@ -1250,7 +1252,7 @@ jobs:
           }
           Write-Host "Every test assembly that collected coverage is present in the report."
 
-      - name: Enforce 90% coverage threshold
+      - name: Enforce coverage thresholds
         if: steps.check-coverage.outputs.has-coverage == 'true'
         shell: pwsh
         run: |
@@ -1683,7 +1685,7 @@ jobs:
             echo "ℹ️  No coverage files found - skipping report generation"
           fi
 
-      - name: Enforce 90% coverage threshold
+      - name: Enforce coverage thresholds
         run: |
           # If no cobertura files were produced (no tests, all test projects
           # skipped, etc.), the preceding step explicitly skipped report
@@ -1827,7 +1829,7 @@ jobs:
           echo "=========================================="
           echo "✅ ALL STAGES PASSED"
           echo "=========================================="
-          echo "Stage 1: Linux tests + 90% coverage ✅"
+          echo "Stage 1: Linux tests + coverage gate (${CODECOV_MINIMUM}% production, ${CODECOV_TEST_MINIMUM}% tests) ✅"
           echo "Stage 2: Windows .NET Core & .NET Framework tests ✅"
           echo "Stage 3: macOS tests ✅"
           echo ""
