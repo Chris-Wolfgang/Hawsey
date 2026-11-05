@@ -5,7 +5,7 @@ name: Release Apps
 #              (https://chris-wolfgang.github.io/Hawsey/play/)
 #
 # The MAUI app's Android APK and Windows zip jobs are parked with the app on the
-# feature/maui branch until it's ready.
+# dev/maui branch until it's ready.
 #
 # Versions come from the Release tag: v1.2.3 (or 1.2.3; a -suffix is dropped) sets
 # ApplicationDisplayVersion 1.2.3 and ApplicationVersion (Android versionCode)
