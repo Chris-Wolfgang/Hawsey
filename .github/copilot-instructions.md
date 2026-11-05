@@ -13,7 +13,7 @@ Hawsey is a C# implementation of a four-player team trick-taking card game playe
 | `src/Wolfgang.Hawsey.UI.Maui` | `net10.0` (unit-test target, no platform head) and `net10.0-android`, plus `net10.0-windows10.0.19041.0` on Windows and `net10.0-ios;net10.0-maccatalyst` on macOS |
 | `tests/Wolfgang.Hawsey.Engine.Tests.Unit` | `net462` through `net10.0` (13 TFMs) |
 | `tests/Wolfgang.Hawsey.UI.Maui.Tests.Unit` | `net10.0` |
-| `tests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency` | `net10.0` (Coyote) |
+| `tests/Wolfgang.Hawsey.Engine.Tests.Concurrency` | `net10.0` (Coyote) |
 | `benchmarks/Wolfgang.Hawsey.Engine.Benchmarks` | `net10.0` |
 | `examples/Wolfgang.Hawsey.Engine.AotSmoke` | `net10.0` |
 

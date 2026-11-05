@@ -14,7 +14,7 @@ public class SimpleAiStrategyTests
 
 
     [Fact]
-    public void DecideTrump_returns_suit_with_most_cards()
+    public void DecideTrump_when_called_returns_the_suit_with_most_cards()
     {
         var engine = new GameEngine();
         var state = engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
@@ -27,7 +27,7 @@ public class SimpleAiStrategyTests
 
 
     [Fact]
-    public void DecidePlay_returns_legal_card()
+    public void DecidePlay_when_called_returns_a_legal_card()
     {
         var engine = new GameEngine();
         var state = engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
@@ -84,7 +84,7 @@ public class SimpleAiStrategyTests
 
 
     [Fact]
-    public void DecideHawseyExchange_returns_valid_cards()
+    public void DecideHawseyExchange_when_called_returns_valid_cards()
     {
         var engine = new GameEngine();
         var state = engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(42));
@@ -111,7 +111,7 @@ public class SimpleAiStrategyTests
 
 
     [Fact]
-    public void Each_decision_that_reads_the_state_rejects_a_null_state()
+    public void Decide_when_state_is_null_throws()
     {
         Assert.Equal("state", Assert.Throws<ArgumentNullException>(() => _strategy.DecideBid(null!, PlayerPosition.North)).ParamName);
         Assert.Equal("state", Assert.Throws<ArgumentNullException>(() => _strategy.DecideTrump(null!, PlayerPosition.North)).ParamName);
