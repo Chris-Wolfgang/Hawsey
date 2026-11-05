@@ -26,8 +26,27 @@ namespace Wolfgang.Hawsey.Engine.Game;
 public sealed class GameState
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="GameState"/> class.
+    /// Initializes a new instance of the <see cref="GameState"/> class. Each parameter
+    /// sets the property of the same name.
     /// </summary>
+    /// <param name="phase">The current game phase (<see cref="Phase"/>).</param>
+    /// <param name="dealer">The current dealer's position (<see cref="Dealer"/>).</param>
+    /// <param name="hands">The hands for each player (<see cref="Hands"/>).</param>
+    /// <param name="trumpSuit">The trump suit, or <c>null</c> for Ace high mode (<see cref="TrumpSuit"/>).</param>
+    /// <param name="trumpMode">The trump mode (<see cref="TrumpMode"/>).</param>
+    /// <param name="biddingResult">The bidding result, or <c>null</c> if bidding has not completed (<see cref="BiddingResult"/>).</param>
+    /// <param name="completedTricks">The tricks completed in the current round (<see cref="CompletedTricks"/>).</param>
+    /// <param name="currentTrick">The current trick in progress, or <c>null</c> (<see cref="CurrentTrick"/>).</param>
+    /// <param name="northSouthScore">The current North/South score (<see cref="NorthSouthScore"/>).</param>
+    /// <param name="eastWestScore">The current East/West score (<see cref="EastWestScore"/>).</param>
+    /// <param name="rules">The house rules in effect (<see cref="Rules"/>).</param>
+    /// <param name="nextToAct">The player who should act next, or <c>null</c> if no action is needed (<see cref="NextToAct"/>).</param>
+    /// <param name="tricksPlayedInRound">The number of tricks played in the current round (<see cref="TricksPlayedInRound"/>).</param>
+    /// <param name="isHawseyRound">Whether this is a Hawsey round (<see cref="IsHawseyRound"/>).</param>
+    /// <param name="hawseyBidder">The Hawsey bidder's position, or <c>null</c> if not a Hawsey round (<see cref="HawseyBidder"/>).</param>
+    /// <param name="highBid">The highest number bid so far while bidding, or <c>0</c> when nobody has bid (<see cref="HighBid"/>).</param>
+    /// <param name="highBidder">The player holding <paramref name="highBid"/>, or <c>null</c> when nobody has bid (<see cref="HighBidder"/>).</param>
+    /// <param name="roundScore">The round the engine has just scored, or <c>null</c> (<see cref="RoundScore"/>).</param>
     public GameState
     (
         GamePhase phase,

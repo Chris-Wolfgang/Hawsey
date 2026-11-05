@@ -243,8 +243,12 @@ public class GameSession
 
 
     /// <summary>
-    /// Advances AI bidding. Returns true if human needs to bid.
+    /// Lets the AI seats bid, in turn, until it is the human's turn or bidding ends.
     /// </summary>
+    /// <returns>
+    /// <see langword="true"/> when the human is next to bid; <see langword="false"/> when
+    /// bidding is over or not open, or a new game was started while it ran.
+    /// </returns>
     public async Task<bool> AdvanceAiBiddingAsync()
     {
         var generation = CurrentGeneration();
@@ -324,6 +328,11 @@ public class GameSession
     /// Names trump for the human. Returns false, and changes nothing, when the
     /// human is not the one naming trump.
     /// </summary>
+    /// <param name="trumpSuit">The trump suit, or <see langword="null"/> for Ace high.</param>
+    /// <returns><see langword="true"/> when trump was named.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="trumpSuit"/> is not a defined <see cref="Suit"/>.
+    /// </exception>
     public bool SelectTrump(Suit? trumpSuit)
     {
         lock (_sync)
@@ -343,8 +352,12 @@ public class GameSession
 
 
     /// <summary>
-    /// Returns true if human needs to select trump.
+    /// Lets an AI bidder name trump, after a short pause, when it is its turn to.
     /// </summary>
+    /// <returns>
+    /// <see langword="true"/> when the human must name trump; <see langword="false"/> when
+    /// an AI named it, it is not the trump selection phase, or a new game was started.
+    /// </returns>
     public async Task<bool> HandleTrumpSelectionAsync()
     {
         var generation = CurrentGeneration();
@@ -465,8 +478,13 @@ public class GameSession
 
 
     /// <summary>
-    /// Returns true if human needs to handle exchange.
+    /// Makes an AI Hawsey bidder's card exchange, after a short pause.
     /// </summary>
+    /// <returns>
+    /// <see langword="true"/> when the human is the Hawsey bidder and must make the
+    /// exchange; <see langword="false"/> when an AI made it, it is not the exchange phase,
+    /// or a new game was started.
+    /// </returns>
     public async Task<bool> HandleHawseyExchangeAsync()
     {
         var generation = CurrentGeneration();
@@ -558,8 +576,12 @@ public class GameSession
 
 
     /// <summary>
-    /// Advances AI plays. Returns true if human needs to play.
+    /// Lets the AI seats play, in turn, until it is the human's turn or the round ends.
     /// </summary>
+    /// <returns>
+    /// <see langword="true"/> when the human is next to play; <see langword="false"/> when
+    /// the round or the game ended, it is not trick play, or a new game was started.
+    /// </returns>
     public async Task<bool> AdvanceAiPlaysAsync()
     {
         var generation = CurrentGeneration();
