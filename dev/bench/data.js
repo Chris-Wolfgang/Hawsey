@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793827287903,
+  "lastUpdate": 1793846377287,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -334,6 +334,54 @@ window.BENCHMARK_DATA = {
             "value": 380261.52913411456,
             "unit": "ns",
             "range": "± 1432.2590744472463"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b24016862328e8b818d2b429c84150d6fd05070c",
+          "message": "chore: project-file hygiene (#1006, 1/2) (#1017)\n\n* chore: drop issue-number references from code comments and project files (#1007)\n\nA comment states the rule; the incident that led to it lives in the commit\nmessage and PR body. Each parenthesised issue number is removed, and where the\nsentence relied on it the reason is kept in words. No code changes.\n\nHawsey.slnx.DotSettings is left alone: it is template-synced, so the change\nbelongs in repo-template first.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* chore: project-file hygiene (#1006)\n\n- Engine tests: xunit.runner.visualstudio 3.0.1 on net8.0+, and 2.8.2 capped\n  with allowedVersions=\"(,3.0.0)\" on net462-net481, net6.0 and net7.0, so a\n  Dependabot bump cannot move those slots to a runner that drops them\n  (netcoreapp3.1/net5.0 keep 2.4.5, capped below 2.5.0).\n- Engine csproj: drop <Authors>, which Directory.Build.props already sets; add\n  <RepositoryUrl>, which Directory.Build.props leaves to each src project.\n- UI.Blazor / UI.Shared csproj: drop <Authors> and the year-less <Copyright>\n  that overrode the year-stamped value from Directory.Build.props.\n- Remove src/, tests/, benchmarks/ and examples/.gitkeep: each directory has\n  held real projects since 0.1.0.\n- CHANGELOG.md: add the Keep a Changelog link references for [Unreleased]\n  and [0.1.0].\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Fable 5.1 <noreply@anthropic.com>",
+          "timestamp": "2026-11-04T21:38:00-05:00",
+          "tree_id": "956a31deb01cd53d666a6bffa07fa97242e2acb7",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/b24016862328e8b818d2b429c84150d6fd05070c"
+        },
+        "date": 1793846375778,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 474.31538009643555,
+            "unit": "ns",
+            "range": "± 1.5617500315157482"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 59.93132162094116,
+            "unit": "ns",
+            "range": "± 0.19521999246107172"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 218.41302820046744,
+            "unit": "ns",
+            "range": "± 4.044812566540248"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 253252.71940104166,
+            "unit": "ns",
+            "range": "± 3555.334536816175"
           }
         ]
       }
