@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793893723529,
+  "lastUpdate": 1793896090294,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -574,6 +574,60 @@ window.BENCHMARK_DATA = {
             "value": 252150.13134765625,
             "unit": "ns",
             "range": "± 2061.1220655943243"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "991da98a857b2dbdfdc31a760fcb299d72b2ae53",
+          "message": "refactor(engine): small simplifications from the code review (#1005) (#1016)\n\n- GameEngine: PlaysPerTrick (4) and PlaysPerHawseyTrick (3) name the trick\n  sizes that were a local and two literals.\n- Deck.Shuffle copies its input with ToArray() instead of an index loop.\n- BidAction.NumberBid has value equality (IEquatable<NumberBid>, Equals,\n  GetHashCode on Amount), so PlacedBid records compare by value; the AI test\n  helper that worked around it now compares bids directly.\n- GameEngine / GameState: the type-level SuppressMessage uses the repo's\n  multi-line argument layout and a using directive instead of the fully\n  qualified name.\n\nCo-authored-by: Claude Fable 5.1 <noreply@anthropic.com>",
+          "timestamp": "2026-11-05T11:26:34-05:00",
+          "tree_id": "a58137cb56372882813ff02dae645adfadf790a9",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/991da98a857b2dbdfdc31a760fcb299d72b2ae53"
+        },
+        "date": 1793896088713,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 497.40381177266437,
+            "unit": "ns",
+            "range": "± 2.893688110224067"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 92.6764400601387,
+            "unit": "ns",
+            "range": "± 1.0433605271429287"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 278.18347517649335,
+            "unit": "ns",
+            "range": "± 1.4908661518323598"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 381900.8229166667,
+            "unit": "ns",
+            "range": "± 2721.6650261623245"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGameWithSimpleAi",
+            "value": 521336.7529296875,
+            "unit": "ns",
+            "range": "± 1694.25273926564"
           }
         ]
       }
