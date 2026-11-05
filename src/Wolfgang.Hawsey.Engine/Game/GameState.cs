@@ -236,6 +236,21 @@ public sealed class GameState
 
 
     /// <summary>
+    /// The number of tricks in a round: each player's twelve cards.
+    /// </summary>
+    public const int TricksPerRound = 12;
+
+
+
+    /// <summary>
+    /// The points a Hawsey bid is worth: the bidding team gains them by taking all
+    /// <see cref="TricksPerRound"/> tricks, and loses them otherwise.
+    /// </summary>
+    public const int HawseyBidAmount = 24;
+
+
+
+    /// <summary>
     /// Gets the lowest number bid the next bidder may make: the house minimum, or one
     /// more than <see cref="HighBid"/>.
     /// </summary>
