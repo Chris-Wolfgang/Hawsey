@@ -26,10 +26,11 @@ public class BidActionTests
     public void NumberBid_Equals_when_amounts_differ_or_other_is_not_a_number_bid_returns_false()
     {
         var bid = new BidAction.NumberBid(8);
+        object otherKindOfBid = BidAction.PassBid.Instance;
 
         Assert.False(bid.Equals(new BidAction.NumberBid(9)));
         Assert.False(bid.Equals(NoBid()));
-        Assert.False(bid.Equals(BidAction.PassBid.Instance));
+        Assert.False(bid.Equals(otherKindOfBid));
     }
 
 
