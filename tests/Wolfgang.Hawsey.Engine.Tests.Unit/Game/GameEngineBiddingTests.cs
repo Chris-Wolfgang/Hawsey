@@ -39,7 +39,7 @@ public class GameEngineBiddingTests
 
 
     [Fact]
-    public void Bidding_starts_left_of_the_dealer_and_goes_clockwise()
+    public void PlaceBid_when_bidding_opens_starts_left_of_the_dealer_and_goes_clockwise()
     {
         var state = Deal();
         Assert.Equal(PlayerPosition.East, state.NextToAct);
@@ -58,7 +58,7 @@ public class GameEngineBiddingTests
 
 
     [Fact]
-    public void When_all_pass_the_dealer_is_stuck_at_the_minimum()
+    public void PlaceBid_when_all_pass_sticks_the_dealer_at_the_minimum()
     {
         var state = Bid(Deal(), Pass, Pass, Pass, Pass);
 
@@ -74,7 +74,7 @@ public class GameEngineBiddingTests
 
 
     [Fact]
-    public void When_all_pass_the_dealer_is_stuck_at_a_custom_minimum()
+    public void PlaceBid_when_all_pass_sticks_the_dealer_at_a_custom_minimum()
     {
         var state = Bid(Deal(new HouseRules { MinimumBid = 8 }), Pass, Pass, Pass, Pass);
 
@@ -85,7 +85,7 @@ public class GameEngineBiddingTests
 
 
     [Fact]
-    public void The_highest_bidder_wins_and_names_trump()
+    public void PlaceBid_when_bidding_ends_gives_the_highest_bidder_the_trump_choice()
     {
         var state = Bid(Deal(), new BidAction.NumberBid(7), new BidAction.NumberBid(8), Pass, Pass);
 
@@ -100,7 +100,7 @@ public class GameEngineBiddingTests
 
 
     [Fact]
-    public void The_dealer_bids_last_and_can_win()
+    public void PlaceBid_when_the_dealer_bids_last_lets_the_dealer_win()
     {
         var state = Bid(Deal(), new BidAction.NumberBid(7), Pass, Pass, new BidAction.NumberBid(9));
 
@@ -111,7 +111,7 @@ public class GameEngineBiddingTests
 
 
     [Fact]
-    public void A_Hawsey_bid_ends_the_bidding_at_once()
+    public void PlaceBid_when_the_bid_is_Hawsey_ends_the_bidding_at_once()
     {
         var state = Bid(Deal(), BidAction.HawseyBid.Instance);
 
@@ -128,7 +128,7 @@ public class GameEngineBiddingTests
 
 
     [Fact]
-    public void A_Hawsey_bid_after_number_bids_ends_the_bidding_at_once()
+    public void PlaceBid_when_Hawsey_follows_number_bids_ends_the_bidding_at_once()
     {
         var state = Bid(Deal(), new BidAction.NumberBid(8), BidAction.HawseyBid.Instance);
 
@@ -139,7 +139,7 @@ public class GameEngineBiddingTests
 
 
     [Fact]
-    public void A_bid_of_the_maximum_is_accepted()
+    public void PlaceBid_when_the_bid_is_the_maximum_accepts_it()
     {
         var state = Bid(Deal(), new BidAction.NumberBid(GameState.MaximumBid));
 
@@ -161,7 +161,7 @@ public class GameEngineBiddingTests
 
 
     [Fact]
-    public void A_bid_below_a_custom_minimum_throws()
+    public void PlaceBid_when_below_a_custom_minimum_throws()
     {
         var state = Deal(new HouseRules { MinimumBid = 8 });
 
@@ -171,7 +171,7 @@ public class GameEngineBiddingTests
 
 
     [Fact]
-    public void A_bid_that_does_not_beat_the_high_bid_throws()
+    public void PlaceBid_when_not_above_the_high_bid_throws()
     {
         var state = Bid(Deal(), new BidAction.NumberBid(8));
 
@@ -181,7 +181,7 @@ public class GameEngineBiddingTests
 
 
     [Fact]
-    public void A_bid_out_of_turn_throws()
+    public void PlaceBid_when_out_of_turn_throws()
     {
         var state = Deal();
 
@@ -191,7 +191,7 @@ public class GameEngineBiddingTests
 
 
     [Fact]
-    public void A_bid_after_bidding_is_over_throws()
+    public void PlaceBid_when_bidding_is_over_throws()
     {
         var state = Bid(Deal(), Pass, Pass, Pass, Pass);
 
@@ -201,7 +201,7 @@ public class GameEngineBiddingTests
 
 
     [Fact]
-    public void A_null_action_throws()
+    public void PlaceBid_when_action_is_null_throws()
     {
         var state = Deal();
 

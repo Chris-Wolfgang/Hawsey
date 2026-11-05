@@ -50,7 +50,7 @@ public class GameStateTableAndRoundScoreTests
 
 
     [Fact]
-    public void Before_the_first_lead_the_table_is_empty()
+    public void TableCards_when_nothing_is_led_is_empty()
     {
         var state = AtFirstLead();
 
@@ -62,7 +62,7 @@ public class GameStateTableAndRoundScoreTests
 
 
     [Fact]
-    public void During_a_trick_the_table_shows_its_cards_and_current_winner()
+    public void TableCards_when_a_trick_is_in_progress_shows_its_cards_and_current_winner()
     {
         var state = Play(Play(AtFirstLead()));
 
@@ -73,7 +73,7 @@ public class GameStateTableAndRoundScoreTests
 
 
     [Fact]
-    public void After_a_trick_is_won_the_table_shows_it_until_the_next_lead()
+    public void TableCards_when_a_trick_is_won_shows_it_until_the_next_lead()
     {
         var state = AtFirstLead();
 
@@ -95,7 +95,7 @@ public class GameStateTableAndRoundScoreTests
 
 
     [Fact]
-    public void A_scored_round_carries_its_score_and_shows_the_last_trick()
+    public void RoundScore_when_a_round_is_scored_is_set_and_the_table_shows_the_last_trick()
     {
         var dealt = Deal();
 
@@ -123,7 +123,7 @@ public class GameStateTableAndRoundScoreTests
 
 
     [Fact]
-    public void The_next_deal_has_no_round_score_and_an_empty_table()
+    public void RoundScore_when_the_next_deal_starts_is_null_and_the_table_is_empty()
     {
         var next = _engine.StartNextRound(RoundDriver.PlayOneRound(Deal(), _ai), new Random(4));
 
