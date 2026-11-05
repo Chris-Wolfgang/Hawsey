@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793847890926,
+  "lastUpdate": 1793885038884,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -430,6 +430,54 @@ window.BENCHMARK_DATA = {
             "value": 395752.3030598958,
             "unit": "ns",
             "range": "± 201.79068162437298"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "1a0994574a220078ebcd3f5191f6181df86107e6",
+          "message": "fix(engine): PerformHawseyExchange refuses invalid cards; name the Hawsey score (#1004) (#1011)\n\nGameSession.PerformHawseyExchange checked only the phase and the bidder, so a\nwrong count or a card not held reached GameEngine.ExchangeHawseyCards and threw\nInvalidOperationException. Every other human move refuses with false. It now\nreturns false, and changes nothing, unless both arrays are two cards the right\nplayer holds (the same Holds check PerformHumanHawseyExchange uses); a null\narray still throws ArgumentNullException, as for PerformHumanHawseyExchange.\n\nGameState.TricksPerRound (12) and GameState.HawseyBidAmount (24) replace the\nliterals in GameEngine and RoundScore, so a UI can read them too.\n\nCo-authored-by: Claude Fable 5.1 <noreply@anthropic.com>",
+          "timestamp": "2026-11-05T08:22:42-05:00",
+          "tree_id": "5e4927fd577c1bc5a8e66d6d8b81c1051ea903af",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/1a0994574a220078ebcd3f5191f6181df86107e6"
+        },
+        "date": 1793885037601,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 550.3775625228882,
+            "unit": "ns",
+            "range": "± 1.5728595598461441"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 86.00299276908238,
+            "unit": "ns",
+            "range": "± 1.1332355762431563"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 278.89576721191406,
+            "unit": "ns",
+            "range": "± 0.28523592942472265"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 460002.0006510417,
+            "unit": "ns",
+            "range": "± 6049.479665283507"
           }
         ]
       }
