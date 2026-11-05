@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1792304531093,
+  "lastUpdate": 1793904416864,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "Mutation score": [
@@ -107,6 +107,33 @@ window.BENCHMARK_DATA = {
           {
             "name": "Mutation score (tests/Wolfgang.Hawsey.Engine.Tests.Unit)",
             "value": 91.76,
+            "unit": "%"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang",
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "7a35852501cb377d8b73f6da27f2972077018025",
+          "message": "docs: describe main as it is: Blazor app, dev/maui branch, published package (#1002) (#1021)\n\n* chore: drop issue-number references from code comments and project files (#1007)\n\nA comment states the rule; the incident that led to it lives in the commit\nmessage and PR body. Each parenthesised issue number is removed, and where the\nsentence relied on it the reason is kept in words. No code changes.\n\nHawsey.slnx.DotSettings is left alone: it is template-synced, so the change\nbelongs in repo-template first.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* chore: project-file hygiene (#1006)\n\n- Engine tests: xunit.runner.visualstudio 3.0.1 on net8.0+, and 2.8.2 capped\n  with allowedVersions=\"(,3.0.0)\" on net462-net481, net6.0 and net7.0, so a\n  Dependabot bump cannot move those slots to a runner that drops them\n  (netcoreapp3.1/net5.0 keep 2.4.5, capped below 2.5.0).\n- Engine csproj: drop <Authors>, which Directory.Build.props already sets; add\n  <RepositoryUrl>, which Directory.Build.props leaves to each src project.\n- UI.Blazor / UI.Shared csproj: drop <Authors> and the year-less <Copyright>\n  that overrode the year-stamped value from Directory.Build.props.\n- Remove src/, tests/, benchmarks/ and examples/.gitkeep: each directory has\n  held real projects since 0.1.0.\n- CHANGELOG.md: add the Keep a Changelog link references for [Unreleased]\n  and [0.1.0].\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* chore: rename the Coyote test project to Wolfgang.Hawsey.Engine.Tests.Concurrency (#1006)\n\ntests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency tests only the engine's\nGameSession, and the MAUI app is not on main. The project, its folder and\nnamespace become Wolfgang.Hawsey.Engine.Tests.Concurrency; Hawsey.slnx,\nREADME.md, .github/copilot-instructions.md and two comments follow.\n\ncoyote.yaml builds and tests the project by path; it is a protected file and\nchanges in its own PR, to merge together with this one.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* docs: describe main as it is: Blazor app, dev/maui branch, published package (#1002)\n\n- README links the MAUI branch as dev/maui (the\n  feature/maui link 404s), and no longer say the package is unpublished.\n- copilot-instructions: the project table lists the Blazor projects instead\n  of the MAUI ones; no workload prerequisite; the workflow list names\n  release-apps.yaml instead of a MAUI build.\n- getting-started.md / docfx index.md: drop the \"not published yet\" text;\n  0.1.0 is on nuget.org.\n- SECURITY.md: consumers and package coordinates reflect the published package\n  and the Blazor app.\n- CONTRIBUTING.md: no MAUI workload prerequisite.\n- TEMPLATE-DRIFT.md: the timeouts are history from the MAUI app being on main;\n  docfx row reason; Hawsey-only workflows list release-apps.yaml, not\n  maui-build.yaml.\n- THREAT-MODEL.md: GameService -> GameSession. adr/index.md: next is 0008.\n- RELEASE-WORKFLOW-SETUP.md / STACKED-PRS.md: say Hawsey has no\n  Setup-BranchRuleset.ps1 (Fix-BranchRuleset.ps1 calls it).\n- Blazor Program.cs, Index.razor, both UI csproj comments: no \"like the MAUI\n  app\" for an app not on this branch. AssemblyInfo keeps the MAUI tests'\n  InternalsVisibleTo (the project lives on dev/maui) and says why.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Fable 5.1 <noreply@anthropic.com>",
+          "timestamp": "2026-11-05T18:11:39Z",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/7a35852501cb377d8b73f6da27f2972077018025"
+        },
+        "date": 1793904412658,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "Mutation score (tests/Wolfgang.Hawsey.Engine.Tests.Unit)",
+            "value": 91.78,
             "unit": "%"
           }
         ]
