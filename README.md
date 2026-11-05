@@ -129,7 +129,7 @@ The game's namesake bid: the bidder plays alone to take all 12 tricks. The bidde
 | `benchmarks/Wolfgang.Hawsey.Engine.Benchmarks` | BenchmarkDotNet benchmarks for the engine. |
 | `examples/Wolfgang.Hawsey.Engine.AotSmoke` | Native AOT smoke test that plays complete games through the engine. |
 
-The .NET MAUI app (Android, Windows, iOS and Mac Catalyst) is in development on the [`feature/maui`](https://github.com/Chris-Wolfgang/Hawsey/tree/feature/maui) branch and isn't part of `main` until it's ready. It uses the same engine.
+The .NET MAUI app (Android, Windows, iOS and Mac Catalyst) is in development on the [`dev/maui`](https://github.com/Chris-Wolfgang/Hawsey/tree/dev/maui) branch and isn't part of `main` until it's ready. It uses the same engine.
 
 The engine is UI-agnostic. Each `GameEngine` method takes the current `GameState` and returns a new one, which makes the engine easy to unit test and replay (see [ADR 0002](docs/adr/0002-ui-agnostic-engine-with-immutable-state.md)).
 
@@ -142,7 +142,7 @@ The engine is UI-agnostic. Each `GameEngine` method takes the current `GameState
 - `netstandard2.0`
 - `net10.0`
 
-Once the package is published, see the [NuGet package page](https://www.nuget.org/packages/Wolfgang.Hawsey.Engine/) for the authoritative per-TFM compatibility matrix.
+See the [NuGet package page](https://www.nuget.org/packages/Wolfgang.Hawsey.Engine/) for the authoritative per-TFM compatibility matrix.
 
 ---
 
@@ -264,7 +264,7 @@ Contributions are welcome, especially:
 
 - **House-rule variants.** New variants belong in `HouseRules` (see [ADR 0004](docs/adr/0004-house-rules-as-an-options-object.md)).
 - **AI strategies.** Implement `IPlayerStrategy`.
-- **UI work** on the Blazor app, or on the MAUI app on the `feature/maui` branch.
+- **UI work** on the Blazor app, or on the MAUI app on the `dev/maui` branch.
 
 Please see [CONTRIBUTING.md](CONTRIBUTING.md) for:
 - Code quality standards

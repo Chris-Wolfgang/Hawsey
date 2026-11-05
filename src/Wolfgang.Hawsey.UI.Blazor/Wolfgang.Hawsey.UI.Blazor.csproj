@@ -10,7 +10,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <!-- An app, not a NuGet package (the SourceLink job skips non-packable projects),
          and its Razor components are not a documented API: opt out of the src/
-         XML-doc default, like the MAUI app. -->
+         XML-doc default. -->
     <IsPackable>false</IsPackable>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>

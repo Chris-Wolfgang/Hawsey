@@ -8,13 +8,9 @@ This guide shows how to start a game with `Wolfgang.Hawsey.Engine`.
 
 ## Installation
 
-The package has not been published to NuGet yet. Once it is:
-
 ```bash
 dotnet add package Wolfgang.Hawsey.Engine
 ```
-
-Until then, clone the [repository](https://github.com/Chris-Wolfgang/Hawsey) and reference `src/Wolfgang.Hawsey.Engine/Wolfgang.Hawsey.Engine.csproj` from your project.
 
 ## Quick Start
 
