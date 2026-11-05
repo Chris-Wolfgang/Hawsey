@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793887200307,
+  "lastUpdate": 1793893723529,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -526,6 +526,54 @@ window.BENCHMARK_DATA = {
             "value": 263873.685546875,
             "unit": "ns",
             "range": "± 1097.6543347565039"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "0c1b0701625b27eb0d6b9cd932b57007da15a4b6",
+          "message": "docs(engine): declare thrown exceptions and document GameState's parameters (#1003) (#1013)\n\n* fix(ui): read the bid range and Hawsey score from the engine (#1004, 2/2) (#1012)\n\n* fix(engine): PerformHawseyExchange refuses invalid cards; name the Hawsey score (#1004)\n\nGameSession.PerformHawseyExchange checked only the phase and the bidder, so a\nwrong count or a card not held reached GameEngine.ExchangeHawseyCards and threw\nInvalidOperationException. Every other human move refuses with false. It now\nreturns false, and changes nothing, unless both arrays are two cards the right\nplayer holds (the same Holds check PerformHumanHawseyExchange uses); a null\narray still throws ArgumentNullException, as for PerformHumanHawseyExchange.\n\nGameState.TricksPerRound (12) and GameState.HawseyBidAmount (24) replace the\nliterals in GameEngine and RoundScore, so a UI can read them too.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* fix(ui): read the bid range and Hawsey score from the engine (#1004)\n\n- The bid picker stopped at 11 while the engine accepts a number bid up to\n  GameState.MaximumBid (12); it now runs to GameState.MaximumBid.\n- The no-state fallback minimum is HouseRules.Default.MinimumBid, not 6.\n- \"Hawsey (24)\" is built once from GameState.HawseyBidAmount.\n- OnCardClickAsync no longer scans the legal plays before PlayHumanCard,\n  which already checks the turn and the card once and returns false.\n- The dead `|| hand is null` after TryGetValue on a non-nullable List is gone.\n- index.html drops user-scalable=no, which blocked pinch-zoom (WCAG 1.4.4).\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Fable 5.1 <noreply@anthropic.com>\n\n* docs(engine): declare thrown exceptions and document GameState's parameters (#1003)\n\n- GameEngine: PlaceBid, SelectTrump, ExchangeHawseyCards, PlayCard and\n  StartNextRound throw ArgumentNullException for a null state (ValidatePhase);\n  SelectTrump also documents the wrong-phase InvalidOperationException.\n- Trick constructor: ArgumentOutOfRangeException for expectedPlays outside 2..4.\n- GameState constructor: a <param> for each of its 18 parameters.\n- GameSession.SelectTrump: <param>, <returns> and the ArgumentOutOfRangeException\n  for an undefined Suit. AdvanceAiBiddingAsync, HandleTrumpSelectionAsync,\n  HandleHawseyExchangeAsync and AdvanceAiPlaysAsync get a <returns> that states\n  the false case. (PerformHawseyExchange's summary was fixed with its behaviour.)\n- GameOverEventArgs / TrickCompletedEventArgs: no leading blank line, three\n  blank lines between members; WaitingFor: no trailing comma on GameOver.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Fable 5.1 <noreply@anthropic.com>",
+          "timestamp": "2026-11-05T10:47:21-05:00",
+          "tree_id": "bc0db826cebcb4c82ae471c4145af2e8279b0366",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/0c1b0701625b27eb0d6b9cd932b57007da15a4b6"
+        },
+        "date": 1793893721762,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 479.0613276163737,
+            "unit": "ns",
+            "range": "± 3.697176076166451"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 61.077854335308075,
+            "unit": "ns",
+            "range": "± 0.307407995099793"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 213.5127727588018,
+            "unit": "ns",
+            "range": "± 5.0609742397846125"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 252150.13134765625,
+            "unit": "ns",
+            "range": "± 2061.1220655943243"
           }
         ]
       }
