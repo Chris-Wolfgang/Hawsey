@@ -39,7 +39,7 @@ public class GameSessionBidsAndExchangeTests
 
 
     [Fact]
-    public async Task Bids_lists_each_bid_of_the_round_in_order()
+    public async Task Bids_when_bidding_is_over_lists_each_bid_in_order()
     {
         var session = TestGameSessions.Unpaced(ai: new EastBidsEight());
         session.StartNewGame();
@@ -64,7 +64,7 @@ public class GameSessionBidsAndExchangeTests
 
 
     [Fact]
-    public async Task Bids_is_a_snapshot_and_a_refused_bid_is_not_listed()
+    public async Task Bids_when_a_bid_is_refused_is_a_snapshot_without_it()
     {
         var session = TestGameSessions.Unpaced(ai: new EastBidsEight());
         session.StartNewGame();
@@ -81,7 +81,7 @@ public class GameSessionBidsAndExchangeTests
 
 
     [Fact]
-    public async Task Bids_starts_empty_for_each_new_deal()
+    public async Task Bids_when_a_new_deal_starts_is_empty()
     {
         var session = TestGameSessions.Unpaced(ai: new EastBidsEight());
         session.StartNewGame();
@@ -96,7 +96,7 @@ public class GameSessionBidsAndExchangeTests
 
 
     [Fact]
-    public async Task PerformHumanHawseyExchange_discards_the_humans_cards_and_takes_the_partners_best()
+    public async Task PerformHumanHawseyExchange_when_valid_discards_the_humans_cards_and_takes_the_partners_best()
     {
         var session = await AtHumanHawseyExchangeAsync();
         var state = session.CurrentState!;
@@ -119,7 +119,7 @@ public class GameSessionBidsAndExchangeTests
 
 
     [Fact]
-    public async Task PerformHumanHawseyExchange_refuses_a_discard_that_is_not_two_held_cards()
+    public async Task PerformHumanHawseyExchange_when_the_discard_is_not_two_held_cards_returns_false()
     {
         var session = await AtHumanHawseyExchangeAsync();
         var before = session.CurrentState!;
@@ -139,7 +139,7 @@ public class GameSessionBidsAndExchangeTests
 
 
     [Fact]
-    public void PerformHumanHawseyExchange_outside_the_humans_exchange_does_nothing()
+    public void PerformHumanHawseyExchange_when_not_the_humans_exchange_returns_false()
     {
         var session = TestGameSessions.Unpaced();
         session.StartNewGame();
@@ -150,10 +150,47 @@ public class GameSessionBidsAndExchangeTests
 
 
     [Fact]
-    public void PerformHumanHawseyExchange_with_a_null_discard_throws()
+    public void PerformHumanHawseyExchange_when_discard_is_null_throws()
     {
         var session = TestGameSessions.Unpaced();
 
         Assert.Equal("discard", Assert.Throws<ArgumentNullException>(() => session.PerformHumanHawseyExchange(null!)).ParamName);
+    }
+
+
+
+    [Fact]
+    public async Task PerformHawseyExchange_when_the_cards_are_not_two_held_cards_each_returns_false()
+    {
+        var session = await AtHumanHawseyExchangeAsync();
+        var before = session.CurrentState!;
+        var hand = before.Hands[GameSession.HumanPosition];
+        var partner = before.Hands[GameSession.HumanPosition.Partner()];
+        Card[] discard = [hand[0], hand[1]];
+        Card[] fromPartner = [partner[0], partner[1]];
+        var notInHand = Deck.CreatePinochleDeck().First(c => !hand.Contains(c));
+        var notInPartnersHand = Deck.CreatePinochleDeck().First(c => !partner.Contains(c));
+        var stateChanges = 0;
+        session.StateChanged += (_, _) => stateChanges++;
+
+        Assert.False(session.PerformHawseyExchange([hand[0]], fromPartner));
+        Assert.False(session.PerformHawseyExchange(discard, [partner[0]]));
+        Assert.False(session.PerformHawseyExchange([hand[0], notInHand], fromPartner));
+        Assert.False(session.PerformHawseyExchange(discard, [partner[0], notInPartnersHand]));
+
+        Assert.Equal(0, stateChanges);
+        Assert.Same(before, session.CurrentState);
+    }
+
+
+
+    [Fact]
+    public void PerformHawseyExchange_when_an_array_is_null_throws()
+    {
+        var session = TestGameSessions.Unpaced();
+        Card[] two = [new Card(Rank.Ace, Suit.Spades), new Card(Rank.King, Suit.Spades)];
+
+        Assert.Equal("discard", Assert.Throws<ArgumentNullException>(() => session.PerformHawseyExchange(null!, two)).ParamName);
+        Assert.Equal("fromPartner", Assert.Throws<ArgumentNullException>(() => session.PerformHawseyExchange(two, null!)).ParamName);
     }
 }

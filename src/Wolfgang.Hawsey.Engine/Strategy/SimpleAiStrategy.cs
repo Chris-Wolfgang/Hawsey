@@ -17,9 +17,13 @@ public class SimpleAiStrategy : IPlayerStrategy
 {
     private const int HighestAiBid = 11;
 
-    private static readonly Suit[] Suits = [Suit.Hearts, Suit.Diamonds, Suit.Clubs, Suit.Spades];
+    private const int CopiesPerCard = 2;
 
-    private static readonly Rank[] Ranks = [Rank.Nine, Rank.Ten, Rank.Jack, Rank.Queen, Rank.King, Rank.Ace];
+    /// <summary>
+    /// The trumps in the deck when a suit is named: two copies each of its six ranks and
+    /// of the left bower (the jack of the same colour).
+    /// </summary>
+    private const int TrumpsInDeck = CopiesPerCard * 7;
 
 
 
@@ -96,7 +100,7 @@ public class SimpleAiStrategy : IPlayerStrategy
 
         // Following. The trick has a card, so it has a led suit and a winner.
         var comparer = new CardComparer(state.TrumpSuit, state.CurrentTrick.LedSuit!.Value);
-        var winning = WinningPlay(state.CurrentTrick, comparer);
+        var winning = state.CurrentTrick.CurrentWinningPlay!;
 
         // If the partner is winning, don't overtake: throw low. Otherwise win as
         // cheaply as possible, or throw low.
@@ -259,41 +263,18 @@ public class SimpleAiStrategy : IPlayerStrategy
 
 
     /// <summary>
-    /// The play currently winning <paramref name="trick"/>, which must hold at least one
-    /// card. The first of two equal cards keeps the lead.
-    /// </summary>
-    private static PlayedCard WinningPlay(Trick trick, CardComparer comparer)
-    {
-        var winner = trick.Plays[0];
-
-        for (var i = 1; i < trick.Plays.Count; i++)
-        {
-            if (comparer.Compare(trick.Plays[i].Card, winner.Card) > 0)
-            {
-                winner = trick.Plays[i];
-            }
-        }
-
-        return winner;
-    }
-
-
-
-    /// <summary>
     /// Whether <paramref name="card"/>, led now, must win the trick: no copy of a higher
     /// card in its effective suit is still out (bowers included), and, for a side card,
     /// no trump is still out to ruff it.
     /// </summary>
     private static bool IsSureWinnerWhenLed(Card card, IReadOnlyList<Card> hand, Dictionary<Card, int> played, Suit? trumpSuit)
     {
-        const int CopiesPerCard = 2;
-
         var rank = CardRanking.GetEffectiveRank(card, trumpSuit);
         var suit = CardRanking.GetEffectiveSuit(card, trumpSuit);
 
-        foreach (var candidateSuit in Suits)
+        foreach (var candidateSuit in Deck.AllSuits)
         {
-            foreach (var candidateRank in Ranks)
+            foreach (var candidateRank in Deck.PinochleRanks)
             {
                 var candidate = new Card(candidateRank, candidateSuit);
 
@@ -314,16 +295,25 @@ public class SimpleAiStrategy : IPlayerStrategy
 
         if (trumpSuit is { } trump && suit != trump)
         {
-            // 14 with a suit named: its 12 cards plus the two left bowers.
-            var trumpsInDeck = CopiesPerCard * Suits
-                .SelectMany(s => Ranks.Select(r => new Card(r, s)))
-                .Count(c => CardRanking.GetEffectiveSuit(c, trumpSuit) == trump);
-            var trumpsGone = played
-                .Where(kv => CardRanking.GetEffectiveSuit(kv.Key, trumpSuit) == trump)
-                .Sum(kv => kv.Value);
-            var trumpsHeld = hand.Count(c => CardRanking.GetEffectiveSuit(c, trumpSuit) == trump);
+            var trumpsOut = TrumpsInDeck;
 
-            if (trumpsInDeck - trumpsGone - trumpsHeld > 0)
+            foreach (var playedCard in played)
+            {
+                if (CardRanking.GetEffectiveSuit(playedCard.Key, trumpSuit) == trump)
+                {
+                    trumpsOut -= playedCard.Value;
+                }
+            }
+
+            for (var i = 0; i < hand.Count; i++)
+            {
+                if (CardRanking.GetEffectiveSuit(hand[i], trumpSuit) == trump)
+                {
+                    trumpsOut--;
+                }
+            }
+
+            if (trumpsOut > 0)
             {
                 return false;
             }

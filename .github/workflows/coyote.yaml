@@ -1,8 +1,8 @@
 name: Coyote (concurrency)
 
-# Scheduled systematic-concurrency testing of the engine's GameSession (#73, #834).
+# Scheduled systematic-concurrency testing of the engine's GameSession.
 #
-# tests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency holds Coyote tests: after build,
+# tests/Wolfgang.Hawsey.Engine.Tests.Concurrency holds Coyote tests: after build,
 # `dotnet coyote rewrite` instruments the assembly so Coyote controls every task
 # interleaving, and any interleaving that throws or breaks an invariant is a bug
 # with a reproducible schedule. PR runs use 200 iterations per test; here:
@@ -67,7 +67,7 @@ jobs:
 
       # Built here, so a restore or build failure fails this step, not the tests.
       - name: Build the Coyote tests
-        run: dotnet build tests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency.csproj -c Release
+        run: dotnet build tests/Wolfgang.Hawsey.Engine.Tests.Concurrency/Wolfgang.Hawsey.Engine.Tests.Concurrency.csproj -c Release
 
       - name: Run Coyote tests
         id: run
@@ -77,7 +77,7 @@ jobs:
           set -o pipefail
           mkdir -p coyote-results
           status=0
-          timeout 300m dotnet test tests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency.csproj \
+          timeout 300m dotnet test tests/Wolfgang.Hawsey.Engine.Tests.Concurrency/Wolfgang.Hawsey.Engine.Tests.Concurrency.csproj \
             -c Release --no-build \
             --logger "trx;LogFileName=coyote.trx" --results-directory coyote-results \
             2>&1 | tee coyote-results/coyote.log || status=$?
@@ -120,7 +120,7 @@ jobs:
             label=bug
             body="The scheduled Coyote run failed: $RUN_URL
 
-          Download the \`coyote-results\` artifact. \`coyote.log\` has Coyote's bug report and the failing schedule. Fix the race, and keep the scenario as a test in \`tests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency\`."
+          Download the \`coyote-results\` artifact. \`coyote.log\` has Coyote's bug report and the failing schedule. Fix the race, and keep the scenario as a test in \`tests/Wolfgang.Hawsey.Engine.Tests.Concurrency\`."
           else
             export TITLE="Coyote: the scheduled run failed without a test failure"
             label=maintenance

@@ -92,7 +92,7 @@ public class GameSessionTests
 
 
     [Fact]
-    public void Before_the_first_game_there_is_no_state_and_it_is_not_the_humans_turn()
+    public void CurrentState_when_no_game_has_started_is_null_and_not_the_humans_turn()
     {
         Assert.Null(_session.CurrentState);
         Assert.False(_session.IsHumanTurn);
@@ -101,7 +101,7 @@ public class GameSessionTests
 
 
     [Fact]
-    public async Task Before_the_first_game_every_move_is_rejected()
+    public async Task StartNewGame_when_not_yet_called_leaves_every_move_rejected()
     {
         Assert.False(await _session.AdvanceAiBiddingAsync());
         Assert.False(_session.PlaceHumanBid(BidAction.PassBid.Instance));
@@ -116,7 +116,7 @@ public class GameSessionTests
 
 
     [Fact]
-    public void StartNewGame_deals_with_North_dealing_and_raises_StateChanged()
+    public void StartNewGame_when_called_deals_with_North_dealing_and_raises_StateChanged()
     {
         var raised = 0;
         _session.StateChanged += (_, _) => raised++;
@@ -133,7 +133,7 @@ public class GameSessionTests
 
 
     [Fact]
-    public void StartNewGame_uses_the_injected_random_so_a_seed_repeats_the_deal()
+    public void StartNewGame_when_seeds_match_repeats_the_deal()
     {
         var first = TestGameSessions.Unpaced(seed: 7);
         var second = TestGameSessions.Unpaced(seed: 7);
@@ -151,7 +151,7 @@ public class GameSessionTests
 
 
     [Fact]
-    public async Task AdvanceAiBiddingAsync_stops_at_the_humans_turn()
+    public async Task AdvanceAiBiddingAsync_when_the_human_is_next_stops_and_returns_true()
     {
         await StartAndReachHumanBidAsync();
 
@@ -162,7 +162,7 @@ public class GameSessionTests
 
 
     [Fact]
-    public void PlaceHumanBid_before_the_humans_turn_is_rejected()
+    public void PlaceHumanBid_when_not_the_humans_turn_returns_false()
     {
         _session.StartNewGame();
 
@@ -173,7 +173,7 @@ public class GameSessionTests
 
 
     [Fact]
-    public async Task A_human_number_bid_wins_and_the_human_names_trump()
+    public async Task SelectTrump_when_the_humans_number_bid_wins_names_trump()
     {
         await ReachHumanTrumpChoiceAsync(new BidAction.NumberBid(7));
 
@@ -197,7 +197,7 @@ public class GameSessionTests
 
 
     [Fact]
-    public async Task When_everyone_passes_the_AI_dealer_is_stuck_and_names_trump()
+    public async Task AdvanceAiBiddingAsync_when_everyone_passes_sticks_the_AI_dealer_who_names_trump()
     {
         await StartAndReachHumanBidAsync();
         Assert.True(_session.PlaceHumanBid(BidAction.PassBid.Instance));
@@ -215,7 +215,7 @@ public class GameSessionTests
 
 
     [Fact]
-    public async Task A_human_Hawsey_bid_leads_to_the_humans_exchange()
+    public async Task PerformHawseyExchange_when_the_human_bid_Hawsey_makes_the_humans_exchange()
     {
         await ReachHumanTrumpChoiceAsync(BidAction.HawseyBid.Instance);
         Assert.True(_session.SelectTrump(Suit.Clubs));
@@ -236,7 +236,7 @@ public class GameSessionTests
 
 
     [Fact]
-    public async Task PlayHumanCard_rejects_an_out_of_turn_or_illegal_card()
+    public async Task PlayHumanCard_when_out_of_turn_or_illegal_returns_false()
     {
         await ReachHumanTrumpChoiceAsync(new BidAction.NumberBid(7));
         Assert.True(_session.SelectTrump(Suit.Spades));
@@ -254,7 +254,7 @@ public class GameSessionTests
 
 
     [Fact]
-    public async Task A_whole_game_raises_every_trick_round_and_the_game_over_once()
+    public async Task AdvanceAiPlaysAsync_when_a_whole_game_is_played_raises_each_trick_round_and_game_over_once()
     {
         var tricks = 0;
         var rounds = 0;
@@ -279,7 +279,7 @@ public class GameSessionTests
 
 
     [Fact]
-    public async Task After_the_game_is_over_the_AI_loops_do_nothing()
+    public async Task AdvanceAiPlaysAsync_when_the_game_is_over_does_nothing()
     {
         await PlayToGameOverAsync();
 
@@ -290,7 +290,7 @@ public class GameSessionTests
 
 
     [Fact]
-    public void StartNextRound_outside_round_scoring_does_nothing()
+    public void StartNextRound_when_not_round_scoring_does_nothing()
     {
         _session.StartNewGame();
         var raised = 0;
@@ -313,7 +313,7 @@ public class GameSessionTests
 
 
     [Fact]
-    public async Task The_public_constructor_paces_the_AI_and_deals_a_game()
+    public async Task Constructor_when_public_paces_the_AI_and_deals_a_game()
     {
         var service = new GameSession();
 
