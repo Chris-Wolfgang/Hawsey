@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793885038884,
+  "lastUpdate": 1793887200307,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -478,6 +478,54 @@ window.BENCHMARK_DATA = {
             "value": 460002.0006510417,
             "unit": "ns",
             "range": "± 6049.479665283507"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "8e33d89dbb417e9da981f42b7521098c9303c4ba",
+          "message": "fix(ui): read the bid range and Hawsey score from the engine (#1004, 2/2) (#1012)\n\n* fix(engine): PerformHawseyExchange refuses invalid cards; name the Hawsey score (#1004)\n\nGameSession.PerformHawseyExchange checked only the phase and the bidder, so a\nwrong count or a card not held reached GameEngine.ExchangeHawseyCards and threw\nInvalidOperationException. Every other human move refuses with false. It now\nreturns false, and changes nothing, unless both arrays are two cards the right\nplayer holds (the same Holds check PerformHumanHawseyExchange uses); a null\narray still throws ArgumentNullException, as for PerformHumanHawseyExchange.\n\nGameState.TricksPerRound (12) and GameState.HawseyBidAmount (24) replace the\nliterals in GameEngine and RoundScore, so a UI can read them too.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* fix(ui): read the bid range and Hawsey score from the engine (#1004)\n\n- The bid picker stopped at 11 while the engine accepts a number bid up to\n  GameState.MaximumBid (12); it now runs to GameState.MaximumBid.\n- The no-state fallback minimum is HouseRules.Default.MinimumBid, not 6.\n- \"Hawsey (24)\" is built once from GameState.HawseyBidAmount.\n- OnCardClickAsync no longer scans the legal plays before PlayHumanCard,\n  which already checks the turn and the card once and returns false.\n- The dead `|| hand is null` after TryGetValue on a non-nullable List is gone.\n- index.html drops user-scalable=no, which blocked pinch-zoom (WCAG 1.4.4).\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Fable 5.1 <noreply@anthropic.com>",
+          "timestamp": "2026-11-05T08:55:22-05:00",
+          "tree_id": "10d245df7d0eabfe51e9c13d7708114a7286b4c6",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/8e33d89dbb417e9da981f42b7521098c9303c4ba"
+        },
+        "date": 1793887197363,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 480.185866355896,
+            "unit": "ns",
+            "range": "± 3.6520236445631697"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 62.02043652534485,
+            "unit": "ns",
+            "range": "± 0.39932449689509936"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 206.71052730083466,
+            "unit": "ns",
+            "range": "± 0.4342447823192027"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 263873.685546875,
+            "unit": "ns",
+            "range": "± 1097.6543347565039"
           }
         ]
       }
