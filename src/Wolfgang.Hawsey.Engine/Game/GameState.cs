@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Wolfgang.Hawsey.Engine.Bidding;
 using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Players;
@@ -20,9 +21,12 @@ namespace Wolfgang.Hawsey.Engine.Game;
 // is invariant in TValue (Dictionary<P, List<Card>> is not assignable to
 // IReadOnlyDictionary<P, IReadOnlyList<Card>>). Callers must treat these collections as
 // read-only per the type's XML doc.
-[System.Diagnostics.CodeAnalysis.SuppressMessage(
-    "Design", "MA0016:Prefer using collection abstraction instead of implementation",
-    Justification = "Engine returns concrete types; callers must treat collections as read-only per the type's XML doc.")]
+[SuppressMessage
+(
+    "Design",
+    "MA0016:Prefer using collection abstraction instead of implementation",
+    Justification = "Engine returns concrete types; callers must treat collections as read-only per the type's XML doc."
+)]
 public sealed class GameState
 {
     /// <summary>
