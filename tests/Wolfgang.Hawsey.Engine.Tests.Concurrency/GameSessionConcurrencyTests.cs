@@ -5,7 +5,7 @@ using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Game;
 using Wolfgang.Hawsey.Engine.Players;
 
-namespace Wolfgang.Hawsey.UI.Maui.Tests.Concurrency;
+namespace Wolfgang.Hawsey.Engine.Tests.Concurrency;
 
 /// <summary>
 /// Coyote systematic tests: each scenario is run under many controlled task

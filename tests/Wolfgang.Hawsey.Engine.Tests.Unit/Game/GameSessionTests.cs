@@ -9,7 +9,7 @@ namespace Wolfgang.Hawsey.Engine.Tests.Unit.Game;
 /// <summary>
 /// <see cref="GameSession"/> driven synchronously: pacing is off, so every AI loop
 /// completes before its task is returned. The concurrent interleavings are covered
-/// by the Coyote tests (Wolfgang.Hawsey.UI.Maui.Tests.Concurrency).
+/// by the Coyote tests (Wolfgang.Hawsey.Engine.Tests.Concurrency).
 /// </summary>
 public class GameSessionTests
 {
