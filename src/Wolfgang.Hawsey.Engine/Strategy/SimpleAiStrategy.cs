@@ -17,9 +17,13 @@ public class SimpleAiStrategy : IPlayerStrategy
 {
     private const int HighestAiBid = 11;
 
-    private static readonly Suit[] Suits = [Suit.Hearts, Suit.Diamonds, Suit.Clubs, Suit.Spades];
+    private const int CopiesPerCard = 2;
 
-    private static readonly Rank[] Ranks = [Rank.Nine, Rank.Ten, Rank.Jack, Rank.Queen, Rank.King, Rank.Ace];
+    /// <summary>
+    /// The trumps in the deck when a suit is named: two copies each of its six ranks and
+    /// of the left bower (the jack of the same colour).
+    /// </summary>
+    private const int TrumpsInDeck = CopiesPerCard * 7;
 
 
 
@@ -265,14 +269,12 @@ public class SimpleAiStrategy : IPlayerStrategy
     /// </summary>
     private static bool IsSureWinnerWhenLed(Card card, IReadOnlyList<Card> hand, Dictionary<Card, int> played, Suit? trumpSuit)
     {
-        const int CopiesPerCard = 2;
-
         var rank = CardRanking.GetEffectiveRank(card, trumpSuit);
         var suit = CardRanking.GetEffectiveSuit(card, trumpSuit);
 
-        foreach (var candidateSuit in Suits)
+        foreach (var candidateSuit in Deck.AllSuits)
         {
-            foreach (var candidateRank in Ranks)
+            foreach (var candidateRank in Deck.PinochleRanks)
             {
                 var candidate = new Card(candidateRank, candidateSuit);
 
@@ -293,16 +295,25 @@ public class SimpleAiStrategy : IPlayerStrategy
 
         if (trumpSuit is { } trump && suit != trump)
         {
-            // 14 with a suit named: its 12 cards plus the two left bowers.
-            var trumpsInDeck = CopiesPerCard * Suits
-                .SelectMany(s => Ranks.Select(r => new Card(r, s)))
-                .Count(c => CardRanking.GetEffectiveSuit(c, trumpSuit) == trump);
-            var trumpsGone = played
-                .Where(kv => CardRanking.GetEffectiveSuit(kv.Key, trumpSuit) == trump)
-                .Sum(kv => kv.Value);
-            var trumpsHeld = hand.Count(c => CardRanking.GetEffectiveSuit(c, trumpSuit) == trump);
+            var trumpsOut = TrumpsInDeck;
 
-            if (trumpsInDeck - trumpsGone - trumpsHeld > 0)
+            foreach (var playedCard in played)
+            {
+                if (CardRanking.GetEffectiveSuit(playedCard.Key, trumpSuit) == trump)
+                {
+                    trumpsOut -= playedCard.Value;
+                }
+            }
+
+            for (var i = 0; i < hand.Count; i++)
+            {
+                if (CardRanking.GetEffectiveSuit(hand[i], trumpSuit) == trump)
+                {
+                    trumpsOut--;
+                }
+            }
+
+            if (trumpsOut > 0)
             {
                 return false;
             }
