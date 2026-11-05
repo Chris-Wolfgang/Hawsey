@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- BenchmarkDotNet baseline for the engine (#32, #90). benchmarks.yaml runs it
+  <!-- BenchmarkDotNet baseline for the engine. benchmarks.yaml runs it
        after every merge to main and charts the history on gh-pages; the per-PR
        comparison workflow runs it on the PR head and on its base. -->
   <PropertyGroup>
