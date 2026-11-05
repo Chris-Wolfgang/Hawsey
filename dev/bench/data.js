@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793902375010,
+  "lastUpdate": 1793913182501,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -682,6 +682,60 @@ window.BENCHMARK_DATA = {
             "value": 232354.30078125,
             "unit": "ns",
             "range": "± 1194.5417838485291"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "598cfc2673a229017e0418488bf27a79f0588d18",
+          "message": "fix: clear the two InspectCode alerts from the review merges (#1057)\n\nGameEngine: new Trick(trumpSuit, PlaysPerTrick) passed 4, the parameter's own\ndefault (RedundantArgumentDefaultValue). PlaysPerTrick stays: the play check\nstill uses it.\n\nBidActionTests: bid.Equals(PassBid.Instance) tests Equals(object) with another\nkind of bid on purpose, which InspectCode reads as a suspicious comparison.\nHolding it in an object local states that intent with no suppression.\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-05T16:11:36-05:00",
+          "tree_id": "7cdc66258580692aaa60318316fd7faf23a0cb46",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/598cfc2673a229017e0418488bf27a79f0588d18"
+        },
+        "date": 1793913180648,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 506.7816054026286,
+            "unit": "ns",
+            "range": "± 3.8040033372039854"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 92.79677172501881,
+            "unit": "ns",
+            "range": "± 1.7591784799297858"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 297.8698310852051,
+            "unit": "ns",
+            "range": "± 7.275568232154656"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 383854.69449869794,
+            "unit": "ns",
+            "range": "± 9069.484160259637"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGameWithSimpleAi",
+            "value": 527226.330078125,
+            "unit": "ns",
+            "range": "± 7185.142297039879"
           }
         ]
       }
