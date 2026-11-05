@@ -256,7 +256,7 @@ public sealed class GameEngine
             );
         }
 
-        var trick = new Trick(trumpSuit, PlaysPerTrick);
+        var trick = new Trick(trumpSuit);
 
         return new GameState
         (
