@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793846377287,
+  "lastUpdate": 1793847890926,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -382,6 +382,54 @@ window.BENCHMARK_DATA = {
             "value": 253252.71940104166,
             "unit": "ns",
             "range": "± 3555.334536816175"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9e727755424343efdb1397b50cc836cf87743599",
+          "message": "test: Method_when_condition names and formatting from CLAUDE.md (#1008) (#1020)\n\n* test: formatting drift from CLAUDE.md (#1008)\n\n- No leading blank line in eleven test files.\n- TestPlayerStrategy: multi-line parameter lists with the parentheses on their\n  own lines.\n- GameEngineTests: `new()` for the engine field; the nested loops that looked\n  for a card outside the bidder's hand become\n  Deck.CreatePinochleDeck().First(c => !bidderHand.Contains(c)), as the same\n  file already does elsewhere.\n- TrickTests: the two out-of-range constructor checks become a [Theory] with\n  InlineData(1) and InlineData(5).\n- SimpleAiStrategyBiddingAndLeadTests: the \"beats a lower high bid and passes\n  otherwise\" [Fact] is split into one test per case.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* test: name every test Method_when_condition_expected_result (#1008)\n\n146 test methods used sentence names or omitted the condition. Each is\nrenamed to the CLAUDE.md pattern, naming the member under test first; no\ntest body changes. The Coyote csproj comment that names one of them follows.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Fable 5.1 <noreply@anthropic.com>",
+          "timestamp": "2026-11-04T22:03:28-05:00",
+          "tree_id": "9e7929f631423916df5c92300ea0e9f6c4a934c6",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/9e727755424343efdb1397b50cc836cf87743599"
+        },
+        "date": 1793847889738,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 556.9026981989542,
+            "unit": "ns",
+            "range": "± 1.9493762062022504"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 95.94861276944478,
+            "unit": "ns",
+            "range": "± 0.6009977447780506"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 291.50137519836426,
+            "unit": "ns",
+            "range": "± 0.9264265660578347"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 395752.3030598958,
+            "unit": "ns",
+            "range": "± 201.79068162437298"
           }
         ]
       }
