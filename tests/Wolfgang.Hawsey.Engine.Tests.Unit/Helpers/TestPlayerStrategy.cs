@@ -1,4 +1,3 @@
-
 using Wolfgang.Hawsey.Engine.Bidding;
 using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Game;
@@ -20,10 +19,12 @@ internal sealed class TestPlayerStrategy : IPlayerStrategy
 
 
 
-    public TestPlayerStrategy(
+    public TestPlayerStrategy
+    (
         Queue<BidAction>? bidQueue = null,
         Suit? preferredTrump = null,
-        bool aceHigh = false)
+        bool aceHigh = false
+    )
     {
         _bidQueue = bidQueue;
         _preferredTrump = preferredTrump;
@@ -64,11 +65,13 @@ internal sealed class TestPlayerStrategy : IPlayerStrategy
 
 
 
-    public void DecideHawseyExchange(
+    public void DecideHawseyExchange
+    (
         GameState state,
         PlayerPosition bidder,
         out Card[] cardsToDiscard,
-        out Card[] cardsFromPartner)
+        out Card[] cardsFromPartner
+    )
     {
         var bidderHand = state.Hands[bidder];
         cardsToDiscard = new[] { bidderHand[0], bidderHand[1] };

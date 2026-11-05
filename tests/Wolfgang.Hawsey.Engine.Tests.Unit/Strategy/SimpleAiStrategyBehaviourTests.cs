@@ -98,7 +98,7 @@ public class SimpleAiStrategyBehaviourTests
 
 
     [Fact]
-    public void DecideTrump_names_the_longest_suit()
+    public void DecideTrump_when_one_suit_is_longest_names_it()
     {
         var hand = new[]
         {
@@ -114,7 +114,7 @@ public class SimpleAiStrategyBehaviourTests
 
 
     [Fact]
-    public void DecideTrump_on_a_tie_names_the_first_suit_in_suit_order()
+    public void DecideTrump_when_suits_tie_names_the_first_in_suit_order()
     {
         var hand = new[]
         {
@@ -232,7 +232,7 @@ public class SimpleAiStrategyBehaviourTests
 
 
     [Fact]
-    public void DecidePlay_with_no_current_trick_plays_as_the_leader()
+    public void DecidePlay_when_there_is_no_current_trick_plays_as_the_leader()
     {
         var hand = new[] { C(Rank.Nine, Suit.Clubs), C(Rank.Ace, Suit.Clubs) };
         var state = Holding(PlayerPosition.East, hand, trump: Suit.Hearts);
@@ -261,7 +261,7 @@ public class SimpleAiStrategyBehaviourTests
 
 
     [Fact]
-    public void DecideHawseyExchange_discards_the_lowest_side_cards_and_takes_the_partners_best_trumps()
+    public void DecideHawseyExchange_when_called_discards_the_lowest_side_cards_and_takes_the_partners_best_trumps()
     {
         var bidder = new[]
         {

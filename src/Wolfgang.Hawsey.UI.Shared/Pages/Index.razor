@@ -288,14 +288,14 @@
                     }
                     else
                     {
-                        @for (var n = MinimumLegalBid; n <= 11; n++)
+                        @for (var n = MinimumLegalBid; n <= GameState.MaximumBid; n++)
                         {
                             var amount = n;
                             <button class="btn" @onclick="@(() => PlaceHumanBidAsync(new BidAction.NumberBid(amount)))">Bid @amount</button>
                         }
                     }
                 </div>
-                <button class="btn red" @onclick="@(() => PlaceHumanBidAsync(BidAction.HawseyBid.Instance))">Hawsey (24)</button>
+                <button class="btn red" @onclick="@(() => PlaceHumanBidAsync(BidAction.HawseyBid.Instance))">@HawseyBidText</button>
                 @if (!IsHumanStuck)
                 {
                     <button class="btn" @onclick="@(() => PlaceHumanBidAsync(BidAction.PassBid.Instance))">Pass</button>
@@ -366,7 +366,10 @@
     // The engine decides the bidding rules; the page only reads them.
     private bool IsHumanStuck => State is { IsNextBidderStuck: true, NextToAct: PlayerPosition.South };
 
-    private int MinimumLegalBid => State?.MinimumLegalBid ?? 6;
+    private int MinimumLegalBid => State?.MinimumLegalBid ?? HouseRules.Default.MinimumBid;
+
+    private static readonly string HawseyBidText =
+        $"Hawsey ({GameState.HawseyBidAmount.ToString(System.Globalization.CultureInfo.InvariantCulture)})";
 
     private static string BidderName(PlayerPosition p) => p switch
     {
@@ -413,7 +416,7 @@
         get
         {
             if (State is null) return Array.Empty<Card>();
-            if (!State.Hands.TryGetValue(PlayerPosition.South, out var hand) || hand is null)
+            if (!State.Hands.TryGetValue(PlayerPosition.South, out var hand))
             {
                 return Array.Empty<Card>();
             }
@@ -556,7 +559,7 @@
         {
             var br = State?.BiddingResult;
             if (br is null) return null;
-            return br.IsHawsey ? "Hawsey (24)" : br.BidAmount.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            return br.IsHawsey ? HawseyBidText : br.BidAmount.ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
     }
 
@@ -716,7 +719,7 @@
         var score = s?.RoundScore;
         var bidTeam = score?.BiddingTeam ?? Team.NorthSouth;
         var isHawsey = score?.IsHawsey ?? false;
-        var bidText = isHawsey ? "Hawsey (24)" : (score?.BidAmount ?? 0).ToString(System.Globalization.CultureInfo.InvariantCulture);
+        var bidText = isHawsey ? HawseyBidText : (score?.BidAmount ?? 0).ToString(System.Globalization.CultureInfo.InvariantCulture);
 
         // The engine names the winner, including the bidding-team rule when both
         // teams reach the target in the same round.
@@ -804,15 +807,8 @@
             return;
         }
 
-        if (!IsHumanPlayTurn) return;
-        var legal = State!.GetLegalPlays();
-        var found = false;
-        for (var i = 0; i < legal.Count; i++)
-        {
-            if (legal[i].Equals(card)) { found = true; break; }
-        }
-        if (!found) return;
-
+        // PlayHumanCard checks the turn and the card's legality once, inside the
+        // engine, and refuses (false) anything else.
         if (Game.PlayHumanCard(card))
         {
             await DriveLoopAsync();
