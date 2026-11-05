@@ -6,9 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Wolfgang.Hawsey.UI.Shared</RootNamespace>
     <Version>0.1.0</Version>
-    <Authors>Chris Wolfgang</Authors>
     <Description>Razor components of the Hawsey Blazor UI. The game logic is the engine's GameSession.</Description>
-    <Copyright>Copyright (c) Chris Wolfgang</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <!-- An app, not a NuGet package (the SourceLink job skips non-packable projects),
          and its Razor components are not a documented API: opt out of the src/

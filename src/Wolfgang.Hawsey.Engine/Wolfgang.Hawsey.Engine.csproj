@@ -12,11 +12,11 @@
          match <Version>. -->
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>$([System.Text.RegularExpressions.Regex]::Replace("$(Version)", "[-+].*$", "")).0</FileVersion>
-    <Authors>Chris Wolfgang</Authors>
     <Description>Game engine for the Hawsey card game — a 4-player team trick-taking game played with a pinochle deck.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/Chris-Wolfgang/Hawsey</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Chris-Wolfgang/Hawsey</RepositoryUrl>
     <PackageTags>hawsey;card-game;trick-taking;pinochle;game-engine</PackageTags>
     <!-- The engine is reflection-free, so it can promise trimming and Native AOT
          to consumers. The ILLink analyzers these switch on only exist for

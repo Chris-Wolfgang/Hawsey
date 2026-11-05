@@ -1,4 +1,3 @@
-
 using Wolfgang.Hawsey.Engine.Rules;
 
 namespace Wolfgang.Hawsey.Engine.Tests.Unit.Rules;
@@ -6,7 +5,7 @@ namespace Wolfgang.Hawsey.Engine.Tests.Unit.Rules;
 public class HouseRulesTests
 {
     [Fact]
-    public void Default_has_expected_values()
+    public void Default_when_read_has_the_expected_values()
     {
         var rules = HouseRules.Default;
 
@@ -19,7 +18,7 @@ public class HouseRulesTests
 
 
     [Fact]
-    public void Init_properties_can_be_overridden()
+    public void Init_when_properties_are_set_overrides_the_defaults()
     {
         var rules = new HouseRules
         {
@@ -74,7 +73,7 @@ public class HouseRulesTests
 
 
     [Fact]
-    public void PointsToWin_of_one_is_accepted()
+    public void PointsToWin_when_one_accepts_it()
     {
         Assert.Equal(1, new HouseRules { PointsToWin = 1 }.PointsToWin);
     }

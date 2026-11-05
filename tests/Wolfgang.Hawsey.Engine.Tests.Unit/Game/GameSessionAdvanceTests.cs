@@ -18,7 +18,7 @@ public class GameSessionAdvanceTests
 
 
     [Fact]
-    public async Task Before_a_game_starts_it_waits_for_nothing()
+    public async Task AdvanceAsync_when_no_game_has_started_waits_for_nothing()
     {
         Assert.Equal(WaitingFor.Nothing, await _session.AdvanceAsync());
     }
@@ -26,7 +26,7 @@ public class GameSessionAdvanceTests
 
 
     [Fact]
-    public async Task A_new_game_waits_for_the_humans_bid()
+    public async Task AdvanceAsync_when_a_new_game_starts_waits_for_the_humans_bid()
     {
         _session.StartNewGame();
 
@@ -37,7 +37,7 @@ public class GameSessionAdvanceTests
 
 
     [Fact]
-    public async Task When_the_human_wins_the_bid_it_waits_for_trump()
+    public async Task AdvanceAsync_when_the_human_wins_the_bid_waits_for_trump()
     {
         _session.StartNewGame();
         await _session.AdvanceAsync();
@@ -49,7 +49,7 @@ public class GameSessionAdvanceTests
 
 
     [Fact]
-    public async Task After_a_human_Hawsey_bid_and_trump_it_waits_for_the_exchange()
+    public async Task AdvanceAsync_when_the_human_bid_Hawsey_and_named_trump_waits_for_the_exchange()
     {
         _session.StartNewGame();
         await _session.AdvanceAsync();
@@ -63,7 +63,7 @@ public class GameSessionAdvanceTests
 
 
     [Fact]
-    public async Task A_round_asks_for_every_card_but_the_forced_last_one_then_waits_for_the_next_round()
+    public async Task AdvanceAsync_when_a_round_is_played_asks_for_each_card_but_the_forced_last_then_waits_for_the_next_round()
     {
         _session.StartNewGame();
         await _session.AdvanceAsync();
@@ -89,7 +89,7 @@ public class GameSessionAdvanceTests
 
 
     [Fact]
-    public async Task At_game_over_it_waits_for_nothing_more_but_says_so()
+    public async Task AdvanceAsync_when_the_game_is_over_waits_for_GameOver()
     {
         // A one-point target: the first round ends the game.
         _session.StartNewGame(new HouseRules { PointsToWin = 1 });
@@ -110,7 +110,7 @@ public class GameSessionAdvanceTests
 
 
     [Fact]
-    public async Task A_new_game_during_an_AI_pause_leaves_the_old_advance_waiting_for_nothing()
+    public async Task AdvanceAsync_when_a_new_game_starts_during_an_AI_pause_waits_for_nothing()
     {
         var paced = TestGameSessions.Paced();
         paced.StartNewGame();

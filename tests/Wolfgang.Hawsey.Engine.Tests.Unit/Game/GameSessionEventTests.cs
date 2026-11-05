@@ -42,7 +42,7 @@ public class GameSessionEventTests
 
 
     [Fact]
-    public void StartNewGame_without_rules_uses_the_default_rules()
+    public void StartNewGame_when_no_rules_are_given_uses_the_default_rules()
     {
         var session = TestGameSessions.Unpaced();
 
@@ -54,7 +54,7 @@ public class GameSessionEventTests
 
 
     [Fact]
-    public void StartNewGame_with_rules_uses_them()
+    public void StartNewGame_when_rules_are_given_uses_them()
     {
         var session = TestGameSessions.Unpaced();
         var rules = new HouseRules { PointsToWin = 30 };
@@ -67,7 +67,7 @@ public class GameSessionEventTests
 
 
     [Fact]
-    public async Task Every_move_raises_StateChanged_exactly_once()
+    public async Task StateChanged_when_any_move_is_made_is_raised_exactly_once()
     {
         var session = TestGameSessions.Unpaced();
 
@@ -97,7 +97,7 @@ public class GameSessionEventTests
 
 
     [Fact]
-    public async Task AI_trump_the_human_Hawsey_exchange_and_the_next_deal_each_raise_StateChanged_once()
+    public async Task StateChanged_when_AI_names_trump_the_human_exchanges_or_a_deal_starts_is_raised_once_each()
     {
         // Everyone passes: the AI dealer (North) is stuck and names trump.
         var stuck = TestGameSessions.Unpaced();
@@ -156,7 +156,7 @@ public class GameSessionEventTests
 
 
     [Fact]
-    public async Task TrickCompleted_reports_the_player_who_won_the_trick()
+    public async Task TrickCompleted_when_a_trick_ends_reports_the_player_who_won_it()
     {
         var session = TestGameSessions.Unpaced();
         var winners = new List<PlayerPosition>();
@@ -185,7 +185,7 @@ public class GameSessionEventTests
 
 
     [Fact]
-    public async Task An_AI_Hawsey_bid_leads_to_the_AI_exchange()
+    public async Task HandleHawseyExchangeAsync_when_an_AI_bid_Hawsey_makes_the_AI_exchange()
     {
         // East, the first bidder, calls Hawsey and names hearts; the session makes
         // East's exchange itself.
@@ -210,7 +210,7 @@ public class GameSessionEventTests
 
 
     [Fact]
-    public async Task Whole_games_against_the_real_AI_see_competitive_bids_and_finish()
+    public async Task AdvanceAsync_when_whole_games_run_against_the_real_AI_sees_competitive_bids_and_finishes()
     {
         // The real SimpleAiStrategy bids on hand strength. The human passes every bid and
         // names hearts when stuck, so each hand's bidding is the AI's. Across these
@@ -274,7 +274,7 @@ public class GameSessionEventTests
 
 
     [Fact]
-    public async Task A_game_can_end_on_an_AI_card_and_the_session_announces_it()
+    public async Task GameOver_when_the_game_ends_on_an_AI_card_is_raised()
     {
         // Seed 1, a target of 12, the human passing and playing its first legal card:
         // the game ends on an AI's card, so AdvanceAiPlaysAsync raises GameOver.
