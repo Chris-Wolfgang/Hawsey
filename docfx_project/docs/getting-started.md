@@ -38,6 +38,54 @@ var final = new GameRunner().RunGame(myStrategy, HouseRules.Default, PlayerPosit
 // final.Phase == GamePhase.GameOver
 ```
 
+## Play Against the AI
+
+`GameSession` is a live game with the human in the South seat and the engine's AI, `SimpleAiStrategy`, in the other three. `AdvanceAsync()` plays the AI moves and returns what the game needs from the human next:
+
+```csharp
+using Wolfgang.Hawsey.Engine.Bidding;
+using Wolfgang.Hawsey.Engine.Cards;
+using Wolfgang.Hawsey.Engine.Game;
+
+var session = new GameSession();
+session.StartNewGame();
+
+while (true)
+{
+    switch (await session.AdvanceAsync())
+    {
+        case WaitingFor.HumanBid:
+            session.PlaceHumanBid(BidAction.PassBid.Instance);  // or new BidAction.NumberBid(7), BidAction.HawseyBid.Instance
+            break;
+
+        case WaitingFor.HumanTrump:
+            session.SelectTrump(Suit.Hearts);                    // null plays ace high (no trump)
+            break;
+
+        case WaitingFor.HumanHawseyExchange:
+            var hand = session.CurrentState!.Hands[GameSession.HumanPosition];
+            session.PerformHumanHawseyExchange([hand[0], hand[1]]);
+            break;
+
+        case WaitingFor.HumanCard:
+            session.PlayHumanCard(session.CurrentState!.GetLegalPlays()[0]);
+            break;
+
+        case WaitingFor.NextRound:
+            session.StartNextRound();                            // CurrentState.RoundScore has the round just scored
+            break;
+
+        case WaitingFor.GameOver:
+            Console.WriteLine($"{session.CurrentState!.Winner} wins");
+            return;
+    }
+}
+```
+
+The session pauses between AI moves so a person can follow them, and raises `StateChanged` for a UI to redraw. This is how the [Blazor app](https://chris-wolfgang.github.io/Hawsey/play/) plays.
+
+`GameSession` and `SimpleAiStrategy` are sealed. To play with your own AI, implement `IPlayerStrategy` and use `GameRunner`, as above.
+
 ## Next Steps
 
 - Explore the [API Reference](../api/index.md) for detailed documentation
