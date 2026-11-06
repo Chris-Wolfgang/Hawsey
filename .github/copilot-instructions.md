@@ -13,6 +13,7 @@ Hawsey is a C# implementation of a four-player team trick-taking card game playe
 | `src/Wolfgang.Hawsey.UI.Blazor` | `net10.0` (Blazor WebAssembly host) |
 | `src/Wolfgang.Hawsey.UI.Shared` | `net10.0` (the Blazor app's Razor components) |
 | `tests/Wolfgang.Hawsey.Engine.Tests.Unit` | `net462` through `net10.0` (13 TFMs) |
+| `tests/Wolfgang.Hawsey.UI.Shared.Tests.Unit` | `net10.0` |
 | `tests/Wolfgang.Hawsey.Engine.Tests.Concurrency` | `net10.0` (Coyote) |
 | `benchmarks/Wolfgang.Hawsey.Engine.Benchmarks` | `net10.0` |
 | `examples/Wolfgang.Hawsey.Engine.AotSmoke` | `net10.0` |
