@@ -22,7 +22,7 @@ namespace Wolfgang.Hawsey.Engine.Game;
 /// every new game, so an AI loop that wakes up after New Game stops instead of
 /// playing into the new game. Events are raised outside the lock.
 /// </remarks>
-public class GameSession
+public sealed class GameSession
 {
     /// <summary>
     /// The seat the human plays. The AI plays the other three.
