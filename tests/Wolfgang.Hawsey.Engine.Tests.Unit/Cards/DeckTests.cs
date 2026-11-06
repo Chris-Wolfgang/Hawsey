@@ -105,9 +105,11 @@ public class DeckTests
 
 
     [Fact]
-    public void Shuffle_when_cards_null_throws()
+    public void Shuffle_when_cards_null_throws_naming_cards()
     {
-        Assert.Throws<ArgumentNullException>(() => Deck.Shuffle(null!, new Random(42)));
+        var exception = Assert.Throws<ArgumentNullException>(() => Deck.Shuffle(null!, new Random(42)));
+
+        Assert.Equal("cards", exception.ParamName);
     }
 
 

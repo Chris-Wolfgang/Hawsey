@@ -21,6 +21,7 @@ dotnet tool restore && dotnet stryker
 | 2026-09-27 | 90.43% | 88 | The Blazor UI's AI becomes the engine's (#879); bidding progress on `GameState` (#878); session bids and the human Hawsey exchange (#882) |
 | 2026-09-28 | 91.54% | 88 | After #884–#897 and #907 (stateless bidding, unused types removed, the #897 killing tests); four more gaps killed (#875) |
 | 2026-10-18 | 91.76% | 88 | Weekly run on `main` (ecf84fa); one more gap killed, one new equivalent (#875) |
+| 2026-11-05 | 91.78% | 88 | Run on `main` (7a35852); one more gap killed (#875) |
 
 ## Triage of the surviving mutants (2026-09-25)
 
@@ -119,5 +120,15 @@ without coverage. 49 of the survivors are in the accepted categories above. The 
 |---|---|---|
 | `GameSession.PlayHumanCard`: `GameOver?.Invoke` | Statement removed | Killed: a game that ends on the **human's** card (seed 3) must announce game over exactly once, from `PlayHumanCard`. The game-over tests only ended games on an AI card, which raises it from `AdvanceAiPlaysAsync`. |
 | `GameState.TableWinningCard`: `First` | `FirstOrDefault` | Equivalent: a completed trick always holds one card from its winner, so the lookup always finds it. |
+
+The killing test was checked by applying the mutant by hand: only that test fails.
+
+## Run on `main` (2026-11-05)
+
+Run 42084306341 on 7a35852: **91.78%**, with 46 survivors. 18 are exception-message strings and 27 are in the accepted categories above. The other one:
+
+| Location | Mutation | Outcome |
+|---|---|---|
+| `Deck.Shuffle`: the `cards` null guard | Statement removed | Killed: without the guard, `ToArray` still throws `ArgumentNullException`, but for its own `source` parameter. The test only checked the exception type, and now also checks that the parameter is `cards`. |
 
 The killing test was checked by applying the mutant by hand: only that test fails.
