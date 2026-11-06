@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793976660945,
+  "lastUpdate": 1794000560477,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -790,6 +790,60 @@ window.BENCHMARK_DATA = {
             "value": 349824.14046223956,
             "unit": "ns",
             "range": "± 8049.528772521267"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5a8519dcc7e541c649b9e10195b0f2074f5c57bb",
+          "message": "test(blazor): add bUnit tests for the game page (#1068)\n\nThe Blazor app's game page had no tests. These run it against a real GameSession,\nunpaced and seeded through the engine's internal constructor, so the engine gets\none more InternalsVisibleTo. They click what a player clicks and read what a\nplayer sees: bidding, trump, the Hawsey exchange, card play, dragging, the game\nlog, round and game summaries, and a New Game during an AI pause.\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-06T16:28:04-05:00",
+          "tree_id": "63a6f3cf72b2dc18b410c703806331ced70d90da",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/5a8519dcc7e541c649b9e10195b0f2074f5c57bb"
+        },
+        "date": 1794000558577,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 423.6551574071248,
+            "unit": "ns",
+            "range": "± 0.24095421079519858"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 59.3545631368955,
+            "unit": "ns",
+            "range": "± 0.2661916517834322"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 201.21662966410318,
+            "unit": "ns",
+            "range": "± 0.7753148322781569"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 248303.38916015625,
+            "unit": "ns",
+            "range": "± 1362.8135413366415"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGameWithSimpleAi",
+            "value": 352870.61181640625,
+            "unit": "ns",
+            "range": "± 1061.4212492468291"
           }
         ]
       }
