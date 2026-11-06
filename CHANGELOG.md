@@ -52,3 +52,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The engine's version attributes are audited and pinned by tests: FileVersion and InformationalVersion follow `<Version>`, and AssemblyVersion stays at 1.0.0.0 as ADR 0006 records. (#852)
 - The .NET MAUI app (Android, Windows, iOS, Mac Catalyst) is not part of this release: it continues on the `feature/maui` branch until it is ready. This release ships the engine and the Blazor web app. (#931)
 
+[Unreleased]: https://github.com/Chris-Wolfgang/Hawsey/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/Chris-Wolfgang/Hawsey/releases/tag/v0.1.0

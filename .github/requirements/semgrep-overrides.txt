@@ -1,10 +1,20 @@
 # Overrides applied when compiling semgrep.txt (uv pip compile --override).
 #
-# pyjwt: semgrep pins pyjwt[crypto]~=2.13.0 (1.177.0 and 1.178.0 alike), and every
-# 2.13.x is affected by GHSA-w6j9-cwv2-h6wq and ten more advisories fixed in 2.14.0, and
-# 2.14.0 itself by GHSA-42vr-xj54-vc7v, fixed in 2.15.0. 2.15.0 changes only PyJWKClient
-# and JWKSetCache behaviour, and semgrep imports jwt only
-# in its MCP server, never in `semgrep scan`, which is all semgrep.yaml runs.
+# mcp: semgrep pins mcp==1.29.0 (1.180.0 through 1.182.1 alike), and every mcp
+# from 1.8.0 up to 1.29.x is affected by GHSA-84m7-p3x7-pcfv (unbounded session
+# accumulation in the StreamableHTTP transport), fixed in 1.30.0. semgrep imports mcp
+# only in its MCP server, never in `semgrep scan`, which is all semgrep.yaml runs.
 # semgrep.yaml installs with --no-deps so pip does not re-apply semgrep's pin. Delete
-# this line once a semgrep release allows pyjwt 2.15.
-pyjwt[crypto]~=2.15.0
+# this line once a semgrep release allows mcp 1.30.
+mcp>=1.30.0,<2
+#
+# opentelemetry: every semgrep release (1.180.0 through 1.183.0) pins the
+# opentelemetry 1.37 / 0.58b0 family, and opentelemetry-api before 1.45.1 is affected by
+# GHSA-xcq7-p3pf-p88h. Overriding only opentelemetry-api would mix 1.45 with a 1.37 SDK,
+# so the whole 1.x family is lifted together; uv then resolves the matching 0.66b
+# instrumentation packages. Delete these lines once a semgrep release allows 1.45.1.
+opentelemetry-api>=1.45.1,<2
+opentelemetry-sdk>=1.45.1,<2
+opentelemetry-proto>=1.45.1,<2
+opentelemetry-exporter-otlp-proto-common>=1.45.1,<2
+opentelemetry-exporter-otlp-proto-http>=1.45.1,<2

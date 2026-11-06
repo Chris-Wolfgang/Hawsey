@@ -81,7 +81,7 @@ public class GameSessionNewGameDuringPauseTests
 
 
     [Fact]
-    public async Task AdvanceAiPlaysAsync_does_not_announce_the_old_round_after_a_new_game_in_the_trick_pause()
+    public async Task AdvanceAiPlaysAsync_when_a_new_game_starts_in_the_trick_pause_does_not_announce_the_old_round()
     {
         await ReachNorthNamingTrumpAsync();
         Assert.False(await _session.HandleTrumpSelectionAsync());

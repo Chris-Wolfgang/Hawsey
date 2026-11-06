@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Wolfgang.Hawsey.Engine.Bidding;
 using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Players;
@@ -17,13 +18,21 @@ namespace Wolfgang.Hawsey.Engine.Game;
 // tests, external callers). The instance form is also DI-friendly — consumers can
 // register a single GameEngine in their service container even though no instance
 // state is currently held.
-[System.Diagnostics.CodeAnalysis.SuppressMessage(
-    "Performance", "S2325:Methods and properties that don't access instance data should be static",
-    Justification = "Instance API preserved to avoid CS0176 breaks at existing call sites and to keep the type DI-friendly.")]
+[SuppressMessage
+(
+    "Performance",
+    "S2325:Methods and properties that don't access instance data should be static",
+    Justification = "Instance API preserved to avoid CS0176 breaks at existing call sites and to keep the type DI-friendly."
+)]
 public sealed class GameEngine
 {
-    /// <summary>The bid amount a Hawsey bid records: 24.</summary>
-    private const int HawseyBidAmount = 24;
+    /// <summary>The cards in a normal trick: one from each of the four players.</summary>
+    private const int PlaysPerTrick = 4;
+
+    /// <summary>The cards in a Hawsey-round trick: the bidder's partner sits out.</summary>
+    private const int PlaysPerHawseyTrick = 3;
+
+
 
     /// <summary>
     /// Starts a new game by dealing the first hand.
@@ -81,7 +90,7 @@ public sealed class GameEngine
     /// <param name="player">The player placing the bid.</param>
     /// <param name="action">The bid action.</param>
     /// <returns>The updated game state: still bidding, or trump selection once bidding is over.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="action"/> is <c>null</c>.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="state"/> or <paramref name="action"/> is <c>null</c>.</exception>
     /// <exception cref="InvalidOperationException">
     /// Thrown when the game is not in the bidding phase, it is not the specified player's
     /// turn, or a number bid is below <see cref="HouseRules.MinimumBid"/>, above
@@ -112,7 +121,7 @@ public sealed class GameEngine
                 break;
 
             case BidAction.HawseyBid:
-                return CreateTrumpSelectionState(state, new BiddingResult(player, HawseyBidAmount, isHawsey: true, isStuck: false));
+                return CreateTrumpSelectionState(state, new BiddingResult(player, GameState.HawseyBidAmount, isHawsey: true, isStuck: false));
 
             default:
                 throw new InvalidOperationException($"Unknown bid action type: {action.GetType().Name}");
@@ -208,9 +217,11 @@ public sealed class GameEngine
     /// <param name="state">The current game state.</param>
     /// <param name="trumpSuit">The trump suit, or <c>null</c> for Ace high.</param>
     /// <returns>The updated game state.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="state"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentOutOfRangeException">
     /// <paramref name="trumpSuit"/> is not a defined <see cref="Suit"/>.
     /// </exception>
+    /// <exception cref="InvalidOperationException">Thrown when the game is not in the trump selection phase.</exception>
     public GameState SelectTrump(GameState state, Suit? trumpSuit)
     {
         ValidatePhase(state, GamePhase.TrumpSelection);
@@ -245,8 +256,7 @@ public sealed class GameEngine
             );
         }
 
-        var expectedPlays = 4;
-        var trick = new Trick(trumpSuit, expectedPlays);
+        var trick = new Trick(trumpSuit);
 
         return new GameState
         (
@@ -278,7 +288,7 @@ public sealed class GameEngine
     /// <param name="cardsToDiscard">The 2 cards the bidder discards.</param>
     /// <param name="cardsFromPartner">The 2 cards the partner gives.</param>
     /// <returns>The updated game state.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="cardsToDiscard"/> or <paramref name="cardsFromPartner"/> is <c>null</c>.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="state"/>, <paramref name="cardsToDiscard"/> or <paramref name="cardsFromPartner"/> is <c>null</c>.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the game is not in the Hawsey exchange phase, the wrong number of cards is provided, or a card is not in the expected hand.</exception>
     public GameState ExchangeHawseyCards
     (
@@ -292,7 +302,7 @@ public sealed class GameEngine
 
         var bidder = state.HawseyBidder!.Value;
         var hands = PerformHawseyExchange(state, bidder, cardsToDiscard, cardsFromPartner);
-        var trick = new Trick(state.TrumpSuit, expectedPlays: 3);
+        var trick = new Trick(state.TrumpSuit, PlaysPerHawseyTrick);
 
         return new GameState
         (
@@ -323,6 +333,7 @@ public sealed class GameEngine
     /// <param name="player">The player playing the card.</param>
     /// <param name="card">The card to play.</param>
     /// <returns>The updated game state.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="state"/> is <c>null</c>.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the game is not in the trick play phase, it is not the specified player's turn, or the card is not a legal play.</exception>
     public GameState PlayCard(GameState state, PlayerPosition player, Card card)
     {
@@ -359,7 +370,8 @@ public sealed class GameEngine
     private GameState ApplyPlay(GameState state, PlayerPosition player, Card card)
     {
         var hands = RemoveCardFromHand(state.Hands, player, card);
-        // Play into a copy: the input state keeps its trick unchanged (#861).
+        // Play into a copy: the input state keeps its trick unchanged, so an
+        // earlier state can be replayed.
         var trick = state.CurrentTrick!.Copy();
         trick.Play(player, card);
 
@@ -379,7 +391,7 @@ public sealed class GameEngine
     /// <param name="state">The current game state (must be in RoundScoring phase).</param>
     /// <param name="random">The random number generator for shuffling.</param>
     /// <returns>The updated game state ready for bidding.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="random"/> is <c>null</c>.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="state"/> or <paramref name="random"/> is <c>null</c>.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the game is not in the round scoring phase.</exception>
     public GameState StartNextRound(GameState state, Random random)
     {
@@ -590,12 +602,12 @@ public sealed class GameEngine
         var completedTricks = new List<TrickResult>(state.CompletedTricks) { trickResult };
         var tricksPlayed = state.TricksPlayedInRound + 1;
 
-        if (tricksPlayed >= 12)
+        if (tricksPlayed >= GameState.TricksPerRound)
         {
             return ScoreRound(state, hands, completedTricks, tricksPlayed);
         }
 
-        var expectedPlays = state.IsHawseyRound ? 3 : 4;
+        var expectedPlays = state.IsHawseyRound ? PlaysPerHawseyTrick : PlaysPerTrick;
         var nextTrick = new Trick(state.TrumpSuit, expectedPlays);
 
         return new GameState

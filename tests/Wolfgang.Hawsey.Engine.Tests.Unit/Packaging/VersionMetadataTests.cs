@@ -4,7 +4,7 @@ using Wolfgang.Hawsey.Engine.Game;
 namespace Wolfgang.Hawsey.Engine.Tests.Unit.Packaging;
 
 /// <summary>
-/// Pins the engine's version attributes to one source, <c>&lt;Version&gt;</c> (#27):
+/// Pins the engine's version attributes to one source, <c>&lt;Version&gt;</c>:
 /// FileVersion and InformationalVersion follow it, and AssemblyVersion stays at the
 /// 1.0.0.0 pin recorded in ADR 0006.
 /// </summary>
@@ -27,7 +27,7 @@ public class VersionMetadataTests
 
 
     [Fact]
-    public void AssemblyVersion_is_pinned_at_1_0_0_0()
+    public void AssemblyVersion_when_read_is_pinned_at_1_0_0_0()
     {
         Assert.Equal(new Version(1, 0, 0, 0), Engine.GetName().Version);
     }
@@ -35,7 +35,7 @@ public class VersionMetadataTests
 
 
     [Fact]
-    public void FileVersion_is_the_package_version_with_a_zero_revision()
+    public void FileVersion_when_read_is_the_package_version_with_a_zero_revision()
     {
         var attribute = Engine.GetCustomAttribute<AssemblyFileVersionAttribute>();
         Assert.NotNull(attribute);
@@ -48,7 +48,7 @@ public class VersionMetadataTests
 
 
     [Fact]
-    public void InformationalVersion_is_a_three_part_package_version()
+    public void InformationalVersion_when_read_is_a_three_part_package_version()
     {
         Assert.Equal(3, Version.Parse(PackageVersion()).ToString().Split('.').Length);
     }

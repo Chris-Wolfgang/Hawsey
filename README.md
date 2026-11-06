@@ -127,7 +127,7 @@ The game's namesake bid: the bidder plays alone to take all 12 tricks. The bidde
 | `src/Wolfgang.Hawsey.UI.Shared` | The Blazor app's Razor components and styles. |
 | `tests/Wolfgang.Hawsey.Engine.Tests.Unit` | Engine unit tests, run on every target framework from `net462` to `net10.0`. |
 | `tests/Wolfgang.Hawsey.UI.Maui.Tests.Unit` | Unit tests for the MAUI app: view models, converters and the app host (XAML and DI). |
-| `tests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency` | Coyote concurrency tests for the engine's `GameSession`. |
+| `tests/Wolfgang.Hawsey.Engine.Tests.Concurrency` | Coyote concurrency tests for the engine's `GameSession`. |
 | `benchmarks/Wolfgang.Hawsey.Engine.Benchmarks` | BenchmarkDotNet benchmarks for the engine. |
 | `examples/Wolfgang.Hawsey.Engine.AotSmoke` | Native AOT smoke test that plays complete games through the engine. |
 
@@ -144,7 +144,7 @@ The engine is UI-agnostic. Each `GameEngine` method takes the current `GameState
 
 The MAUI app targets `net10.0-android` on every OS, plus `net10.0-windows10.0.19041.0` when built on Windows and `net10.0-ios` / `net10.0-maccatalyst` when built on macOS.
 
-Once the package is published, see the [NuGet package page](https://www.nuget.org/packages/Wolfgang.Hawsey.Engine/) for the authoritative per-TFM compatibility matrix.
+See the [NuGet package page](https://www.nuget.org/packages/Wolfgang.Hawsey.Engine/) for the authoritative per-TFM compatibility matrix.
 
 ---
 

@@ -1,4 +1,3 @@
-
 using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Players;
 using Wolfgang.Hawsey.Engine.TrickPlay;
@@ -196,7 +195,7 @@ public class TrickTests
 
 
     [Fact]
-    public void GetResult_returns_all_played_cards()
+    public void GetResult_when_complete_returns_all_played_cards()
     {
         var trick = new Trick(Suit.Hearts);
 
@@ -242,11 +241,12 @@ public class TrickTests
 
 
 
-    [Fact]
-    public void Constructor_when_expected_plays_out_of_range_throws()
+    [Theory]
+    [InlineData(1)]
+    [InlineData(5)]
+    public void Constructor_when_expected_plays_out_of_range_throws(int expectedPlays)
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => new Trick(Suit.Hearts, 1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => new Trick(Suit.Hearts, 5));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new Trick(Suit.Hearts, expectedPlays));
     }
 
 
@@ -262,7 +262,7 @@ public class TrickTests
 
 
     [Fact]
-    public void GetCurrentWinner_returns_winning_card_mid_trick()
+    public void GetCurrentWinner_when_mid_trick_returns_the_winning_card()
     {
         var trick = new Trick(Suit.Hearts);
 
@@ -270,6 +270,47 @@ public class TrickTests
         trick.Play(PlayerPosition.East, new Card(Rank.Ace, Suit.Clubs));
 
         Assert.Equal(new Card(Rank.Ace, Suit.Clubs), trick.GetCurrentWinner());
+    }
+
+
+
+    [Fact]
+    public void CurrentWinningPlay_when_no_plays_returns_null()
+    {
+        var trick = new Trick(Suit.Hearts);
+
+        Assert.Null(trick.CurrentWinningPlay);
+    }
+
+
+
+    [Fact]
+    public void CurrentWinningPlay_when_duplicate_cards_returns_the_first_played()
+    {
+        var trick = new Trick(Suit.Hearts);
+        var ace = new Card(Rank.Ace, Suit.Clubs);
+
+        trick.Play(PlayerPosition.North, new Card(Rank.Ten, Suit.Clubs));
+        trick.Play(PlayerPosition.East, ace);
+        trick.Play(PlayerPosition.South, ace);
+
+        var winning = trick.CurrentWinningPlay!;
+
+        Assert.Equal(PlayerPosition.East, winning.Player);
+        Assert.Equal(ace, winning.Card);
+    }
+
+
+
+    [Fact]
+    public void GetResult_returns_a_snapshot_of_the_plays_not_the_tricks_list()
+    {
+        var trick = new Trick(Suit.Hearts, expectedPlays: 2);
+
+        trick.Play(PlayerPosition.North, new Card(Rank.Ten, Suit.Clubs));
+        trick.Play(PlayerPosition.East, new Card(Rank.Ace, Suit.Clubs));
+
+        Assert.NotSame(trick.Plays, trick.GetResult().Cards);
     }
 
 

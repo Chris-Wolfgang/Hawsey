@@ -42,7 +42,7 @@ public class GameSessionEventTests
 
 
     [Fact]
-    public void StartNewGame_without_rules_uses_the_default_rules()
+    public void StartNewGame_when_no_rules_are_given_uses_the_default_rules()
     {
         var session = TestGameSessions.Unpaced();
 
@@ -54,7 +54,7 @@ public class GameSessionEventTests
 
 
     [Fact]
-    public void StartNewGame_with_rules_uses_them()
+    public void StartNewGame_when_rules_are_given_uses_them()
     {
         var session = TestGameSessions.Unpaced();
         var rules = new HouseRules { PointsToWin = 30 };
@@ -67,7 +67,7 @@ public class GameSessionEventTests
 
 
     [Fact]
-    public async Task Every_move_raises_StateChanged_exactly_once()
+    public async Task StateChanged_when_any_move_is_made_is_raised_exactly_once()
     {
         var session = TestGameSessions.Unpaced();
 
@@ -97,7 +97,7 @@ public class GameSessionEventTests
 
 
     [Fact]
-    public async Task AI_trump_the_human_Hawsey_exchange_and_the_next_deal_each_raise_StateChanged_once()
+    public async Task StateChanged_when_AI_names_trump_the_human_exchanges_or_a_deal_starts_is_raised_once_each()
     {
         // Everyone passes: the AI dealer (North) is stuck and names trump.
         var stuck = TestGameSessions.Unpaced();
@@ -156,7 +156,7 @@ public class GameSessionEventTests
 
 
     [Fact]
-    public async Task TrickCompleted_reports_the_player_who_won_the_trick()
+    public async Task TrickCompleted_when_a_trick_ends_reports_the_player_who_won_it()
     {
         var session = TestGameSessions.Unpaced();
         var winners = new List<PlayerPosition>();
@@ -185,7 +185,7 @@ public class GameSessionEventTests
 
 
     [Fact]
-    public async Task An_AI_Hawsey_bid_leads_to_the_AI_exchange()
+    public async Task HandleHawseyExchangeAsync_when_an_AI_bid_Hawsey_makes_the_AI_exchange()
     {
         // East, the first bidder, calls Hawsey and names hearts; the session makes
         // East's exchange itself.
@@ -210,7 +210,7 @@ public class GameSessionEventTests
 
 
     [Fact]
-    public async Task Whole_games_against_the_real_AI_see_competitive_bids_and_finish()
+    public async Task AdvanceAsync_when_whole_games_run_against_the_real_AI_sees_competitive_bids_and_finishes()
     {
         // The real SimpleAiStrategy bids on hand strength. The human passes every bid and
         // names hearts when stuck, so each hand's bidding is the AI's. Across these
@@ -274,24 +274,47 @@ public class GameSessionEventTests
 
 
     [Fact]
-    public async Task A_game_can_end_on_an_AI_card_and_the_session_announces_it()
+    public async Task GameOver_when_the_game_ends_on_an_AI_card_is_raised()
     {
         // Seed 1, a target of 12, the human passing and playing its first legal card:
         // the game ends on an AI's card, so AdvanceAiPlaysAsync raises GameOver.
         var session = TestGameSessions.Unpaced(seed: 1);
 
-        Assert.True(await EndsOnAnAiCard(session));
+        var (byAi, byHuman) = await PlayToGameOverCountingAnnouncements(session);
+
         Assert.Equal(GamePhase.GameOver, session.CurrentState!.Phase);
+        Assert.Equal((1, 0), (byAi, byHuman));
     }
 
 
 
-    private static async Task<bool> EndsOnAnAiCard(GameSession session)
+    [Fact]
+    public async Task A_game_can_end_on_the_humans_card_and_the_session_announces_it()
     {
-        // The handler only counts; the loop reads the count around each AI call to see
-        // whether that call is the one that ended the game.
+        // Seed 3, a target of 12, the human passing and playing its first legal card:
+        // the game ends on the human's card, so PlayHumanCard raises GameOver.
+        var session = TestGameSessions.Unpaced(seed: 3);
+
+        var (byAi, byHuman) = await PlayToGameOverCountingAnnouncements(session);
+
+        Assert.Equal(GamePhase.GameOver, session.CurrentState!.Phase);
+        Assert.Equal((0, 1), (byAi, byHuman));
+    }
+
+
+
+    /// <summary>
+    /// Plays a game to its end, the human passing every bid and playing its first legal
+    /// card, and counts the GameOver announcements raised by the AI's moves and by the
+    /// human's.
+    /// </summary>
+    private static async Task<(int ByAi, int ByHuman)> PlayToGameOverCountingAnnouncements(GameSession session)
+    {
+        // The handler only counts; the loop reads the count around each move to see
+        // which move ended the game.
         var gameOvers = 0;
-        var endedByAi = false;
+        var byAi = 0;
+        var byHuman = 0;
         session.GameOver += (_, _) => gameOvers++;
         session.StartNewGame(new HouseRules { PointsToWin = 12 });
 
@@ -317,19 +340,21 @@ public class GameSessionEventTests
                     break;
 
                 default:
-                    var before = gameOvers;
+                    var beforeAi = gameOvers;
                     var humanPlays = await session.AdvanceAiPlaysAsync();
-                    endedByAi |= gameOvers > before;
+                    byAi += gameOvers - beforeAi;
 
                     if (humanPlays)
                     {
+                        var beforeHuman = gameOvers;
                         session.PlayHumanCard(session.CurrentState.GetLegalPlays()[0]);
+                        byHuman += gameOvers - beforeHuman;
                     }
 
                     break;
             }
         }
 
-        return endedByAi;
+        return (byAi, byHuman);
     }
 }

@@ -5,7 +5,7 @@ using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Game;
 using Wolfgang.Hawsey.Engine.Players;
 
-namespace Wolfgang.Hawsey.UI.Maui.Tests.Concurrency;
+namespace Wolfgang.Hawsey.Engine.Tests.Concurrency;
 
 /// <summary>
 /// Coyote systematic tests: each scenario is run under many controlled task
@@ -31,7 +31,7 @@ public class GameSessionConcurrencyTests
     /// The iterations run in batches, each in a new <see cref="TestingEngine"/>. An engine
     /// keeps data for every iteration it explores until it is disposed (about 0.5 MB per
     /// whole game), so one engine for the monthly soak's budget ran a GitHub runner out of
-    /// memory (#943). Measured with a forced collection after each disposed engine, the live
+    /// memory. Measured with a forced collection after each disposed engine, the live
     /// heap stays flat from batch to batch: the growth is the engine's, not a leak.
     /// </remarks>
     private static void RunSystematicTest(Func<Task> scenario, uint costFactor = 1)
@@ -132,7 +132,7 @@ public class GameSessionConcurrencyTests
 
 
     [Fact]
-    public void Human_double_tap_plays_exactly_one_card()
+    public void PlayHumanCard_when_the_human_double_taps_plays_exactly_one_card()
     {
         RunSystematicTest(async () =>
         {
@@ -154,7 +154,7 @@ public class GameSessionConcurrencyTests
 
 
     [Fact]
-    public void New_game_during_an_AI_turn_does_not_let_the_old_loop_touch_the_new_game()
+    public void StartNewGame_when_an_AI_turn_is_running_keeps_the_old_loop_out_of_the_new_game()
     {
         RunSystematicTest(async () =>
         {
@@ -185,7 +185,7 @@ public class GameSessionConcurrencyTests
 
 
     [Fact]
-    public void Full_game_reports_every_trick_winner_and_announces_game_over_exactly_once()
+    public void AdvanceAsync_when_a_whole_game_runs_reports_every_trick_winner_and_game_over_once()
     {
         RunSystematicTest(async () =>
         {

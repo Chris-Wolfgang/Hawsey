@@ -8,7 +8,7 @@ using Wolfgang.Hawsey.Engine.Tests.Unit.PropertyBased;
 namespace Wolfgang.Hawsey.Engine.Tests.Unit.Game;
 
 /// <summary>
-/// <see cref="GameState.Winner"/> (#862): the team that reached
+/// <see cref="GameState.Winner"/>: the team that reached
 /// <see cref="HouseRules.PointsToWin"/>, and the bidding team when both reached it in
 /// the same round.
 /// </summary>
@@ -28,7 +28,7 @@ public class GameStateWinnerTests
 
 
     [Fact]
-    public void Winner_is_null_while_the_game_continues()
+    public void Winner_when_the_game_continues_is_null()
     {
         var state = _engine.StartGame(HouseRules.Default, PlayerPosition.North, new Random(1));
         Assert.Null(state.Winner);
@@ -61,12 +61,12 @@ public class GameStateWinnerTests
 
 
     [Fact]
-    public void When_both_teams_reach_the_target_in_one_round_the_bidding_team_wins()
+    public void Winner_when_both_teams_reach_the_target_in_one_round_is_the_bidding_team()
     {
         // With a target of 1, both teams reach it whenever the bidding team makes its
         // bid and the defenders take a trick. Search a fixed range of seeds for a round
         // where the stuck dealer's team is East/West, so North/South is NOT the answer,
-        // which is what the old UI rule always said (#862).
+        // which is what the old UI rule always said.
         var state = Enumerable
             .Range(0, 500)
             .Select
@@ -117,7 +117,7 @@ public class GameStateWinnerTests
 
 
     [Fact]
-    public void Winner_before_game_over_is_null_even_past_the_target()
+    public void Winner_when_past_the_target_before_game_over_is_null()
     {
         Assert.Null(Scored(GamePhase.RoundScoring, northSouth: HouseRules.Default.PointsToWin + 5, eastWest: 0).Winner);
     }

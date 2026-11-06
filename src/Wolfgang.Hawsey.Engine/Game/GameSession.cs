@@ -23,7 +23,7 @@ namespace Wolfgang.Hawsey.Engine.Game;
 /// every new game, so an AI loop that wakes up after New Game stops instead of
 /// playing into the new game. Events are raised outside the lock.
 /// </remarks>
-public class GameSession
+public sealed class GameSession
 {
     /// <summary>
     /// The seat the human plays. The AI plays the other three.
@@ -36,7 +36,7 @@ public class GameSession
     private readonly Func<Random> _randomFactory;
     private readonly IPlayerStrategy _aiStrategy;
     // MA0158 (use System.Threading.Lock) does not apply here: the Coyote concurrency tests
-    // (tests/Wolfgang.Hawsey.UI.Maui.Tests.Concurrency) control lock ordering by rewriting
+    // (tests/Wolfgang.Hawsey.Engine.Tests.Concurrency) control lock ordering by rewriting
     // Monitor, which `lock (object)` compiles to. Coyote 1.7.11 cannot see
     // System.Threading.Lock: with it, both tests fail with "Potential deadlock or hang
     // detected" (verified). Keep the Monitor-based lock while the tests rely on Coyote.
@@ -267,8 +267,12 @@ public class GameSession
 
 
     /// <summary>
-    /// Advances AI bidding. Returns true if human needs to bid.
+    /// Lets the AI seats bid, in turn, until it is the human's turn or bidding ends.
     /// </summary>
+    /// <returns>
+    /// <see langword="true"/> when the human is next to bid; <see langword="false"/> when
+    /// bidding is over or not open, or a new game was started while it ran.
+    /// </returns>
     public async Task<bool> AdvanceAiBiddingAsync()
     {
         var generation = CurrentGeneration();
@@ -328,7 +332,7 @@ public class GameSession
                 return false;
             }
 
-            // A number bid must beat the high bid, and at least meet the minimum (#867).
+            // A number bid must beat the high bid, and at least meet the minimum.
             if (action is BidAction.NumberBid { Amount: var amount } && (amount < state.MinimumLegalBid || amount > GameState.MaximumBid))
             {
                 return false;
@@ -348,6 +352,11 @@ public class GameSession
     /// Names trump for the human. Returns false, and changes nothing, when the
     /// human is not the one naming trump.
     /// </summary>
+    /// <param name="trumpSuit">The trump suit, or <see langword="null"/> for Ace high.</param>
+    /// <returns><see langword="true"/> when trump was named.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="trumpSuit"/> is not a defined <see cref="Suit"/>.
+    /// </exception>
     public bool SelectTrump(Suit? trumpSuit)
     {
         lock (_sync)
@@ -367,8 +376,12 @@ public class GameSession
 
 
     /// <summary>
-    /// Returns true if human needs to select trump.
+    /// Lets an AI bidder name trump, after a short pause, when it is its turn to.
     /// </summary>
+    /// <returns>
+    /// <see langword="true"/> when the human must name trump; <see langword="false"/> when
+    /// an AI named it, it is not the trump selection phase, or a new game was started.
+    /// </returns>
     public async Task<bool> HandleTrumpSelectionAsync()
     {
         var generation = CurrentGeneration();
@@ -409,14 +422,36 @@ public class GameSession
 
 
     /// <summary>
-    /// Applies the human's Hawsey exchange. Returns false, and changes nothing,
-    /// unless the game is in the Hawsey exchange phase with the human as bidder.
+    /// Applies the human's Hawsey exchange. Returns false, and changes nothing, unless
+    /// the game is in the Hawsey exchange phase with the human as bidder,
+    /// <paramref name="discard"/> is two cards the human holds and
+    /// <paramref name="fromPartner"/> is two cards the human's partner holds.
     /// </summary>
+    /// <param name="discard">The two cards the human discards.</param>
+    /// <param name="fromPartner">The two cards the human's partner gives.</param>
+    /// <returns><see langword="true"/> when the exchange was made.</returns>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="discard"/> or <paramref name="fromPartner"/> is <see langword="null"/>.
+    /// </exception>
     public bool PerformHawseyExchange(Card[] discard, Card[] fromPartner)
     {
+        if (discard == null)
+        {
+            throw new ArgumentNullException(nameof(discard));
+        }
+
+        if (fromPartner == null)
+        {
+            throw new ArgumentNullException(nameof(fromPartner));
+        }
+
         lock (_sync)
         {
-            if (_state is not { Phase: GamePhase.HawseyExchange, HawseyBidder: HumanPosition })
+            if (_state is not { Phase: GamePhase.HawseyExchange, HawseyBidder: HumanPosition }
+                || discard.Length != 2
+                || fromPartner.Length != 2
+                || !Holds(_state.Hands[HumanPosition], discard)
+                || !Holds(_state.Hands[HumanPosition.Partner()], fromPartner))
             {
                 return false;
             }
@@ -467,8 +502,13 @@ public class GameSession
 
 
     /// <summary>
-    /// Returns true if human needs to handle exchange.
+    /// Makes an AI Hawsey bidder's card exchange, after a short pause.
     /// </summary>
+    /// <returns>
+    /// <see langword="true"/> when the human is the Hawsey bidder and must make the
+    /// exchange; <see langword="false"/> when an AI made it, it is not the exchange phase,
+    /// or a new game was started.
+    /// </returns>
     public async Task<bool> HandleHawseyExchangeAsync()
     {
         var generation = CurrentGeneration();
@@ -560,8 +600,12 @@ public class GameSession
 
 
     /// <summary>
-    /// Advances AI plays. Returns true if human needs to play.
+    /// Lets the AI seats play, in turn, until it is the human's turn or the round ends.
     /// </summary>
+    /// <returns>
+    /// <see langword="true"/> when the human is next to play; <see langword="false"/> when
+    /// the round or the game ended, it is not trick play, or a new game was started.
+    /// </returns>
     public async Task<bool> AdvanceAiPlaysAsync()
     {
         var generation = CurrentGeneration();
@@ -773,7 +817,7 @@ public class GameSession
             ? new TrickCompletedEventArgs(state.CompletedTricks[state.CompletedTricks.Count - 1].Winner)
             : null;
         // GameState decides the winner, including the bidding-team rule when both
-        // teams reach the target in the same round (#862).
+        // teams reach the target in the same round.
         var gameOver = state.Winner is { } winner ? new GameOverEventArgs(winner) : null;
 
         return new PlayOutcome(trickCompleted, state.Phase == GamePhase.RoundScoring, gameOver);
