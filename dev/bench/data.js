@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793913182501,
+  "lastUpdate": 1793976660945,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -736,6 +736,60 @@ window.BENCHMARK_DATA = {
             "value": 527226.330078125,
             "unit": "ns",
             "range": "± 7185.142297039879"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "3f2b9da9d612f87b8d4c055684bc28f651db2b3c",
+          "message": "refactor(engine)!: seal GameSession and SimpleAiStrategy (#1063)\n\nNeither class is designed for inheritance: they have no virtual or protected\nmembers, and nothing in the repo derives from them. An AI is customised by\nimplementing IPlayerStrategy, and the test double PassingAi wraps\nSimpleAiStrategy.\n\nSealing breaks anyone deriving from the published 0.1.0 types, so the\nchangelog fragment records it as breaking.\n\nCloses #1059\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-06T09:49:33-05:00",
+          "tree_id": "4f28499bc28cbe47ee7b19681e393169f58193ec",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/3f2b9da9d612f87b8d4c055684bc28f651db2b3c"
+        },
+        "date": 1793976659224,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 435.0848711331685,
+            "unit": "ns",
+            "range": "± 0.40099228822396166"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 60.87880527973175,
+            "unit": "ns",
+            "range": "± 0.46914056424474676"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 205.90436704953513,
+            "unit": "ns",
+            "range": "± 0.5466772894485331"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 260776.57779947916,
+            "unit": "ns",
+            "range": "± 463.9807491636344"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGameWithSimpleAi",
+            "value": 349824.14046223956,
+            "unit": "ns",
+            "range": "± 8049.528772521267"
           }
         ]
       }
