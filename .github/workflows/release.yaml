@@ -16,6 +16,9 @@ concurrency:
   cancel-in-progress: false
 
 env:
+  # A busy runner can take longer than vstest's default 90 seconds to start a test
+  # host, and the run then aborts with no test having failed.
+  VSTEST_CONNECTION_TIMEOUT: 300
   # Minimum line coverage for PRODUCTION assemblies (anything under src/).
   # 95: the fleet coverage policy (#909); every src assembly was at 98% or more
   # when it was raised from 90.
