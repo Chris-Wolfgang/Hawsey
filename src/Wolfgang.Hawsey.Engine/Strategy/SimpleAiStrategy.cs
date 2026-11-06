@@ -13,7 +13,7 @@ namespace Wolfgang.Hawsey.Engine.Strategy;
 /// left can beat when it has one, lets its partner's winning card stand, and otherwise
 /// wins as cheaply as it can or throws its lowest card.
 /// </summary>
-public class SimpleAiStrategy : IPlayerStrategy
+public sealed class SimpleAiStrategy : IPlayerStrategy
 {
     private const int HighestAiBid = 11;
 
