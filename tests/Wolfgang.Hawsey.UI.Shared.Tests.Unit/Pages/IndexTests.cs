@@ -353,6 +353,94 @@ public sealed class IndexTests : BunitContext
 
 
 
+    private static void StartHawseyExchange(IRenderedComponent<IndexPage> page)
+    {
+        ClickButton(page, NewGame);
+        page.Find(".modal-card > button.btn.red").Click();
+        ClickButton(page, "♠ Spades");
+    }
+
+
+
+    private static string[] SelectedText(IRenderedComponent<IndexPage> page) =>
+        page
+            .FindAll(".hand .card.selected-discard")
+            .Select(c => string.Concat(c.TextContent.Where(ch => !char.IsWhiteSpace(ch))))
+            .ToArray();
+
+
+
+    [Fact]
+    public void HawseyExchange_when_both_copies_of_a_card_are_chosen_discards_both()
+    {
+        var session = UseSession();
+        var page = Render<IndexPage>();
+
+        StartHawseyExchange(page);
+
+        // Seed 42 deals two nines of spades, in positions 1 and 2.
+        Assert.Equal("9♠", HandText(page)[1]);
+        Assert.Equal("9♠", HandText(page)[2]);
+
+        page.FindAll(".hand .card")[1].Click();
+
+        Assert.Single(page.FindAll(".hand .card.selected-discard"));
+
+        page.FindAll(".hand .card")[2].Click();
+
+        Assert.Equal(["9♠", "9♠"], SelectedText(page));
+
+        ClickButton(page, Confirm);
+
+        Assert.Equal(GamePhase.TrickPlay, session.CurrentState!.Phase);
+        Assert.Equal(12, page.FindAll(".hand .card").Count);
+        Assert.DoesNotContain("9♠", HandText(page));
+    }
+
+
+
+    [Fact]
+    public void HawseyExchange_when_one_copy_is_clicked_twice_deselects_it_and_leaves_the_other_copy_alone()
+    {
+        UseSession();
+        var page = Render<IndexPage>();
+
+        StartHawseyExchange(page);
+
+        page.FindAll(".hand .card")[1].Click();
+        page.FindAll(".hand .card")[2].Click();
+        page.FindAll(".hand .card")[1].Click();
+
+        Assert.Equal(["9♠"], SelectedText(page));
+        Assert.Contains("selected-discard", page.FindAll(".hand .card")[2].ClassName, StringComparison.Ordinal);
+    }
+
+
+
+    [Theory]
+    [InlineData(3, 3, 7, "the selected card itself is dragged right")]
+    [InlineData(5, 5, 3, "the selected card itself is dragged left")]
+    [InlineData(5, 3, 8, "another card is dragged across it, left to right")]
+    [InlineData(5, 9, 3, "another card is dragged across it, right to left")]
+    [InlineData(4, 7, 9, "another card moves entirely to its right")]
+    public void HawseyExchange_when_a_card_is_dragged_keeps_the_selection_on_the_same_card(int selected, int dragged, int dropOn, string scenario)
+    {
+        UseSession();
+        var page = Render<IndexPage>();
+
+        StartHawseyExchange(page);
+
+        var expected = HandText(page)[selected];
+
+        page.FindAll(".hand .card")[selected].Click();
+        page.FindAll(".hand .card")[dragged].DragStart();
+        page.FindAll(".hand .card")[dropOn].Drop();
+
+        Assert.True(string.Equals(Assert.Single(SelectedText(page)), expected, StringComparison.Ordinal), scenario);
+    }
+
+
+
     [Fact]
     public void CardClick_when_a_legal_card_is_played_moves_it_to_the_table()
     {

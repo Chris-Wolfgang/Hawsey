@@ -136,7 +136,7 @@
             var legal = LegalPlays.Contains(card);
             var canPlay = IsHumanPlayTurn && legal;
             var isDragging = _dragIndex == index;
-            var isSelectedForDiscard = _hawseyExchangeVisible && _hawseyDiscardSelection.Contains(card);
+            var isSelectedForDiscard = _hawseyExchangeVisible && _hawseyDiscardIndexes.Contains(index);
             var interactive = _hawseyExchangeVisible || canPlay;
             <div class="card @(IsRed(card) ? "red" : "") @(canPlay ? "playable" : "") @(!interactive ? "disabled" : "") @(isDragging ? "dragging" : "") @(isSelectedForDiscard ? "selected-discard" : "")"
                  draggable="true"
@@ -145,7 +145,7 @@
                  @ondragover="@(() => { })"
                  @ondragend="OnDragEnd"
                  @ondrop="@(() => OnDrop(index))"
-                 @onclick="() => OnCardClickAsync(card)">
+                 @onclick="() => OnCardClickAsync(index, card)">
                 <span class="rank">@RankText(card.Rank)</span>
                 <span class="suit">@SuitSymbol(card.Suit)</span>
             </div>
@@ -253,9 +253,9 @@
                     Your partner gives you their <strong>2 best</strong> for the chosen trump.
                 </p>
                 <p class="modal-sub">
-                    Selected: <strong>@_hawseyDiscardSelection.Count / 2</strong>
+                    Selected: <strong>@_hawseyDiscardIndexes.Count / 2</strong>
                 </p>
-                <button class="btn primary" disabled="@(_hawseyDiscardSelection.Count != 2)"
+                <button class="btn primary" disabled="@(_hawseyDiscardIndexes.Count != 2)"
                         @onclick="ConfirmHawseyDiscardAsync">Discard &amp; receive</button>
             </div>
         </div>
@@ -311,7 +311,9 @@
     private bool _bidPickerVisible;
     private bool _trumpPickerVisible;
     private bool _hawseyExchangeVisible;
-    private readonly List<Card> _hawseyDiscardSelection = new();
+    // Positions in the displayed hand, not card values: a pinochle deck has two copies of
+    // every card, they compare equal, and the player can discard both.
+    private readonly List<int> _hawseyDiscardIndexes = new();
     private bool _logVisible;
     private RoundSummarySnapshot? _roundSummary;
     private string _statusMessage = "Welcome to Hawsey. Click NEW GAME to start.";
@@ -511,6 +513,20 @@
         if (insertAt < 0) insertAt = 0;
         if (insertAt > _customOrder.Count) insertAt = _customOrder.Count;
         _customOrder.Insert(insertAt, card);
+
+        // The selection stays on the same cards when one is dragged during the exchange.
+        for (var i = 0; i < _hawseyDiscardIndexes.Count; i++)
+        {
+            _hawseyDiscardIndexes[i] = IndexAfterMove(_hawseyDiscardIndexes[i], from, insertAt);
+        }
+    }
+
+    private static int IndexAfterMove(int index, int from, int to)
+    {
+        if (index == from) return to;
+        if (from < index && index <= to) return index - 1;
+        if (to <= index && index < from) return index + 1;
+        return index;
     }
 
     private IReadOnlyList<Card> LegalPlays =>
@@ -658,7 +674,7 @@
         _bidPickerVisible = false;
         _trumpPickerVisible = false;
         _hawseyExchangeVisible = false;
-        _hawseyDiscardSelection.Clear();
+        _hawseyDiscardIndexes.Clear();
         _roundSummary = null;
         _customOrder = null;
         _dragIndex = null;
@@ -680,25 +696,19 @@
         await DriveLoopAsync();
     }
 
-    private void ToggleHawseyDiscard(Card card)
+    private void ToggleHawseyDiscard(int index)
     {
-        if (!_hawseyExchangeVisible) return;
-        var idx = _hawseyDiscardSelection.IndexOf(card);
-        if (idx >= 0)
+        if (!_hawseyDiscardIndexes.Remove(index) && _hawseyDiscardIndexes.Count < 2)
         {
-            _hawseyDiscardSelection.RemoveAt(idx);
-        }
-        else if (_hawseyDiscardSelection.Count < 2)
-        {
-            _hawseyDiscardSelection.Add(card);
+            _hawseyDiscardIndexes.Add(index);
         }
     }
 
     private async Task ConfirmHawseyDiscardAsync()
     {
-        if (_hawseyDiscardSelection.Count != 2) return;
-        var discard = _hawseyDiscardSelection.ToArray();
-        _hawseyDiscardSelection.Clear();
+        if (_hawseyDiscardIndexes.Count != 2) return;
+        var discard = _hawseyDiscardIndexes.Select(i => HumanHand[i]).ToArray();
+        _hawseyDiscardIndexes.Clear();
         _hawseyExchangeVisible = false;
         Game.PerformHumanHawseyExchange(discard);
         await DriveLoopAsync();
@@ -772,7 +782,7 @@
 
             case WaitingFor.HumanHawseyExchange:
                 _hawseyExchangeVisible = true;
-                _hawseyDiscardSelection.Clear();
+                _hawseyDiscardIndexes.Clear();
                 _statusMessage = "Hawsey! Pick 2 cards to discard.";
                 break;
 
@@ -798,12 +808,12 @@
         await InvokeAsync(StateHasChanged);
     }
 
-    private async Task OnCardClickAsync(Card card)
+    private async Task OnCardClickAsync(int index, Card card)
     {
         // Hawsey discard-selection mode steals clicks from trick play.
         if (_hawseyExchangeVisible)
         {
-            ToggleHawseyDiscard(card);
+            ToggleHawseyDiscard(index);
             return;
         }
 
