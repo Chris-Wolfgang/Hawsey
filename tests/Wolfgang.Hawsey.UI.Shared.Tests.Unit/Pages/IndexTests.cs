@@ -418,10 +418,11 @@ public sealed class IndexTests : BunitContext
 
 
     [Theory]
-    [InlineData(3, 7, 5, "the selected card itself is dragged right")]
-    [InlineData(5, 0, 5, "another card is dragged across it, from the left")]
-    [InlineData(5, 9, 5, "another card is dragged across it, from the right")]
-    [InlineData(5, 6, 8, "another card moves entirely to its right")]
+    [InlineData(3, 3, 7, "the selected card itself is dragged right")]
+    [InlineData(5, 5, 3, "the selected card itself is dragged left")]
+    [InlineData(5, 3, 8, "another card is dragged across it, left to right")]
+    [InlineData(5, 9, 3, "another card is dragged across it, right to left")]
+    [InlineData(4, 7, 9, "another card moves entirely to its right")]
     public void HawseyExchange_when_a_card_is_dragged_keeps_the_selection_on_the_same_card(int selected, int dragged, int dropOn, string scenario)
     {
         UseSession();
