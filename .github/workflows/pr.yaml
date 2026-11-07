@@ -359,11 +359,27 @@ jobs:
           # resolves regardless of whether that dir is already on PATH.
           export PATH="$HOME/.dotnet/tools:$PATH"
           echo "Inspecting: $SLN"
-          jb inspectcode "$SLN" \
-            --output=inspect.sarif \
-            --format=sarif \
-            --severity=WARNING \
-            --no-build
+
+          # InspectCode starts MSBuild and connects to it. On a busy runner that connection
+          # can fail, and the run then ends with "No files to inspect were found" without
+          # having analysed anything. Only that is retried: any other failure is real.
+          max_attempts=3
+          for attempt in $(seq 1 "$max_attempts"); do
+            rc=0
+            jb inspectcode "$SLN" \
+              --output=inspect.sarif \
+              --format=sarif \
+              --severity=WARNING \
+              --no-build 2>&1 | tee inspect.log || rc=$?
+            if [ "$rc" -eq 0 ]; then
+              break
+            fi
+            if [ "$attempt" -eq "$max_attempts" ] || ! grep -q "Can't connect to protocol model" inspect.log; then
+              exit "$rc"
+            fi
+            echo "::warning::InspectCode couldn't connect to MSBuild (attempt $attempt of $max_attempts); retrying in 30s."
+            sleep 30
+          done
 
       - name: Hand the SARIF to the upload job
         # Runs even when the gate below fails so warning-level findings still reach
