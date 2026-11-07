@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794000560477,
+  "lastUpdate": 1794011650963,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -844,6 +844,60 @@ window.BENCHMARK_DATA = {
             "value": 352870.61181640625,
             "unit": "ns",
             "range": "± 1061.4212492468291"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4eb21c88a1e2b3d111eabf8712dc3d2a49d377cc",
+          "message": "fix(blazor): let the Hawsey exchange discard both copies of a card (#1069)\n\n* fix(blazor): let the Hawsey exchange discard both copies of a card\n\nThe page tracked the discard selection by card value, and a pinochle deck has two\nequal copies of every card: selecting one marked both, and clicking the second\ndeselected the first. It now tracks positions in the displayed hand, as the MAUI\napp does, and moves them when a card is dragged during the exchange.\n\nCloses #1067\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n* test(blazor): make the drag cases actually move the selected card\n\nRemoving the position update on drag failed only one of the first version's cases,\nbecause their positions didn't match their labels. Each rule in IndexAfterMove now\nhas a case that fails without it.\n\nRefs #1067\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-06T19:32:59-05:00",
+          "tree_id": "53bea38257c4cbe1bda70df41e6ded7db5a22770",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/4eb21c88a1e2b3d111eabf8712dc3d2a49d377cc"
+        },
+        "date": 1794011649356,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 434.30875794092816,
+            "unit": "ns",
+            "range": "± 0.4000123038512061"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 58.988550543785095,
+            "unit": "ns",
+            "range": "± 0.26161060572826494"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 202.1049883365631,
+            "unit": "ns",
+            "range": "± 0.22367846841987168"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 255782.3614908854,
+            "unit": "ns",
+            "range": "± 1958.805341503221"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGameWithSimpleAi",
+            "value": 331794.26774088544,
+            "unit": "ns",
+            "range": "± 589.8738749431991"
           }
         ]
       }
