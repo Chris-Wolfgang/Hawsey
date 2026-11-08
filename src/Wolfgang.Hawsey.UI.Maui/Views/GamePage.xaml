@@ -274,7 +274,7 @@
                             </BindableLayout.ItemTemplate>
                         </FlexLayout>
                         <HorizontalStackLayout Spacing="6" HorizontalOptions="Center" Margin="0,6,0,0">
-                            <Button HeightRequest="{StaticResource TouchTarget}" Text="Hawsey (24)" Style="{StaticResource RedButton}"
+                            <Button HeightRequest="{StaticResource TouchTarget}" Text="{Binding HawseyBidText}" Style="{StaticResource RedButton}"
                                     Command="{Binding PlaceBidCommand}" CommandParameter="hawsey" />
                             <Button HeightRequest="{StaticResource TouchTarget}" Text="Pass" Style="{StaticResource TableButton}" IsVisible="{Binding CanPass}"
                                     Command="{Binding PlaceBidCommand}" CommandParameter="pass" />
