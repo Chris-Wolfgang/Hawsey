@@ -31,7 +31,7 @@ public sealed class ConverterTests : IDisposable
 
 
     [Fact]
-    public void BoolToOpacity_dims_cards_that_cannot_be_played()
+    public void BoolToOpacityConverter_Convert_when_the_card_does_nothing_dims_it()
     {
         var converter = new BoolToOpacityConverter();
 
@@ -43,7 +43,7 @@ public sealed class ConverterTests : IDisposable
 
 
     [Fact]
-    public void Colour_converters_without_an_app_use_their_fallback_colours()
+    public void BoolToStrokeConverter_Convert_when_there_is_no_app_uses_its_fallback_colours()
     {
         Application.Current = null;
 
@@ -54,7 +54,7 @@ public sealed class ConverterTests : IDisposable
 
 
     [Fact]
-    public void Colour_converters_use_the_apps_resource_colours()
+    public void BoolToStrokeConverter_Convert_when_the_app_is_running_uses_its_resource_colours()
     {
         var app = new App();
         Application.Current = app;
@@ -66,7 +66,7 @@ public sealed class ConverterTests : IDisposable
 
 
     [Fact]
-    public void No_converter_converts_back()
+    public void ConvertBack_when_called_on_any_converter_throws()
     {
         IValueConverter[] converters =
         [
