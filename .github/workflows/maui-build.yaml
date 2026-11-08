@@ -24,8 +24,10 @@ on:
       - 'Directory.Packages.props'
       - 'global.json'
       - '.github/workflows/maui-build.yaml'
+  # dev/maui too: main is merged down into it without a PR, and the platform heads of
+  # that merge are built nowhere else (pr.yaml skips platform TFMs).
   push:
-    branches: [main]
+    branches: [main, dev/maui]
   workflow_dispatch:
 
 permissions:
