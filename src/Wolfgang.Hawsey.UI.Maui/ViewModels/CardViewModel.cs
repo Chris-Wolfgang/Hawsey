@@ -7,7 +7,7 @@ namespace Wolfgang.Hawsey.UI.Maui.ViewModels;
 /// green outline, a card that does nothing when tapped now is dimmed, and a card picked as
 /// a Hawsey-exchange discard is raised with a red outline.
 /// </summary>
-public class CardViewModel
+public sealed class CardViewModel
 {
     /// <param name="card">The card.</param>
     /// <param name="isLegal">Whether the human may play it now.</param>
@@ -21,29 +21,14 @@ public class CardViewModel
         IsLegal = isLegal;
         IsSelected = isSelected;
         IsInteractive = isInteractive ?? (isLegal || isSelected);
-        RankText = card.Rank switch
-        {
-            Rank.Nine => "9",
-            Rank.Ten => "10",
-            Rank.Jack => "J",
-            Rank.Queen => "Q",
-            Rank.King => "K",
-            Rank.Ace => "A",
-            _ => "?"
-        };
-        SuitSymbol = card.Suit switch
-        {
-            Suit.Hearts => "\u2665",
-            Suit.Diamonds => "\u2666",
-            Suit.Clubs => "\u2663",
-            Suit.Spades => "\u2660",
-            _ => "?"
-        };
+        RankText = CardText.Rank(card.Rank);
+        SuitSymbol = CardText.Suit(card.Suit);
         SuitColor = card.Suit.IsRed() ? TableColors.CardRed : TableColors.CardBlack;
     }
 
 
 
+    /// <summary>The card.</summary>
     public Card Card { get; }
 
     /// <summary>Whether the human may play the card now (it gets the green outline).</summary>
@@ -54,7 +39,26 @@ public class CardViewModel
 
     /// <summary>Whether tapping the card does anything now; the others are dimmed.</summary>
     public bool IsInteractive { get; }
+    /// <summary>The rank as shown on the card (<see cref="CardText.Rank"/>).</summary>
     public string RankText { get; }
+    /// <summary>The suit's symbol (<see cref="CardText.Suit"/>).</summary>
     public string SuitSymbol { get; }
+    /// <summary>The ink colour: red for hearts and diamonds, black otherwise.</summary>
     public Color SuitColor { get; }
+
+
+
+    /// <summary>
+    /// Whether <paramref name="other"/> shows the same: the same card, equally legal,
+    /// picked and interactive (the text and colour follow from the card).
+    /// </summary>
+    public bool ShowsTheSameAs(CardViewModel other)
+    {
+        ArgumentNullException.ThrowIfNull(other);
+
+        return Card == other.Card
+            && IsLegal == other.IsLegal
+            && IsSelected == other.IsSelected
+            && IsInteractive == other.IsInteractive;
+    }
 }

@@ -65,7 +65,7 @@ public sealed class RoundSummaryViewModel
 
 
 
-    /// <summary>The bid: a number of tricks, or "Hawsey (24)".</summary>
+    /// <summary>The bid: a number of tricks, or the Hawsey bid (<see cref="ViewModels.BidText.Hawsey"/>).</summary>
     public string BidText { get; }
 
 
@@ -116,10 +116,7 @@ public sealed class RoundSummaryViewModel
 
         var score = state.RoundScore;
         var bidTeam = score?.BiddingTeam ?? Team.NorthSouth;
-        var isHawsey = score?.IsHawsey ?? false;
-        var bidText = isHawsey
-            ? "Hawsey (24)"
-            : (score?.BidAmount ?? 0).ToString(System.Globalization.CultureInfo.InvariantCulture);
+        var bidText = ViewModels.BidText.For(score?.IsHawsey ?? false, score?.BidAmount ?? 0);
 
         var usWon = state.Winner == Team.NorthSouth;
         var winnerLabel = usWon ? "US" : "THEM";

@@ -10,7 +10,7 @@ public class NoDispatchNeededTests
 
 
     [Fact]
-    public void Dispatcher_needs_no_dispatch_and_serves_every_thread()
+    public void IsDispatchRequired_when_read_is_false_and_the_dispatcher_serves_every_thread()
     {
         Assert.False(_dispatcher.IsDispatchRequired);
         Assert.Same(_dispatcher, _dispatcher.GetForCurrentThread());
@@ -19,7 +19,7 @@ public class NoDispatchNeededTests
 
 
     [Fact]
-    public void Dispatcher_refuses_to_dispatch()
+    public void Dispatch_when_called_throws()
     {
         Assert.Throws<NotSupportedException>(() => _dispatcher.Dispatch(() => { }));
         Assert.Throws<NotSupportedException>(() => _dispatcher.DispatchDelayed(TimeSpan.Zero, () => { }));
