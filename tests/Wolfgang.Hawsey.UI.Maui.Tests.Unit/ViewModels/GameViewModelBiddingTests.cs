@@ -65,7 +65,7 @@ public class GameViewModelBiddingTests
 
 
     [Fact]
-    public void Before_any_bid_the_overlay_offers_the_minimum_up_to_eleven()
+    public void BidOptions_when_nobody_has_bid_runs_from_the_minimum_to_eleven()
     {
         var (vm, _) = Table();
 
@@ -79,7 +79,7 @@ public class GameViewModelBiddingTests
 
 
     [Fact]
-    public void After_an_opponent_bids_the_overlay_names_them_and_offers_only_higher_bids()
+    public void BidPrompt_when_an_opponent_has_bid_names_them_and_offers_only_higher_bids()
     {
         var (vm, _) = Table(new SeatBids(PlayerPosition.East, 8));
 
@@ -93,7 +93,7 @@ public class GameViewModelBiddingTests
 
 
     [Fact]
-    public void A_bid_that_does_not_beat_the_high_bid_is_ignored()
+    public void PlaceBidCommand_when_the_bid_does_not_beat_the_high_bid_is_ignored()
     {
         var (vm, session) = Table(new SeatBids(PlayerPosition.East, 8));
         vm.NewGameCommand.Execute(null);
@@ -108,7 +108,7 @@ public class GameViewModelBiddingTests
 
 
     [Fact]
-    public void A_partners_bid_is_shown_as_the_partners()
+    public void BidPrompt_when_the_partner_has_bid_names_the_partner()
     {
         // In the third deal South deals, so North bids before the human.
         var (vm, session) = Table(new SeatBids(PlayerPosition.North, 7));
@@ -123,7 +123,7 @@ public class GameViewModelBiddingTests
 
 
     [Fact]
-    public void The_stuck_dealer_may_only_bid_the_minimum_or_call_Hawsey()
+    public void BidOptions_when_the_human_is_the_stuck_dealer_offers_only_the_minimum_or_Hawsey()
     {
         var (vm, session) = Table();
         vm.NewGameCommand.Execute(null);

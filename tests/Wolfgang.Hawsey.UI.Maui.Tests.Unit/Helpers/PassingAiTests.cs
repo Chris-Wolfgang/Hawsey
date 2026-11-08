@@ -13,7 +13,7 @@ namespace Wolfgang.Hawsey.UI.Maui.Tests.Unit.Helpers;
 public class PassingAiTests
 {
     [Fact]
-    public void PassingAi_passes_every_bid_and_otherwise_decides_like_the_real_AI()
+    public void DecideBid_when_asked_passes_and_every_other_decision_is_the_real_AIs()
     {
         var state = new GameEngine().StartGame(HouseRules.Default, PlayerPosition.North, new Random(3));
         var real = new SimpleAiStrategy();

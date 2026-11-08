@@ -39,7 +39,7 @@ public class GameViewModelHawseyExchangeTests
 
 
     [Fact]
-    public void Naming_trump_after_a_Hawsey_bid_opens_the_exchange_with_nothing_picked()
+    public void SelectTrumpCommand_when_the_human_bid_Hawsey_opens_the_exchange_with_nothing_picked()
     {
         ReachTheExchange();
 
@@ -55,7 +55,7 @@ public class GameViewModelHawseyExchangeTests
 
 
     [Fact]
-    public void Tapping_picks_at_most_two_cards_and_a_second_tap_unpicks()
+    public void PlayCardCommand_when_exchanging_picks_at_most_two_cards_and_a_second_tap_unpicks()
     {
         ReachTheExchange();
 
@@ -77,7 +77,7 @@ public class GameViewModelHawseyExchangeTests
 
 
     [Fact]
-    public void Tapping_a_card_no_longer_in_the_hand_picks_nothing()
+    public void PlayCardCommand_when_exchanging_and_the_card_is_not_in_the_hand_picks_nothing()
     {
         ReachTheExchange();
 
@@ -89,7 +89,7 @@ public class GameViewModelHawseyExchangeTests
 
 
     [Fact]
-    public void Confirming_with_fewer_than_two_picked_does_nothing()
+    public void ConfirmHawseyExchangeCommand_when_fewer_than_two_are_picked_does_nothing()
     {
         ReachTheExchange();
         Tap(0);
@@ -103,7 +103,7 @@ public class GameViewModelHawseyExchangeTests
 
 
     [Fact]
-    public void Confirming_discards_the_picks_takes_the_partners_best_and_plays_on()
+    public void ConfirmHawseyExchangeCommand_when_two_are_picked_discards_them_takes_the_partners_best_and_plays_on()
     {
         ReachTheExchange();
         var state = _session.CurrentState!;
@@ -149,7 +149,7 @@ public class GameViewModelHawseyExchangeTests
 
 
     [Fact]
-    public void A_new_game_during_the_exchange_closes_it_and_drops_the_picks()
+    public void NewGameCommand_when_exchanging_closes_the_exchange_and_drops_the_picks()
     {
         ReachTheExchange();
         Tap(0);

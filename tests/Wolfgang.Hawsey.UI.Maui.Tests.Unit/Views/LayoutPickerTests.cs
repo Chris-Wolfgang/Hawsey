@@ -52,7 +52,7 @@ public class LayoutPickerTests
     [Theory]
     [InlineData(640, 360)]
     [InlineData(1920, 1080)]
-    public void UseCompact_follows_the_humans_choice_whatever_the_size(double width, double height)
+    public void UseCompact_when_the_human_has_chosen_follows_the_choice_whatever_the_size(double width, double height)
     {
         Assert.True(LayoutPicker.UseCompact(width, height, LayoutChoice.Compact));
         Assert.False(LayoutPicker.UseCompact(width, height, LayoutChoice.Table));

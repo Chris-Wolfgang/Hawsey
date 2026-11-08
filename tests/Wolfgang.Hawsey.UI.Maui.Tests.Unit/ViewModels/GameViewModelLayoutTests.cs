@@ -15,7 +15,7 @@ public class GameViewModelLayoutTests
 
 
     [Fact]
-    public void IsCompactLayout_before_the_page_has_a_size_is_false()
+    public void IsCompactLayout_when_the_page_has_no_size_is_false()
     {
         Assert.False(_vm.IsCompactLayout);
         Assert.True(_vm.IsTableLayout);
@@ -26,7 +26,7 @@ public class GameViewModelLayoutTests
     [Theory]
     [InlineData(915, 412, true)]
     [InlineData(1280, 800, false)]
-    public void SetPageSize_picks_the_layout_from_the_size(double width, double height, bool compact)
+    public void SetPageSize_when_the_layout_is_Auto_picks_it_from_the_size(double width, double height, bool compact)
     {
         _vm.SetPageSize(width, height);
 
@@ -37,7 +37,7 @@ public class GameViewModelLayoutTests
 
 
     [Fact]
-    public void ToggleLayoutCommand_on_a_phone_shows_the_table_and_keeps_it_through_a_resize()
+    public void ToggleLayoutCommand_when_on_a_phone_shows_the_table_and_keeps_it_through_a_resize()
     {
         _vm.SetPageSize(915, 412);
 
@@ -50,7 +50,7 @@ public class GameViewModelLayoutTests
 
 
     [Fact]
-    public void ToggleLayoutCommand_on_a_tablet_shows_the_compact_layout_and_keeps_it_through_a_resize()
+    public void ToggleLayoutCommand_when_on_a_tablet_shows_the_compact_layout_and_keeps_it_through_a_resize()
     {
         _vm.SetPageSize(1280, 800);
 
@@ -63,7 +63,7 @@ public class GameViewModelLayoutTests
 
 
     [Fact]
-    public void ToggleLayoutCommand_twice_returns_to_the_first_layout()
+    public void ToggleLayoutCommand_when_executed_twice_returns_to_the_first_layout()
     {
         _vm.SetPageSize(915, 412);
 

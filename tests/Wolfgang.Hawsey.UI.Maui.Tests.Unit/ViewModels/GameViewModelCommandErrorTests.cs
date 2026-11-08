@@ -22,7 +22,7 @@ public class GameViewModelCommandErrorTests
 
 
     [Fact]
-    public void A_command_that_throws_reports_the_failure_in_the_status()
+    public void NewGameCommand_when_the_move_throws_reports_the_failure_in_the_status()
     {
         var vm = new GameViewModel(TestGameSessions.Unpaced(ai: new FailingAi()), new ImmediateDispatcher());
 
