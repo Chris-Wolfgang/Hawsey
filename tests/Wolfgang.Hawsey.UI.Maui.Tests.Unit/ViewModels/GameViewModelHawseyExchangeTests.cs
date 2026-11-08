@@ -149,6 +149,32 @@ public class GameViewModelHawseyExchangeTests
 
 
     [Fact]
+    public void ConfirmHawseyExchangeCommand_when_the_game_moved_on_unseen_is_refused_and_changes_nothing()
+    {
+        // The view model has not yet seen a New Game (its dispatcher is busy), so the
+        // exchange still shows with two cards picked; the session refuses the stale move.
+        var session = TestGameSessions.Unpaced();
+        var dispatcher = new DeferredDispatcher();
+        var vm = new GameViewModel(session, dispatcher);
+        vm.NewGameCommand.Execute(null);
+        vm.PlaceBidCommand.Execute("hawsey");
+        vm.SelectTrumpCommand.Execute("spades");
+        dispatcher.RunAll();
+        vm.PlayCardCommand.Execute(vm.HumanCards[0]);
+        vm.PlayCardCommand.Execute(vm.HumanCards[3]);
+        session.StartNewGame();
+        var dealt = session.CurrentState;
+
+        vm.ConfirmHawseyExchangeCommand.Execute(null);
+
+        Assert.Same(dealt, session.CurrentState);
+        Assert.True(vm.IsHawseyExchangeVisible);
+        Assert.Equal("Hawsey! Pick 2 cards to discard.", vm.StatusMessage);
+    }
+
+
+
+    [Fact]
     public void NewGameCommand_when_exchanging_closes_the_exchange_and_drops_the_picks()
     {
         ReachTheExchange();
