@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794102468470,
+  "lastUpdate": 1794172650901,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -952,6 +952,60 @@ window.BENCHMARK_DATA = {
             "value": 460042.09554036456,
             "unit": "ns",
             "range": "± 8404.136184126384"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "469be701357c5832e0bb241cfd2d696c0912ba02",
+          "message": "fix(engine)!: the top number bid is 11; all twelve tricks is the Hawsey bid (#1092)\n\nGameState.MaximumBid was 12, so the engine accepted a number bid for all twelve\ntricks and the Blazor page offered \"Bid 12\", while the MAUI app stopped at 11 and\nSimpleAiStrategy never bids above 11. Bidding all twelve is what the Hawsey bid is\nfor, so MaximumBid is now 11 and PlaceBid refuses 12. The Blazor page reads the\nconstant, so it stops at 11 with no change of its own.\n\nRefs #1079\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-08T16:16:09-05:00",
+          "tree_id": "a1cc7c503c93606e1b0335847d3e0803f000e733",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/469be701357c5832e0bb241cfd2d696c0912ba02"
+        },
+        "date": 1794172649444,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 440.2407925923665,
+            "unit": "ns",
+            "range": "± 0.2892719928366245"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 63.78591559330622,
+            "unit": "ns",
+            "range": "± 1.486981026836264"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 204.76422810554504,
+            "unit": "ns",
+            "range": "± 0.8074063192590987"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 282935.10856119794,
+            "unit": "ns",
+            "range": "± 2967.234172464235"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGameWithSimpleAi",
+            "value": 375947.65380859375,
+            "unit": "ns",
+            "range": "± 2936.2565054073593"
           }
         ]
       }
