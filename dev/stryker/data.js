@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793904416864,
+  "lastUpdate": 1794141887142,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "Mutation score": [
@@ -134,6 +134,33 @@ window.BENCHMARK_DATA = {
           {
             "name": "Mutation score (tests/Wolfgang.Hawsey.Engine.Tests.Unit)",
             "value": 91.78,
+            "unit": "%"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]",
+            "email": "49699333+dependabot[bot]@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "efa657ec58d453feb23aed22e55999f1ff0ab384",
+          "message": "Bump the dotnet-dependencies group with 3 updates (#1076)\n\nBumps bunit from 2.13.3 to 2.14.0\nBumps jetbrains.resharper.globaltools from 2026.2.4 to 2026.2.4.1\nBumps Meziantou.Analyzer from 3.0.320 to 3.0.321\n\n---\nupdated-dependencies:\n- dependency-name: bunit\n  dependency-version: 2.14.0\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: dotnet-dependencies\n- dependency-name: jetbrains.resharper.globaltools\n  dependency-version: 2026.2.4.1\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Meziantou.Analyzer\n  dependency-version: 3.0.321\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>\nCo-authored-by: Chris Wolfgang <210299580+Chris-Wolfgang@users.noreply.github.com>",
+          "timestamp": "2026-11-08T02:28:07Z",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/efa657ec58d453feb23aed22e55999f1ff0ab384"
+        },
+        "date": 1794141882384,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "Mutation score (tests/Wolfgang.Hawsey.Engine.Tests.Unit)",
+            "value": 91.94,
             "unit": "%"
           }
         ]
