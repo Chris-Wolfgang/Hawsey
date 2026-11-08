@@ -5,8 +5,10 @@ using AndroidX.Core.View;
 
 namespace Wolfgang.Hawsey.UI.Maui;
 
-// Landscape only: the table is laid out for a wide screen and scaled to fit
-// (Views/TableScale); in portrait it would be about a third of its size.
+// Landscape only, as on iOS (Platforms/iOS/Info.plist): both layouts are designed for a
+// landscape screen. The table is scaled to fit (Views/TableScale), and the compact phone
+// layout (Views/CompactTableView) is sized for a landscape phone; neither is laid out for
+// portrait.
 [Activity(Theme = "@style/Maui.SplashTheme", MainLauncher = true,
     ScreenOrientation = ScreenOrientation.SensorLandscape,
     ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation |
