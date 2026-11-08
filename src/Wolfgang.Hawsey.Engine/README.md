@@ -87,7 +87,7 @@ var final = new GameRunner().RunGame(new SimpleAiStrategy(), HouseRules.Default,
 ## The game
 
 - 48-card pinochle deck (two each of 9, 10, J, Q, K, A in four suits), 12 cards each, North/South against East/West.
-- **Bidding:** pass, or bid the number of tricks your team will take (minimum 6 by default).
+- **Bidding:** pass, or bid the number of tricks your team will take, from the minimum (6 by default) up to 11. All 12 is the Hawsey bid.
 - **Trump:** the high bidder names a suit, or plays ace high. With a suit, the jack of trump (right bower) is highest and the other jack of the same colour (left bower) is second and counts as trump.
 - **Scoring:** one point per trick. A bidding team that falls short loses its bid. First to 62 wins.
 - **Hawsey:** the bidder plays alone for all 12 tricks, swapping two cards with their partner, for 24 points (or −24).
