@@ -7,7 +7,7 @@ namespace Wolfgang.Hawsey.UI.Maui.ViewModels;
 /// green outline, a card that does nothing when tapped now is dimmed, and a card picked as
 /// a Hawsey-exchange discard is raised with a red outline.
 /// </summary>
-public class CardViewModel
+public sealed class CardViewModel
 {
     /// <param name="card">The card.</param>
     /// <param name="isLegal">Whether the human may play it now.</param>
@@ -28,6 +28,7 @@ public class CardViewModel
 
 
 
+    /// <summary>The card.</summary>
     public Card Card { get; }
 
     /// <summary>Whether the human may play the card now (it gets the green outline).</summary>
@@ -38,8 +39,11 @@ public class CardViewModel
 
     /// <summary>Whether tapping the card does anything now; the others are dimmed.</summary>
     public bool IsInteractive { get; }
+    /// <summary>The rank as shown on the card (<see cref="CardText.Rank"/>).</summary>
     public string RankText { get; }
+    /// <summary>The suit's symbol (<see cref="CardText.Suit"/>).</summary>
     public string SuitSymbol { get; }
+    /// <summary>The ink colour: red for hearts and diamonds, black otherwise.</summary>
     public Color SuitColor { get; }
 
 

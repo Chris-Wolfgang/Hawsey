@@ -35,6 +35,7 @@ public partial class SeatViewModel : INotifyPropertyChanged
 
 
 
+    /// <summary>Where the seat is at the table.</summary>
     public PlayerPosition Position { get; }
 
 
@@ -47,11 +48,12 @@ public partial class SeatViewModel : INotifyPropertyChanged
 
 
 
-    /// <summary>The seat's label, for example "Partner".</summary>
+    /// <summary>The seat's label, for example "PARTNER" or "OPPONENT LEFT".</summary>
     public string Name { get; }
 
 
 
+    /// <summary>How many cards the seat holds.</summary>
     public int CardCount
     {
         get => _cardCount;
@@ -105,6 +107,7 @@ public partial class SeatViewModel : INotifyPropertyChanged
 
 
 
+    /// <summary>Whether the seat deals this round.</summary>
     public bool IsDealer
     {
         get => _isDealer;
@@ -137,6 +140,7 @@ public partial class SeatViewModel : INotifyPropertyChanged
 
 
 
+    /// <summary>Whether the seat has a card on the table (<see cref="TableCard"/> is set).</summary>
     public bool HasTableCard => _tableCard != null;
 
 

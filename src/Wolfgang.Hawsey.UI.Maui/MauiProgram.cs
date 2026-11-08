@@ -5,6 +5,7 @@ using Wolfgang.Hawsey.UI.Maui.Views;
 
 namespace Wolfgang.Hawsey.UI.Maui;
 
+/// <summary>Builds the app: the shell, and the game page wired to one game session and view model.</summary>
 public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()

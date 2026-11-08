@@ -128,26 +128,29 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
+    /// <summary>The status line: what the game is waiting for, or what went wrong.</summary>
     public string StatusMessage
     {
         get => _statusMessage;
-        set => SetProperty(ref _statusMessage, value);
+        private set => SetProperty(ref _statusMessage, value);
     }
 
 
 
+    /// <summary>Whether the bid panel is open: it is the human's turn to bid.</summary>
     public bool IsBiddingVisible
     {
         get => _isBiddingVisible;
-        set => SetProperty(ref _isBiddingVisible, value);
+        private set => SetProperty(ref _isBiddingVisible, value);
     }
 
 
 
+    /// <summary>Whether the trump picker is open: the human won the bid and names trump.</summary>
     public bool IsTrumpPickerVisible
     {
         get => _isTrumpPickerVisible;
-        set => SetProperty(ref _isTrumpPickerVisible, value);
+        private set => SetProperty(ref _isTrumpPickerVisible, value);
     }
 
 
@@ -156,7 +159,7 @@ public partial class GameViewModel : INotifyPropertyChanged
     public bool IsLogVisible
     {
         get => _isLogVisible;
-        set => SetProperty(ref _isLogVisible, value);
+        private set => SetProperty(ref _isLogVisible, value);
     }
 
 
@@ -179,6 +182,7 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
+    /// <summary>Whether the round summary is showing (<see cref="RoundSummary"/> is set).</summary>
     public bool IsRoundSummaryVisible => _roundSummary != null;
 
 
@@ -211,7 +215,7 @@ public partial class GameViewModel : INotifyPropertyChanged
     public int NorthSouthScore
     {
         get => _northSouthScore;
-        set => SetProperty(ref _northSouthScore, value);
+        private set => SetProperty(ref _northSouthScore, value);
     }
 
 
@@ -220,7 +224,7 @@ public partial class GameViewModel : INotifyPropertyChanged
     public int EastWestScore
     {
         get => _eastWestScore;
-        set => SetProperty(ref _eastWestScore, value);
+        private set => SetProperty(ref _eastWestScore, value);
     }
 
 
@@ -252,6 +256,7 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
+    /// <summary>Whether trump is a red suit (hearts or diamonds).</summary>
     public bool IsTrumpRed
     {
         get => _isTrumpRed;
@@ -295,6 +300,7 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
+    /// <summary>Whether the human's team won the bid (it shows in their colour).</summary>
     public bool IsTrumpSetterUs => string.Equals(_trumpSetterTeam, "US", StringComparison.Ordinal);
 
 
@@ -342,7 +348,7 @@ public partial class GameViewModel : INotifyPropertyChanged
     public string BidPrompt
     {
         get => _bidPrompt;
-        set => SetProperty(ref _bidPrompt, value);
+        private set => SetProperty(ref _bidPrompt, value);
     }
 
 
@@ -353,7 +359,7 @@ public partial class GameViewModel : INotifyPropertyChanged
     public bool CanPass
     {
         get => _canPass;
-        set => SetProperty(ref _canPass, value);
+        private set => SetProperty(ref _canPass, value);
     }
 
 
@@ -365,7 +371,7 @@ public partial class GameViewModel : INotifyPropertyChanged
     public bool IsHawseyExchangeVisible
     {
         get => _isHawseyExchangeVisible;
-        set => SetProperty(ref _isHawseyExchangeVisible, value);
+        private set => SetProperty(ref _isHawseyExchangeVisible, value);
     }
 
 
@@ -374,7 +380,7 @@ public partial class GameViewModel : INotifyPropertyChanged
     public string ExchangeSelectionText
     {
         get => _exchangeSelectionText;
-        set => SetProperty(ref _exchangeSelectionText, value);
+        private set => SetProperty(ref _exchangeSelectionText, value);
     }
 
 
@@ -387,11 +393,17 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
+    /// <summary>Deals a new game and plays the AI seats up to the human's first move.</summary>
     public ICommand NewGameCommand { get; }
+    /// <summary>Deals the next round once a round has been scored.</summary>
     public ICommand NextRoundCommand { get; }
+    /// <summary>Places the human's bid: a number, <c>"pass"</c> or <c>"hawsey"</c>.</summary>
     public ICommand PlaceBidCommand { get; }
+    /// <summary>Names trump: <c>"hearts"</c>, <c>"diamonds"</c>, <c>"clubs"</c>, <c>"spades"</c>, or anything else for ace high.</summary>
     public ICommand SelectTrumpCommand { get; }
+    /// <summary>Plays the tapped card, or in the Hawsey exchange picks or unpicks it as a discard.</summary>
     public ICommand PlayCardCommand { get; }
+    /// <summary>Opens or closes the game log.</summary>
     public ICommand ToggleLogCommand { get; }
 
 
