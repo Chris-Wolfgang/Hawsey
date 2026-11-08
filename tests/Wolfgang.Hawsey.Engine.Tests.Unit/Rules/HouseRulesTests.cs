@@ -1,3 +1,4 @@
+using Wolfgang.Hawsey.Engine.Game;
 using Wolfgang.Hawsey.Engine.Rules;
 
 namespace Wolfgang.Hawsey.Engine.Tests.Unit.Rules;
@@ -39,7 +40,7 @@ public class HouseRulesTests
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    [InlineData(13)]
+    [InlineData(GameState.MaximumBid + 1)]
     public void MinimumBid_when_out_of_range_throws(int minimumBid)
     {
         var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new HouseRules { MinimumBid = minimumBid });
@@ -52,7 +53,7 @@ public class HouseRulesTests
 
     [Theory]
     [InlineData(1)]
-    [InlineData(12)]
+    [InlineData(GameState.MaximumBid)]
     public void MinimumBid_at_a_bound_is_accepted(int minimumBid)
     {
         Assert.Equal(minimumBid, new HouseRules { MinimumBid = minimumBid }.MinimumBid);
