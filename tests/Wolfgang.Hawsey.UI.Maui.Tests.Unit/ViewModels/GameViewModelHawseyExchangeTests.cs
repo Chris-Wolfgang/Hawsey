@@ -127,6 +127,27 @@ public class GameViewModelHawseyExchangeTests
 
 
 
+    [Theory]
+    [InlineData(3, 3, 7, "the picked card itself is dragged right")]
+    [InlineData(5, 5, 3, "the picked card itself is dragged left")]
+    [InlineData(5, 3, 8, "another card is dragged across it, left to right")]
+    [InlineData(5, 9, 3, "another card is dragged across it, right to left")]
+    [InlineData(4, 7, 9, "another card moves entirely to its right")]
+    public void MoveCard_when_a_card_is_dragged_during_the_exchange_keeps_the_pick_on_the_same_card(int picked, int from, int to, string scenario)
+    {
+        ReachTheExchange();
+        var expected = _vm.HumanCards[picked].Card;
+        Tap(picked);
+
+        _vm.MoveCard(from, to);
+
+        var stillPicked = Assert.Single(_vm.HumanCards, c => c.IsSelected);
+        Assert.True(stillPicked.Card == expected, scenario);
+        Assert.Equal("Selected: 1 / 2", _vm.ExchangeSelectionText);
+    }
+
+
+
     [Fact]
     public void A_new_game_during_the_exchange_closes_it_and_drops_the_picks()
     {
