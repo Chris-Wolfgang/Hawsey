@@ -12,10 +12,11 @@ Last full sync: template `e5e665a` (2026-09-26, Hawsey #24).
 
 | File | Difference | Why |
 |---|---|---|
-| `.github/workflows/pr.yaml` | InspectCode `timeout-minutes: 35` (template 20) | Set while the MAUI app (and its `dotnet workload restore`) was on `main`. The app now lives on `dev/maui`, so this can return to the template value. |
+| `.github/workflows/pr.yaml` | InspectCode `timeout-minutes: 35` (template 20) | The MAUI app's `dotnet workload restore` alone takes minutes (#844). |
+| `.github/workflows/pr.yaml` | Also runs on pushes to `dev/maui`, and its InspectCode SARIF upload is `main`-only | `dev/maui` was the MAUI app's development branch, and `main` was merged down into it without a PR (#1090). |
 | `.github/workflows/pr.yaml` | InspectCode retries when it can't connect to MSBuild | Seen twice on 2026-11-06. It isn't in the template yet. |
 | `.github/dependabot.yml` | pip ignores `semgrep`, `mcp` and `opentelemetry-*` | `semgrep.txt` uses overrides, which Dependabot can't apply. Update them with the uv command in that file's header. |
-| `.github/workflows/codeql.yaml` | `timeout-minutes: 45` (template 30) | Same history as the InspectCode timeout; can return to the template value. |
+| `.github/workflows/codeql.yaml` | `timeout-minutes: 45` (template 30) | Same MAUI workload restore (#844). |
 | `.github/workflows/release.yaml` | Builds and attaches a reproducible-build manifest | See [REPRODUCIBLE-BUILD.md](REPRODUCIBLE-BUILD.md) (#91). |
 | `.github/workflows/benchmarks.yaml`, `BannedSymbols.txt` | Template placeholders filled in | Project path and namespace are Hawsey's. |
 | `.config/dotnet-tools.json` | Adds `microsoft.coyote.cli` | Concurrency tests for the engine's `GameSession` (#843). |
@@ -28,8 +29,9 @@ Last full sync: template `e5e665a` (2026-09-26, Hawsey #24).
 ## Workflows only Hawsey has
 
 `aot-smoke.yaml`, `coyote.yaml`, `cross-platform-differential.yaml`, `fuzz.yaml`,
-`pr-benchmarks.yaml`, `release-apps.yaml` and `reproducible-build.yaml`. These cover engine- and
-app-specific checks and the Blazor app's deployment, which the template has no equivalent for.
+`maui-build.yaml`, `pr-benchmarks.yaml`, `release-apps.yaml` and `reproducible-build.yaml`. These
+cover engine- and app-specific checks, the MAUI app's platform builds, and the apps' releases,
+which the template has no equivalent for.
 
 ## Template files Hawsey doesn't have
 
