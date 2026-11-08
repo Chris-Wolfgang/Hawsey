@@ -305,7 +305,7 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
-    /// <summary>The winning bid next to the team, for example "· 7" or "· Hawsey (24)".</summary>
+    /// <summary>The winning bid next to the team, for example "· 7" or "· Hawsey (24)" (<see cref="BidText"/>).</summary>
     public string BidAmountText
     {
         get => _bidAmountText;
@@ -334,8 +334,8 @@ public partial class GameViewModel : INotifyPropertyChanged
 
     /// <summary>
     /// The number bids the human may make now, as command parameters: from the
-    /// minimum legal bid up to 11 (12 tricks is a Hawsey bid), or only the minimum
-    /// when the human is the stuck dealer.
+    /// minimum legal bid up to <see cref="GameState.MaximumBid"/> (all twelve tricks is
+    /// the Hawsey bid), or only the minimum when the human is the stuck dealer.
     /// </summary>
     public ObservableCollection<string> BidOptions { get; } = new();
 
@@ -390,6 +390,11 @@ public partial class GameViewModel : INotifyPropertyChanged
     /// best. It can run only when exactly two cards are picked.
     /// </summary>
     public ICommand ConfirmHawseyExchangeCommand => _confirmHawseyExchangeCommand;
+
+
+
+    /// <summary>The Hawsey button's text, with the points from the engine (<see cref="BidText.Hawsey"/>).</summary>
+    public string HawseyBidText => BidText.Hawsey;
 
 
 
@@ -770,8 +775,7 @@ public partial class GameViewModel : INotifyPropertyChanged
         }
 
         TrumpSetterTeam = result.Winner.GetTeam() == Team.NorthSouth ? "US" : "THEM";
-        var bid = result.IsHawsey ? "Hawsey (24)" : result.BidAmount.ToString(CultureInfo.InvariantCulture);
-        BidAmountText = $"· {bid}";
+        BidAmountText = $"· {BidText.For(result.IsHawsey, result.BidAmount)}";
     }
 
 
@@ -822,15 +826,13 @@ public partial class GameViewModel : INotifyPropertyChanged
 
     /// <summary>
     /// The bid panel's prompt and buttons, from the engine's bidding progress. Same
-    /// rules and words as the Blazor UI: the minimum legal bid up to 11; the stuck dealer
+    /// rules and words as the Blazor UI: the minimum legal bid up to the engine's maximum; the stuck dealer
     /// may only bid the minimum or call Hawsey.
     /// </summary>
     private void UpdateBidChoices(GameState state)
     {
-        const int HighestNumberBid = 11;
-
         var stuck = state.IsNextBidderStuck;
-        var highest = stuck ? state.MinimumLegalBid : HighestNumberBid;
+        var highest = stuck ? state.MinimumLegalBid : GameState.MaximumBid;
 
         BidOptions.Clear();
 

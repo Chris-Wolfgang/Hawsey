@@ -326,7 +326,8 @@ public class GameViewModelTests
         _vm.SelectTrumpCommand.Execute("hearts");
 
         Assert.Equal("Hawsey! Pick 2 cards to discard.", _vm.StatusMessage);
-        Assert.Equal("· Hawsey (24)", _vm.BidAmountText);
+        Assert.Equal($"· Hawsey ({GameState.HawseyBidAmount})", _vm.BidAmountText);
+        Assert.Equal($"Hawsey ({GameState.HawseyBidAmount})", _vm.HawseyBidText);
         Assert.Equal(GamePhase.HawseyExchange, _session.CurrentState!.Phase);
     }
 

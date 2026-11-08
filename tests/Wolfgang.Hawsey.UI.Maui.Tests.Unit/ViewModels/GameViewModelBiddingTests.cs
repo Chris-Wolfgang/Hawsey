@@ -10,7 +10,7 @@ namespace Wolfgang.Hawsey.UI.Maui.Tests.Unit.ViewModels;
 
 /// <summary>
 /// The bid overlay: the prompt (who holds the high bid), the bid buttons (the minimum
-/// legal bid up to 11, or only the minimum for the stuck dealer), and whether Pass is
+/// legal bid up to the engine's maximum, or only the minimum for the stuck dealer), and whether Pass is
 /// offered. All read from the engine's bidding progress.
 /// </summary>
 public class GameViewModelBiddingTests
@@ -21,6 +21,15 @@ public class GameViewModelBiddingTests
         public override BidAction DecideBid(GameState state, PlayerPosition player) =>
             player == seat && amount > state.HighBid ? new BidAction.NumberBid(amount) : BidAction.PassBid.Instance;
     }
+
+
+
+    /// <summary>The bids from <paramref name="lowest"/> up to the engine's maximum, as the panel lists them.</summary>
+    private static string[] BidsFrom(int lowest) =>
+        Enumerable
+            .Range(lowest, GameState.MaximumBid - lowest + 1)
+            .Select(n => n.ToString(System.Globalization.CultureInfo.InvariantCulture))
+            .ToArray();
 
 
 
@@ -65,14 +74,14 @@ public class GameViewModelBiddingTests
 
 
     [Fact]
-    public void BidOptions_when_nobody_has_bid_runs_from_the_minimum_to_eleven()
+    public void BidOptions_when_nobody_has_bid_runs_from_the_minimum_to_the_engines_maximum()
     {
         var (vm, _) = Table();
 
         vm.NewGameCommand.Execute(null);
 
         Assert.Equal("No bids yet. Minimum: 6", vm.BidPrompt);
-        Assert.Equal(["6", "7", "8", "9", "10", "11"], vm.BidOptions);
+        Assert.Equal(BidsFrom(6), vm.BidOptions);
         Assert.True(vm.CanPass);
     }
 
@@ -86,7 +95,7 @@ public class GameViewModelBiddingTests
         vm.NewGameCommand.Execute(null);
 
         Assert.Equal("Current high bid: 8 by East (opponents)", vm.BidPrompt);
-        Assert.Equal(["9", "10", "11"], vm.BidOptions);
+        Assert.Equal(BidsFrom(9), vm.BidOptions);
         Assert.True(vm.CanPass);
     }
 
@@ -117,7 +126,7 @@ public class GameViewModelBiddingTests
         PlayUntilHumanBidsWith(vm, session, PlayerPosition.South);
 
         Assert.Equal("Current high bid: 7 by your partner", vm.BidPrompt);
-        Assert.Equal(["8", "9", "10", "11"], vm.BidOptions);
+        Assert.Equal(BidsFrom(8), vm.BidOptions);
     }
 
 
