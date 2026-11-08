@@ -1,3 +1,4 @@
+using System.Collections.Specialized;
 using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Game;
 using Wolfgang.Hawsey.Engine.Players;
@@ -578,6 +579,30 @@ public class GameViewModelTests
         _vm.MoveCard(0, 1);
 
         Assert.Empty(_vm.HumanCards);
+    }
+
+
+
+    [Fact]
+    public void PlayCardCommand_when_the_AI_answers_rebuilds_the_hand_once_and_otherwise_replaces_only_changed_cards()
+    {
+        _vm.NewGameCommand.Execute(null);
+        _vm.PlaceBidCommand.Execute("pass");
+        var changes = new List<NotifyCollectionChangedAction>();
+        _vm.HumanCards.CollectionChanged += (_, e) => changes.Add(e.Action);
+
+        // The human's card leaves the hand (one rebuild); then the AI's moves change
+        // nothing in it, until the human's next turn makes some cards legal again.
+        PlayFirstLegalCard();
+
+        Assert.Equal(1, changes.Count(a => a == NotifyCollectionChangedAction.Reset));
+        Assert.All
+        (
+            changes.Where(a => a != NotifyCollectionChangedAction.Reset),
+            a => Assert.True(a is NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Replace, a.ToString())
+        );
+        Assert.True(changes.Count(a => a == NotifyCollectionChangedAction.Replace) <= _vm.HumanCards.Count);
+        Assert.Equal(11, _vm.HumanCards.Count);
     }
 
 

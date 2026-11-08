@@ -867,25 +867,50 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
+    /// <summary>
+    /// Brings <see cref="HumanCards"/> up to date. It runs on every state change, most of
+    /// which (the AI's moves) leave the hand as it is, so only the cards that changed are
+    /// replaced, and the hand is rebuilt only when its size changes; otherwise the bound
+    /// layout would redraw every card on every move.
+    /// </summary>
     private void UpdateHumanHand(GameState state)
     {
         var humanPlays = state.Phase == GamePhase.TrickPlay && state.NextToAct == GameSession.HumanPosition;
         var legalPlays = humanPlays ? state.GetLegalPlays() : Array.Empty<Card>();
         var hand = SyncHandOrder(state.Hands[GameSession.HumanPosition]);
-
-        HumanCards.Clear();
+        var cards = new List<CardViewModel>(hand.Count);
 
         for (var i = 0; i < hand.Count; i++)
         {
             var card = hand[i];
 
             // In the exchange every card may be picked as a discard.
-            HumanCards.Add
+            cards.Add
             (
                 IsHawseyExchangeVisible
                     ? new CardViewModel(card, isLegal: false, isSelected: _discardIndexes.Contains(i), isInteractive: true)
                     : new CardViewModel(card, legalPlays.Contains(card))
             );
+        }
+
+        if (cards.Count != HumanCards.Count)
+        {
+            HumanCards.Clear();
+
+            foreach (var card in cards)
+            {
+                HumanCards.Add(card);
+            }
+
+            return;
+        }
+
+        for (var i = 0; i < cards.Count; i++)
+        {
+            if (!cards[i].ShowsTheSameAs(HumanCards[i]))
+            {
+                HumanCards[i] = cards[i];
+            }
         }
     }
 

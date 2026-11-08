@@ -57,4 +57,20 @@ public class CardViewModel
     public string RankText { get; }
     public string SuitSymbol { get; }
     public Color SuitColor { get; }
+
+
+
+    /// <summary>
+    /// Whether <paramref name="other"/> shows the same: the same card, equally legal,
+    /// picked and interactive (the text and colour follow from the card).
+    /// </summary>
+    public bool ShowsTheSameAs(CardViewModel other)
+    {
+        ArgumentNullException.ThrowIfNull(other);
+
+        return Card == other.Card
+            && IsLegal == other.IsLegal
+            && IsSelected == other.IsSelected
+            && IsInteractive == other.IsInteractive;
+    }
 }

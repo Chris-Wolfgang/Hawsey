@@ -45,4 +45,38 @@ public class CardViewModelTests
         Assert.Equal(card, hand.Card);
         Assert.True(hand.IsLegal);
     }
+
+
+
+    [Fact]
+    public void ShowsTheSameAs_when_card_and_flags_match_is_true()
+    {
+        var card = new Card(Rank.Ace, Suit.Spades);
+
+        Assert.True(new CardViewModel(card, isLegal: true).ShowsTheSameAs(new CardViewModel(card, isLegal: true)));
+    }
+
+
+
+    [Fact]
+    public void ShowsTheSameAs_when_the_card_or_any_flag_differs_is_false()
+    {
+        var card = new Card(Rank.Ace, Suit.Spades);
+        var shown = new CardViewModel(card, isLegal: false, isSelected: false, isInteractive: false);
+
+        Assert.False(shown.ShowsTheSameAs(new CardViewModel(new Card(Rank.King, Suit.Spades), isLegal: false, isSelected: false, isInteractive: false)));
+        Assert.False(shown.ShowsTheSameAs(new CardViewModel(card, isLegal: true, isSelected: false, isInteractive: false)));
+        Assert.False(shown.ShowsTheSameAs(new CardViewModel(card, isLegal: false, isSelected: true, isInteractive: false)));
+        Assert.False(shown.ShowsTheSameAs(new CardViewModel(card, isLegal: false, isSelected: false, isInteractive: true)));
+    }
+
+
+
+    [Fact]
+    public void ShowsTheSameAs_when_other_is_null_throws()
+    {
+        var shown = new CardViewModel(new Card(Rank.Ace, Suit.Spades), isLegal: false);
+
+        Assert.Equal("other", Assert.Throws<ArgumentNullException>(() => shown.ShowsTheSameAs(null!)).ParamName);
+    }
 }
