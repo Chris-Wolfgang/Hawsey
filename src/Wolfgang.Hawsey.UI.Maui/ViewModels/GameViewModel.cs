@@ -745,7 +745,7 @@ public partial class GameViewModel : INotifyPropertyChanged
         // Until trump is named the engine's TrumpSuit is empty, as it is in ace high.
         var trump = state.Phase is GamePhase.Bidding or GamePhase.TrumpSelection ? null : state.TrumpSuit;
         HasTrumpSuit = trump.HasValue;
-        TrumpSymbol = trump.HasValue ? SuitSymbol(trump.Value) : NoCard;
+        TrumpSymbol = trump.HasValue ? CardText.Suit(trump.Value) : NoCard;
         IsTrumpRed = trump is Suit.Hearts or Suit.Diamonds;
 
         var result = state.BiddingResult;
@@ -783,7 +783,7 @@ public partial class GameViewModel : INotifyPropertyChanged
         LedByText = table.Count == 0 ? "" : $"Led by {LeaderName(table[0].Player)}";
 
         var winning = _gameService.TableWinningCard;
-        WinningCardText = winning is { } card ? $"{RankText(card.Rank)} {SuitSymbol(card.Suit)}" : NoCard;
+        WinningCardText = winning is { } card ? $"{CardText.Rank(card.Rank)} {CardText.Suit(card.Suit)}" : NoCard;
     }
 
 
@@ -953,19 +953,9 @@ public partial class GameViewModel : INotifyPropertyChanged
     // Spades, hearts, clubs, diamonds (alternating colours), high rank first.
     private static int CompareForDisplay(Card a, Card b)
     {
-        var bySuit = SuitDisplayOrder(a.Suit).CompareTo(SuitDisplayOrder(b.Suit));
+        var bySuit = CardText.DisplayOrder(a.Suit).CompareTo(CardText.DisplayOrder(b.Suit));
         return bySuit != 0 ? bySuit : ((int)b.Rank).CompareTo((int)a.Rank);
     }
-
-
-
-    private static int SuitDisplayOrder(Suit suit) => suit switch
-    {
-        Suit.Spades => 0,
-        Suit.Hearts => 1,
-        Suit.Clubs => 2,
-        _ => 3,
-    };
 
 
 
@@ -1001,28 +991,6 @@ public partial class GameViewModel : INotifyPropertyChanged
             GameLog.Add(entry);
         }
     }
-
-
-
-    private static string SuitSymbol(Suit suit) => suit switch
-    {
-        Suit.Hearts => "♥",
-        Suit.Diamonds => "♦",
-        Suit.Clubs => "♣",
-        _ => "♠",
-    };
-
-
-
-    private static string RankText(Rank rank) => rank switch
-    {
-        Rank.Nine => "9",
-        Rank.Ten => "10",
-        Rank.Jack => "J",
-        Rank.Queen => "Q",
-        Rank.King => "K",
-        _ => "A",
-    };
 
 
 
