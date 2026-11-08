@@ -419,6 +419,28 @@ public class GameViewModelTests
 
 
     [Fact]
+    public void NewGameCommand_when_clicked_during_an_AI_pause_shows_only_the_new_games_turn()
+    {
+        // The first New Game's AI loop is paused when the second starts; the session tells
+        // it to stand down (WaitingFor.Nothing), and only the second game's turn shows.
+        var session = TestGameSessions.Paced();
+        var vm = new GameViewModel(session, new ImmediateDispatcher());
+
+        vm.NewGameCommand.Execute(null);
+        vm.NewGameCommand.Execute(null);
+
+        Assert.True
+        (
+            SpinWait.SpinUntil(() => string.Equals(vm.StatusMessage, "Your turn to bid.", StringComparison.Ordinal), TimeSpan.FromSeconds(30)),
+            vm.StatusMessage
+        );
+        Assert.True(vm.IsBiddingVisible);
+        Assert.Equal(GamePhase.Bidding, session.CurrentState!.Phase);
+    }
+
+
+
+    [Fact]
     public void NextRoundCommand_when_the_round_is_not_over_is_ignored()
     {
         _vm.NewGameCommand.Execute(null);
