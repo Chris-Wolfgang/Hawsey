@@ -10,7 +10,7 @@ namespace Wolfgang.Hawsey.UI.Maui.Tests.Unit.ViewModels;
 
 /// <summary>
 /// The bid overlay: the prompt (who holds the high bid), the bid buttons (the minimum
-/// legal bid up to 11, or only the minimum for the stuck dealer), and whether Pass is
+/// legal bid up to the engine's maximum, or only the minimum for the stuck dealer), and whether Pass is
 /// offered. All read from the engine's bidding progress.
 /// </summary>
 public class GameViewModelBiddingTests
@@ -21,6 +21,15 @@ public class GameViewModelBiddingTests
         public override BidAction DecideBid(GameState state, PlayerPosition player) =>
             player == seat && amount > state.HighBid ? new BidAction.NumberBid(amount) : BidAction.PassBid.Instance;
     }
+
+
+
+    /// <summary>The bids from <paramref name="lowest"/> up to the engine's maximum, as the panel lists them.</summary>
+    private static string[] BidsFrom(int lowest) =>
+        Enumerable
+            .Range(lowest, GameState.MaximumBid - lowest + 1)
+            .Select(n => n.ToString(System.Globalization.CultureInfo.InvariantCulture))
+            .ToArray();
 
 
 
@@ -65,35 +74,35 @@ public class GameViewModelBiddingTests
 
 
     [Fact]
-    public void Before_any_bid_the_overlay_offers_the_minimum_up_to_eleven()
+    public void BidOptions_when_nobody_has_bid_runs_from_the_minimum_to_the_engines_maximum()
     {
         var (vm, _) = Table();
 
         vm.NewGameCommand.Execute(null);
 
         Assert.Equal("No bids yet. Minimum: 6", vm.BidPrompt);
-        Assert.Equal(["6", "7", "8", "9", "10", "11"], vm.BidOptions);
+        Assert.Equal(BidsFrom(6), vm.BidOptions);
         Assert.True(vm.CanPass);
     }
 
 
 
     [Fact]
-    public void After_an_opponent_bids_the_overlay_names_them_and_offers_only_higher_bids()
+    public void BidPrompt_when_an_opponent_has_bid_names_them_and_offers_only_higher_bids()
     {
         var (vm, _) = Table(new SeatBids(PlayerPosition.East, 8));
 
         vm.NewGameCommand.Execute(null);
 
         Assert.Equal("Current high bid: 8 by East (opponents)", vm.BidPrompt);
-        Assert.Equal(["9", "10", "11"], vm.BidOptions);
+        Assert.Equal(BidsFrom(9), vm.BidOptions);
         Assert.True(vm.CanPass);
     }
 
 
 
     [Fact]
-    public void A_bid_that_does_not_beat_the_high_bid_is_ignored()
+    public void PlaceBidCommand_when_the_bid_does_not_beat_the_high_bid_is_ignored()
     {
         var (vm, session) = Table(new SeatBids(PlayerPosition.East, 8));
         vm.NewGameCommand.Execute(null);
@@ -108,7 +117,7 @@ public class GameViewModelBiddingTests
 
 
     [Fact]
-    public void A_partners_bid_is_shown_as_the_partners()
+    public void BidPrompt_when_the_partner_has_bid_names_the_partner()
     {
         // In the third deal South deals, so North bids before the human.
         var (vm, session) = Table(new SeatBids(PlayerPosition.North, 7));
@@ -117,13 +126,13 @@ public class GameViewModelBiddingTests
         PlayUntilHumanBidsWith(vm, session, PlayerPosition.South);
 
         Assert.Equal("Current high bid: 7 by your partner", vm.BidPrompt);
-        Assert.Equal(["8", "9", "10", "11"], vm.BidOptions);
+        Assert.Equal(BidsFrom(8), vm.BidOptions);
     }
 
 
 
     [Fact]
-    public void The_stuck_dealer_may_only_bid_the_minimum_or_call_Hawsey()
+    public void BidOptions_when_the_human_is_the_stuck_dealer_offers_only_the_minimum_or_Hawsey()
     {
         var (vm, session) = Table();
         vm.NewGameCommand.Execute(null);

@@ -26,6 +26,31 @@ internal sealed class ImmediateDispatcher : IUiDispatcher
 
 
 /// <summary>
+/// Keeps dispatched work instead of running it, as a busy UI thread would: the view model
+/// does not see a state change until <see cref="RunAll"/>.
+/// </summary>
+internal sealed class DeferredDispatcher : IUiDispatcher
+{
+    private readonly Queue<Action> _work = new();
+
+
+
+    public void Post(Action action) => _work.Enqueue(action);
+
+
+
+    public void RunAll()
+    {
+        while (_work.Count > 0)
+        {
+            _work.Dequeue()();
+        }
+    }
+}
+
+
+
+/// <summary>
 /// A <see cref="GameSession"/> with no pauses between AI moves and a seeded deal, so
 /// a command runs the game forward synchronously and repeatably. The AI seats default
 /// to <see cref="PassingAi"/>, so the human's bid decides each scenario; pass
@@ -35,6 +60,12 @@ internal static class TestGameSessions
 {
     public static GameSession Unpaced(int seed = 42, IPlayerStrategy? ai = null) =>
         new(aiPacing: false, randomFactory: () => new Random(seed), aiStrategy: ai ?? new PassingAi());
+
+
+
+    /// <summary>Paced like the app (real pauses between AI moves), for New Game during a pause.</summary>
+    public static GameSession Paced(int seed = 42, IPlayerStrategy? ai = null) =>
+        new(aiPacing: true, randomFactory: () => new Random(seed), aiStrategy: ai ?? new PassingAi());
 }
 
 

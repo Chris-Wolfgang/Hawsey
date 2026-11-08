@@ -252,9 +252,10 @@ public sealed class GameState
 
 
     /// <summary>
-    /// The highest number bid: all twelve tricks.
+    /// The highest number bid: eleven tricks. Bidding all twelve is the Hawsey bid
+    /// (<see cref="HawseyBidAmount"/>), not a number bid.
     /// </summary>
-    public const int MaximumBid = 12;
+    public const int MaximumBid = 11;
 
 
 

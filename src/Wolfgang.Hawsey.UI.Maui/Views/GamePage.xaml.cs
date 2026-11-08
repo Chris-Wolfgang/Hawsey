@@ -19,9 +19,13 @@ public partial class GamePage
         _viewModel = viewModel;
         BindingContext = viewModel;
         TableHost.SizeChanged += (_, _) => OnHostSizeChanged();
-        _viewModel.PropertyChanged += (_, e) =>
+
+        // The table shows exactly when the layout is not compact (its IsVisible is bound to
+        // IsTableLayout), so the page follows a layout change from its own element rather
+        // than subscribing to the view model, which outlives it (MauiProgram).
+        Table.PropertyChanged += (_, e) =>
         {
-            if (string.Equals(e.PropertyName, nameof(GameViewModel.IsCompactLayout), StringComparison.Ordinal))
+            if (string.Equals(e.PropertyName, nameof(IsVisible), StringComparison.Ordinal))
             {
                 PlacePanels();
             }
