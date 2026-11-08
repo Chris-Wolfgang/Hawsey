@@ -422,7 +422,7 @@ public partial class GameViewModel : INotifyPropertyChanged
     /// Moves a card in the shown hand, as dragging it does: the card at
     /// <paramref name="from"/> goes before the card now at <paramref name="to"/>. It
     /// changes only the order the human sees, never the game. Any picked Hawsey
-    /// discards are dropped, since they are positions in the old order.
+    /// discards stay on the same cards: their positions move with the hand.
     /// </summary>
     public void MoveCard(int from, int to)
     {
@@ -434,10 +434,40 @@ public partial class GameViewModel : INotifyPropertyChanged
         }
 
         var card = _handOrder[from];
+        var insertAt = to > from ? to - 1 : to;
         _handOrder.RemoveAt(from);
-        _handOrder.Insert(to > from ? to - 1 : to, card);
-        _discardIndexes.Clear();
+        _handOrder.Insert(insertAt, card);
+
+        for (var i = 0; i < _discardIndexes.Count; i++)
+        {
+            _discardIndexes[i] = IndexAfterMove(_discardIndexes[i], from, insertAt);
+        }
+
         UpdateFromState();
+    }
+
+
+
+    // Where the card at index ends up when the card at from moves to to (as the Blazor
+    // page's IndexAfterMove does).
+    private static int IndexAfterMove(int index, int from, int to)
+    {
+        if (index == from)
+        {
+            return to;
+        }
+
+        if (from < index && index <= to)
+        {
+            return index - 1;
+        }
+
+        if (to <= index && index < from)
+        {
+            return index + 1;
+        }
+
+        return index;
     }
 
 
