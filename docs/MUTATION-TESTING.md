@@ -22,6 +22,7 @@ dotnet tool restore && dotnet stryker
 | 2026-09-28 | 91.54% | 88 | After #884–#897 and #907 (stateless bidding, unused types removed, the #897 killing tests); four more gaps killed (#875) |
 | 2026-10-18 | 91.76% | 88 | Weekly run on `main` (ecf84fa); one more gap killed, one new equivalent (#875) |
 | 2026-11-05 | 91.78% | 88 | Run on `main` (7a35852); one more gap killed (#875) |
+| 2026-11-06 | 91.94% | 90 | The floor rises, after scores of 91.5% or better since 2026-09-28 |
 
 ## Triage of the surviving mutants (2026-09-25)
 

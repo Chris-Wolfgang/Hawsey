@@ -34,6 +34,14 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
+    # semgrep.txt is compiled with semgrep-overrides.txt, which lifts these past the
+    # pins in semgrep's own metadata. Dependabot can't apply overrides, so updating them
+    # fails with dependency_file_not_resolvable. Update them by running the uv command
+    # in semgrep.txt's header.
+    ignore:
+      - dependency-name: "semgrep"
+      - dependency-name: "mcp"
+      - dependency-name: "opentelemetry-*"
     labels:
       - "dependencies"
     groups:

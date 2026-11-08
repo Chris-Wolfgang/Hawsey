@@ -14,6 +14,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/Wolfgang.Hawsey.Engine.Tests.Unit/Wolfgang.Hawsey.Engine.Tests.Unit.csproj" />
     <Project Path="tests/Wolfgang.Hawsey.UI.Maui.Tests.Unit/Wolfgang.Hawsey.UI.Maui.Tests.Unit.csproj" />
+    <Project Path="tests/Wolfgang.Hawsey.UI.Shared.Tests.Unit/Wolfgang.Hawsey.UI.Shared.Tests.Unit.csproj" />
     <Project Path="tests/Wolfgang.Hawsey.Engine.Tests.Concurrency/Wolfgang.Hawsey.Engine.Tests.Concurrency.csproj" />
   </Folder>
 </Solution>
