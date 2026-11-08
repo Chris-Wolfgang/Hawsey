@@ -1,6 +1,3 @@
-#pragma warning disable AsyncFixer01
-#pragma warning disable AsyncFixer03
-#pragma warning disable VSTHRD101
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
@@ -469,7 +466,7 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
-    private async Task StartNewGameAsync()
+    private Task StartNewGameAsync()
     {
         IsBiddingVisible = false;
         IsTrumpPickerVisible = false;
@@ -477,7 +474,7 @@ public partial class GameViewModel : INotifyPropertyChanged
         _handOrder = null;
         _discardIndexes.Clear();
         _gameService.StartNewGame();
-        await AdvanceGameAsync().ConfigureAwait(true);
+        return AdvanceGameAsync();
     }
 
 
