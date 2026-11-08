@@ -631,10 +631,10 @@ public class GameViewModelTests
         var changed = new List<string?>();
         _vm.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
 
-        _vm.StatusMessage = "x";
-        _vm.StatusMessage = "x";
-        _vm.IsBiddingVisible = false;
+        // The log opens (a change); the page's size leaves the layout as it was (none).
+        _vm.ToggleLogCommand.Execute(null);
+        _vm.SetPageSize(0, 0);
 
-        Assert.Equal([nameof(GameViewModel.StatusMessage)], changed);
+        Assert.Equal([nameof(GameViewModel.IsLogVisible)], changed);
     }
 }
