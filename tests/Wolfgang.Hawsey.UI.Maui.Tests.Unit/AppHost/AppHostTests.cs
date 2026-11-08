@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui.Controls;
 using Wolfgang.Hawsey.Engine.Game;
@@ -60,4 +61,49 @@ public class AppHostTests
         Assert.IsType<GameViewModel>(page.BindingContext);
         Assert.Same(app.Services.GetRequiredService<GameSession>(), app.Services.GetRequiredService<GameSession>());
     }
+
+
+
+    [Fact]
+    public void CreateMauiApp_when_a_page_is_created_again_gives_it_the_same_view_model()
+    {
+        // The page's XAML reads the app's resources, and its bindings need a dispatcher.
+        NoDispatchNeeded.Install();
+        Application.Current = new App();
+
+        using var app = MauiProgram.CreateMauiApp();
+
+        var first = app.Services.GetRequiredService<GamePage>();
+        var second = app.Services.GetRequiredService<GamePage>();
+
+        Assert.NotSame(first, second);
+        Assert.Same(first.BindingContext, second.BindingContext);
+        Assert.Same(app.Services.GetRequiredService<GameViewModel>(), first.BindingContext);
+    }
+
+
+
+    [Fact]
+    public void GamePage_when_no_longer_referenced_is_not_kept_alive_by_the_view_model()
+    {
+        // The page's XAML reads the app's resources, and its bindings need a dispatcher.
+        NoDispatchNeeded.Install();
+        Application.Current = new App();
+
+        var vm = new GameViewModel(TestGameSessions.Unpaced(), new ImmediateDispatcher());
+        var page = CreateAndDropPage(vm);
+
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
+
+        Assert.False(page.IsAlive);
+        GC.KeepAlive(vm);
+    }
+
+
+
+    // A separate method, so no local in the test keeps the page reachable.
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static WeakReference CreateAndDropPage(GameViewModel vm) => new(new GamePage(vm));
 }
