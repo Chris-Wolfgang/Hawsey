@@ -81,9 +81,12 @@ public sealed class IndexTests : BunitContext
     /// </summary>
     private static void PlayUntil(IRenderedComponent<IndexPage> page, string stopButton)
     {
-        for (var step = 0; !HasButton(page, stopButton); step++)
+        var steps = 0;
+
+        while (!HasButton(page, stopButton))
         {
-            Assert.True(step < 10_000, "The game never reached the button " + stopButton);
+            steps++;
+            Assert.True(steps <= 10_000, "The game never reached the button " + stopButton);
 
             var playable = page.FindAll(".hand .card.playable");
 
