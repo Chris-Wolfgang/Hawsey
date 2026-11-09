@@ -77,6 +77,8 @@ Trigger: published GitHub Release
 
 - [ ] All PRs for the release are merged to `main`, and `pr.yaml` is green on `main`
 - [ ] The `<Version>` in `src/Wolfgang.Hawsey.Engine/Wolfgang.Hawsey.Engine.csproj` is the version you will tag
+- [ ] For the first release of a calendar year, the `<Copyright>` year range in `Directory.Build.props` ends in that year
+  (for example `Copyright (c) 2026-2027 Chris Wolfgang`). It is a literal so that a later rebuild of the tag reproduces it.
 - [ ] `CHANGELOG.md` has the new version section, assembled from the fragments in `changelog/unreleased/` (`pwsh ./scripts/changelog.ps1 assemble`)
 - [ ] Local build succeeds: `dotnet build --configuration Release`
 - [ ] Local tests pass: `dotnet test --configuration Release`

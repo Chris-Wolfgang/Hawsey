@@ -150,6 +150,7 @@ public class GameEngineBiddingTests
 
     [Theory]
     [InlineData(5)]
+    [InlineData(12)] // all twelve tricks is the Hawsey bid, not a number bid
     [InlineData(13)]
     public void A_number_bid_outside_the_minimum_to_the_maximum_throws(int amount)
     {

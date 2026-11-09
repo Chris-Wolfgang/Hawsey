@@ -1,6 +1,3 @@
-#pragma warning disable AsyncFixer01
-#pragma warning disable AsyncFixer03
-#pragma warning disable VSTHRD101
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
@@ -131,26 +128,29 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
+    /// <summary>The status line: what the game is waiting for, or what went wrong.</summary>
     public string StatusMessage
     {
         get => _statusMessage;
-        set => SetProperty(ref _statusMessage, value);
+        private set => SetProperty(ref _statusMessage, value);
     }
 
 
 
+    /// <summary>Whether the bid panel is open: it is the human's turn to bid.</summary>
     public bool IsBiddingVisible
     {
         get => _isBiddingVisible;
-        set => SetProperty(ref _isBiddingVisible, value);
+        private set => SetProperty(ref _isBiddingVisible, value);
     }
 
 
 
+    /// <summary>Whether the trump picker is open: the human won the bid and names trump.</summary>
     public bool IsTrumpPickerVisible
     {
         get => _isTrumpPickerVisible;
-        set => SetProperty(ref _isTrumpPickerVisible, value);
+        private set => SetProperty(ref _isTrumpPickerVisible, value);
     }
 
 
@@ -159,7 +159,7 @@ public partial class GameViewModel : INotifyPropertyChanged
     public bool IsLogVisible
     {
         get => _isLogVisible;
-        set => SetProperty(ref _isLogVisible, value);
+        private set => SetProperty(ref _isLogVisible, value);
     }
 
 
@@ -182,6 +182,7 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
+    /// <summary>Whether the round summary is showing (<see cref="RoundSummary"/> is set).</summary>
     public bool IsRoundSummaryVisible => _roundSummary != null;
 
 
@@ -214,7 +215,7 @@ public partial class GameViewModel : INotifyPropertyChanged
     public int NorthSouthScore
     {
         get => _northSouthScore;
-        set => SetProperty(ref _northSouthScore, value);
+        private set => SetProperty(ref _northSouthScore, value);
     }
 
 
@@ -223,7 +224,7 @@ public partial class GameViewModel : INotifyPropertyChanged
     public int EastWestScore
     {
         get => _eastWestScore;
-        set => SetProperty(ref _eastWestScore, value);
+        private set => SetProperty(ref _eastWestScore, value);
     }
 
 
@@ -255,6 +256,7 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
+    /// <summary>Whether trump is a red suit (hearts or diamonds).</summary>
     public bool IsTrumpRed
     {
         get => _isTrumpRed;
@@ -298,11 +300,12 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
+    /// <summary>Whether the human's team won the bid (it shows in their colour).</summary>
     public bool IsTrumpSetterUs => string.Equals(_trumpSetterTeam, "US", StringComparison.Ordinal);
 
 
 
-    /// <summary>The winning bid next to the team, for example "· 7" or "· Hawsey (24)".</summary>
+    /// <summary>The winning bid next to the team, for example "· 7" or "· Hawsey (24)" (<see cref="BidText"/>).</summary>
     public string BidAmountText
     {
         get => _bidAmountText;
@@ -331,8 +334,8 @@ public partial class GameViewModel : INotifyPropertyChanged
 
     /// <summary>
     /// The number bids the human may make now, as command parameters: from the
-    /// minimum legal bid up to 11 (12 tricks is a Hawsey bid), or only the minimum
-    /// when the human is the stuck dealer.
+    /// minimum legal bid up to <see cref="GameState.MaximumBid"/> (all twelve tricks is
+    /// the Hawsey bid), or only the minimum when the human is the stuck dealer.
     /// </summary>
     public ObservableCollection<string> BidOptions { get; } = new();
 
@@ -345,7 +348,7 @@ public partial class GameViewModel : INotifyPropertyChanged
     public string BidPrompt
     {
         get => _bidPrompt;
-        set => SetProperty(ref _bidPrompt, value);
+        private set => SetProperty(ref _bidPrompt, value);
     }
 
 
@@ -356,7 +359,7 @@ public partial class GameViewModel : INotifyPropertyChanged
     public bool CanPass
     {
         get => _canPass;
-        set => SetProperty(ref _canPass, value);
+        private set => SetProperty(ref _canPass, value);
     }
 
 
@@ -368,7 +371,7 @@ public partial class GameViewModel : INotifyPropertyChanged
     public bool IsHawseyExchangeVisible
     {
         get => _isHawseyExchangeVisible;
-        set => SetProperty(ref _isHawseyExchangeVisible, value);
+        private set => SetProperty(ref _isHawseyExchangeVisible, value);
     }
 
 
@@ -377,7 +380,7 @@ public partial class GameViewModel : INotifyPropertyChanged
     public string ExchangeSelectionText
     {
         get => _exchangeSelectionText;
-        set => SetProperty(ref _exchangeSelectionText, value);
+        private set => SetProperty(ref _exchangeSelectionText, value);
     }
 
 
@@ -390,11 +393,22 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
+    /// <summary>The Hawsey button's text, with the points from the engine (<see cref="BidText.Hawsey"/>).</summary>
+    public string HawseyBidText => BidText.Hawsey;
+
+
+
+    /// <summary>Deals a new game and plays the AI seats up to the human's first move.</summary>
     public ICommand NewGameCommand { get; }
+    /// <summary>Deals the next round once a round has been scored.</summary>
     public ICommand NextRoundCommand { get; }
+    /// <summary>Places the human's bid: a number, <c>"pass"</c> or <c>"hawsey"</c>.</summary>
     public ICommand PlaceBidCommand { get; }
+    /// <summary>Names trump: <c>"hearts"</c>, <c>"diamonds"</c>, <c>"clubs"</c>, <c>"spades"</c>, or anything else for ace high.</summary>
     public ICommand SelectTrumpCommand { get; }
+    /// <summary>Plays the tapped card, or in the Hawsey exchange picks or unpicks it as a discard.</summary>
     public ICommand PlayCardCommand { get; }
+    /// <summary>Opens or closes the game log.</summary>
     public ICommand ToggleLogCommand { get; }
 
 
@@ -425,7 +439,7 @@ public partial class GameViewModel : INotifyPropertyChanged
     /// Moves a card in the shown hand, as dragging it does: the card at
     /// <paramref name="from"/> goes before the card now at <paramref name="to"/>. It
     /// changes only the order the human sees, never the game. Any picked Hawsey
-    /// discards are dropped, since they are positions in the old order.
+    /// discards stay on the same cards: their positions move with the hand.
     /// </summary>
     public void MoveCard(int from, int to)
     {
@@ -437,10 +451,40 @@ public partial class GameViewModel : INotifyPropertyChanged
         }
 
         var card = _handOrder[from];
+        var insertAt = to > from ? to - 1 : to;
         _handOrder.RemoveAt(from);
-        _handOrder.Insert(to > from ? to - 1 : to, card);
-        _discardIndexes.Clear();
+        _handOrder.Insert(insertAt, card);
+
+        for (var i = 0; i < _discardIndexes.Count; i++)
+        {
+            _discardIndexes[i] = IndexAfterMove(_discardIndexes[i], from, insertAt);
+        }
+
         UpdateFromState();
+    }
+
+
+
+    // Where the card at index ends up when the card at from moves to to (as the Blazor
+    // page's IndexAfterMove does).
+    private static int IndexAfterMove(int index, int from, int to)
+    {
+        if (index == from)
+        {
+            return to;
+        }
+
+        if (from < index && index <= to)
+        {
+            return index - 1;
+        }
+
+        if (to <= index && index < from)
+        {
+            return index + 1;
+        }
+
+        return index;
     }
 
 
@@ -469,7 +513,7 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
-    private async Task StartNewGameAsync()
+    private Task StartNewGameAsync()
     {
         IsBiddingVisible = false;
         IsTrumpPickerVisible = false;
@@ -477,7 +521,7 @@ public partial class GameViewModel : INotifyPropertyChanged
         _handOrder = null;
         _discardIndexes.Clear();
         _gameService.StartNewGame();
-        await AdvanceGameAsync().ConfigureAwait(true);
+        return AdvanceGameAsync();
     }
 
 
@@ -718,7 +762,7 @@ public partial class GameViewModel : INotifyPropertyChanged
         // Until trump is named the engine's TrumpSuit is empty, as it is in ace high.
         var trump = state.Phase is GamePhase.Bidding or GamePhase.TrumpSelection ? null : state.TrumpSuit;
         HasTrumpSuit = trump.HasValue;
-        TrumpSymbol = trump.HasValue ? SuitSymbol(trump.Value) : NoCard;
+        TrumpSymbol = trump.HasValue ? CardText.Suit(trump.Value) : NoCard;
         IsTrumpRed = trump is Suit.Hearts or Suit.Diamonds;
 
         var result = state.BiddingResult;
@@ -731,8 +775,7 @@ public partial class GameViewModel : INotifyPropertyChanged
         }
 
         TrumpSetterTeam = result.Winner.GetTeam() == Team.NorthSouth ? "US" : "THEM";
-        var bid = result.IsHawsey ? "Hawsey (24)" : result.BidAmount.ToString(CultureInfo.InvariantCulture);
-        BidAmountText = $"· {bid}";
+        BidAmountText = $"· {BidText.For(result.IsHawsey, result.BidAmount)}";
     }
 
 
@@ -756,7 +799,7 @@ public partial class GameViewModel : INotifyPropertyChanged
         LedByText = table.Count == 0 ? "" : $"Led by {LeaderName(table[0].Player)}";
 
         var winning = _gameService.TableWinningCard;
-        WinningCardText = winning is { } card ? $"{RankText(card.Rank)} {SuitSymbol(card.Suit)}" : NoCard;
+        WinningCardText = winning is { } card ? $"{CardText.Rank(card.Rank)} {CardText.Suit(card.Suit)}" : NoCard;
     }
 
 
@@ -783,15 +826,13 @@ public partial class GameViewModel : INotifyPropertyChanged
 
     /// <summary>
     /// The bid panel's prompt and buttons, from the engine's bidding progress. Same
-    /// rules and words as the Blazor UI: the minimum legal bid up to 11; the stuck dealer
+    /// rules and words as the Blazor UI: the minimum legal bid up to the engine's maximum; the stuck dealer
     /// may only bid the minimum or call Hawsey.
     /// </summary>
     private void UpdateBidChoices(GameState state)
     {
-        const int HighestNumberBid = 11;
-
         var stuck = state.IsNextBidderStuck;
-        var highest = stuck ? state.MinimumLegalBid : HighestNumberBid;
+        var highest = stuck ? state.MinimumLegalBid : GameState.MaximumBid;
 
         BidOptions.Clear();
 
@@ -840,25 +881,50 @@ public partial class GameViewModel : INotifyPropertyChanged
 
 
 
+    /// <summary>
+    /// Brings <see cref="HumanCards"/> up to date. It runs on every state change, most of
+    /// which (the AI's moves) leave the hand as it is, so only the cards that changed are
+    /// replaced, and the hand is rebuilt only when its size changes; otherwise the bound
+    /// layout would redraw every card on every move.
+    /// </summary>
     private void UpdateHumanHand(GameState state)
     {
         var humanPlays = state.Phase == GamePhase.TrickPlay && state.NextToAct == GameSession.HumanPosition;
         var legalPlays = humanPlays ? state.GetLegalPlays() : Array.Empty<Card>();
         var hand = SyncHandOrder(state.Hands[GameSession.HumanPosition]);
-
-        HumanCards.Clear();
+        var cards = new List<CardViewModel>(hand.Count);
 
         for (var i = 0; i < hand.Count; i++)
         {
             var card = hand[i];
 
             // In the exchange every card may be picked as a discard.
-            HumanCards.Add
+            cards.Add
             (
                 IsHawseyExchangeVisible
                     ? new CardViewModel(card, isLegal: false, isSelected: _discardIndexes.Contains(i), isInteractive: true)
                     : new CardViewModel(card, legalPlays.Contains(card))
             );
+        }
+
+        if (cards.Count != HumanCards.Count)
+        {
+            HumanCards.Clear();
+
+            foreach (var card in cards)
+            {
+                HumanCards.Add(card);
+            }
+
+            return;
+        }
+
+        for (var i = 0; i < cards.Count; i++)
+        {
+            if (!cards[i].ShowsTheSameAs(HumanCards[i]))
+            {
+                HumanCards[i] = cards[i];
+            }
         }
     }
 
@@ -901,19 +967,9 @@ public partial class GameViewModel : INotifyPropertyChanged
     // Spades, hearts, clubs, diamonds (alternating colours), high rank first.
     private static int CompareForDisplay(Card a, Card b)
     {
-        var bySuit = SuitDisplayOrder(a.Suit).CompareTo(SuitDisplayOrder(b.Suit));
+        var bySuit = CardText.DisplayOrder(a.Suit).CompareTo(CardText.DisplayOrder(b.Suit));
         return bySuit != 0 ? bySuit : ((int)b.Rank).CompareTo((int)a.Rank);
     }
-
-
-
-    private static int SuitDisplayOrder(Suit suit) => suit switch
-    {
-        Suit.Spades => 0,
-        Suit.Hearts => 1,
-        Suit.Clubs => 2,
-        _ => 3,
-    };
 
 
 
@@ -949,28 +1005,6 @@ public partial class GameViewModel : INotifyPropertyChanged
             GameLog.Add(entry);
         }
     }
-
-
-
-    private static string SuitSymbol(Suit suit) => suit switch
-    {
-        Suit.Hearts => "♥",
-        Suit.Diamonds => "♦",
-        Suit.Clubs => "♣",
-        _ => "♠",
-    };
-
-
-
-    private static string RankText(Rank rank) => rank switch
-    {
-        Rank.Nine => "9",
-        Rank.Ten => "10",
-        Rank.Jack => "J",
-        Rank.Queen => "Q",
-        Rank.King => "K",
-        _ => "A",
-    };
 
 
 

@@ -1,3 +1,4 @@
+using System.Collections.Specialized;
 using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Game;
 using Wolfgang.Hawsey.Engine.Players;
@@ -91,7 +92,7 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void Initially_the_table_is_empty_and_the_player_is_welcomed()
+    public void Constructor_when_no_game_has_started_shows_an_empty_table_and_the_welcome()
     {
         Assert.Empty(_vm.HumanCards);
         Assert.All(Seats, s => Assert.False(s.HasTableCard));
@@ -108,7 +109,7 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void Seats_are_named_as_the_Blazor_UI_names_them()
+    public void Seats_when_created_are_named_as_the_Blazor_UI_names_them()
     {
         Assert.Equal
         (
@@ -120,7 +121,7 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void NewGameCommand_deals_and_asks_the_human_to_bid()
+    public void NewGameCommand_when_the_AI_passes_deals_and_asks_the_human_to_bid()
     {
         _vm.NewGameCommand.Execute(null);
 
@@ -145,7 +146,7 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void The_hand_is_sorted_spades_hearts_clubs_diamonds_high_card_first()
+    public void HumanCards_when_dealt_are_sorted_spades_hearts_clubs_diamonds_high_card_first()
     {
         _vm.NewGameCommand.Execute(null);
 
@@ -162,7 +163,7 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void While_the_AIs_bid_their_bids_show_on_their_seats_and_the_bidder_is_highlighted()
+    public void Seats_when_the_AI_bids_show_the_bids_and_highlight_the_bidder()
     {
         _vm.NewGameCommand.Execute(null);
 
@@ -179,7 +180,7 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void PlaceBidCommand_pass_leaves_the_stuck_dealer_and_plays_to_the_humans_card()
+    public void PlaceBidCommand_when_the_human_passes_leaves_the_stuck_dealer_and_plays_to_the_humans_card()
     {
         _vm.NewGameCommand.Execute(null);
 
@@ -204,7 +205,7 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void PlaceBidCommand_with_an_unknown_value_does_nothing()
+    public void PlaceBidCommand_when_the_value_is_unknown_does_nothing()
     {
         _vm.NewGameCommand.Execute(null);
 
@@ -217,7 +218,7 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void PlaceBidCommand_before_the_humans_turn_is_ignored()
+    public void PlaceBidCommand_when_it_is_not_the_humans_turn_is_ignored()
     {
         _session.StartNewGame();
 
@@ -230,7 +231,7 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void A_number_bid_wins_and_the_human_names_trump()
+    public void PlaceBidCommand_when_a_number_bid_wins_asks_the_human_to_name_trump()
     {
         _vm.NewGameCommand.Execute(null);
 
@@ -258,7 +259,7 @@ public class GameViewModelTests
     [InlineData("hearts", Suit.Hearts)]
     [InlineData("clubs", Suit.Clubs)]
     [InlineData("spades", Suit.Spades)]
-    public void SelectTrumpCommand_names_the_suit(string parameter, Suit expected)
+    public void SelectTrumpCommand_when_given_a_suit_names_it(string parameter, Suit expected)
     {
         _vm.NewGameCommand.Execute(null);
         _vm.PlaceBidCommand.Execute("7");
@@ -271,7 +272,7 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void A_black_trump_shows_black_watermarks()
+    public void SelectTrumpCommand_when_trump_is_black_shows_black_watermarks()
     {
         _vm.NewGameCommand.Execute(null);
         _vm.PlaceBidCommand.Execute("7");
@@ -286,7 +287,7 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void SelectTrumpCommand_acehigh_plays_without_trump()
+    public void SelectTrumpCommand_when_acehigh_plays_without_trump()
     {
         _vm.NewGameCommand.Execute(null);
         _vm.PlaceBidCommand.Execute("7");
@@ -314,7 +315,7 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void A_Hawsey_bid_asks_the_human_for_the_exchange()
+    public void PlaceBidCommand_when_the_human_bids_Hawsey_asks_for_the_exchange()
     {
         _vm.NewGameCommand.Execute(null);
         _vm.PlaceBidCommand.Execute("hawsey");
@@ -325,14 +326,15 @@ public class GameViewModelTests
         _vm.SelectTrumpCommand.Execute("hearts");
 
         Assert.Equal("Hawsey! Pick 2 cards to discard.", _vm.StatusMessage);
-        Assert.Equal("· Hawsey (24)", _vm.BidAmountText);
+        Assert.Equal($"· Hawsey ({GameState.HawseyBidAmount})", _vm.BidAmountText);
+        Assert.Equal($"Hawsey ({GameState.HawseyBidAmount})", _vm.HawseyBidText);
         Assert.Equal(GamePhase.HawseyExchange, _session.CurrentState!.Phase);
     }
 
 
 
     [Fact]
-    public void PlayCardCommand_ignores_an_illegal_card()
+    public void PlayCardCommand_when_the_card_is_illegal_is_ignored()
     {
         _vm.NewGameCommand.Execute(null);
         _vm.PlaceBidCommand.Execute("pass");
@@ -348,7 +350,7 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void PlayCardCommand_ignores_a_card_the_session_rejects()
+    public void PlayCardCommand_when_the_session_rejects_the_card_is_ignored()
     {
         _vm.NewGameCommand.Execute(null);
 
@@ -361,7 +363,7 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void PlayCardCommand_with_no_card_does_nothing()
+    public void PlayCardCommand_when_there_is_no_card_does_nothing()
     {
         _vm.NewGameCommand.Execute(null);
         _vm.PlaceBidCommand.Execute("pass");
@@ -375,7 +377,7 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void PlayCardCommand_plays_the_card_and_the_AI_answers()
+    public void PlayCardCommand_when_the_card_is_legal_plays_it_and_the_AI_answers()
     {
         _vm.NewGameCommand.Execute(null);
         _vm.PlaceBidCommand.Execute("pass");
@@ -390,7 +392,7 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void A_round_ends_in_a_summary_that_waits_for_Next_round()
+    public void PlayCardCommand_when_the_round_ends_shows_a_summary_that_waits_for_Next_round()
     {
         _vm.NewGameCommand.Execute(null);
 
@@ -418,7 +420,29 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void NextRoundCommand_before_the_round_is_over_is_ignored()
+    public void NewGameCommand_when_clicked_during_an_AI_pause_shows_only_the_new_games_turn()
+    {
+        // The first New Game's AI loop is paused when the second starts; the session tells
+        // it to stand down (WaitingFor.Nothing), and only the second game's turn shows.
+        var session = TestGameSessions.Paced();
+        var vm = new GameViewModel(session, new ImmediateDispatcher());
+
+        vm.NewGameCommand.Execute(null);
+        vm.NewGameCommand.Execute(null);
+
+        Assert.True
+        (
+            SpinWait.SpinUntil(() => string.Equals(vm.StatusMessage, "Your turn to bid.", StringComparison.Ordinal), TimeSpan.FromSeconds(30)),
+            vm.StatusMessage
+        );
+        Assert.True(vm.IsBiddingVisible);
+        Assert.Equal(GamePhase.Bidding, session.CurrentState!.Phase);
+    }
+
+
+
+    [Fact]
+    public void NextRoundCommand_when_the_round_is_not_over_is_ignored()
     {
         _vm.NewGameCommand.Execute(null);
         var before = _session.CurrentState;
@@ -432,7 +456,7 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void Playing_whole_games_reaches_game_over_and_Play_again_resets_the_table()
+    public void NewGameCommand_when_a_game_is_over_resets_the_table_for_another()
     {
         _vm.NewGameCommand.Execute(null);
 
@@ -471,7 +495,7 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void A_completed_trick_stays_on_the_table_until_the_next_lead()
+    public void Seats_when_a_trick_completes_keep_its_cards_on_the_table()
     {
         _vm.NewGameCommand.Execute(null);
 
@@ -479,32 +503,40 @@ public class GameViewModelTests
         // (TrickCompleted), and the view model subscribed before this test did, so when
         // the test's handler runs each seat must show its card of the trick just won.
         // That includes the twelfth trick, when the round is over and there is no
-        // current trick at all.
-        var checkedTricks = 0;
+        // current trick at all. The handler runs inside the command, which reports any
+        // exception in the status line instead of throwing, so it only records what it
+        // sees; the assertions come after.
+        var tricks = new List<(PlayerPosition Player, Card Played, Card? Shown)[]>();
         _session.TrickCompleted += (_, _) =>
         {
             var trick = _session.CurrentState!.CompletedTricks[^1];
-
-            foreach (var play in trick.Cards)
-            {
-                Assert.Equal(play.Card, Seats.Single(s => s.Position == play.Player).TableCard?.Card);
-            }
-
-            checkedTricks++;
+            tricks.Add
+            (
+                trick.Cards
+                    .Select(play => (play.Player, play.Card, Seats.Single(s => s.Position == play.Player).TableCard?.Card))
+                    .ToArray()
+            );
         };
 
         _vm.PlaceBidCommand.Execute("pass");
 
-        while (checkedTricks < 12)
+        for (var steps = 0; tricks.Count < 12; steps++)
         {
+            Assert.True(steps < 100, "The round did not finish.");
             PlayFirstLegalCard();
         }
+
+        Assert.All
+        (
+            tricks.SelectMany(t => t),
+            seen => Assert.True(seen.Shown == seen.Played, $"{seen.Player} played {seen.Played} but the table shows {seen.Shown}")
+        );
     }
 
 
 
     [Fact]
-    public void The_game_log_lists_the_bids_then_each_tricks_winner()
+    public void GameLog_when_the_round_goes_on_lists_the_bids_then_each_tricks_winner()
     {
         _vm.NewGameCommand.Execute(null);
 
@@ -521,7 +553,7 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void ToggleLogCommand_opens_and_closes_the_log()
+    public void ToggleLogCommand_when_executed_opens_and_closes_the_log()
     {
         _vm.ToggleLogCommand.Execute(null);
 
@@ -535,7 +567,7 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void MoveCard_moves_a_card_before_the_card_it_is_dropped_on()
+    public void MoveCard_when_in_range_moves_the_card_before_the_card_it_is_dropped_on()
     {
         _vm.NewGameCommand.Execute(null);
         var before = _vm.HumanCards.Select(c => c.Card).ToList();
@@ -560,7 +592,7 @@ public class GameViewModelTests
     [InlineData(2, 12)]
     [InlineData(12, 2)]
     [InlineData(2, -1)]
-    public void MoveCard_out_of_range_or_onto_itself_does_nothing(int from, int to)
+    public void MoveCard_when_out_of_range_or_onto_itself_does_nothing(int from, int to)
     {
         _vm.NewGameCommand.Execute(null);
         var before = _vm.HumanCards.Select(c => c.Card).ToList();
@@ -573,7 +605,7 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void MoveCard_before_a_deal_does_nothing()
+    public void MoveCard_when_nothing_is_dealt_does_nothing()
     {
         _vm.MoveCard(0, 1);
 
@@ -583,7 +615,31 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void The_humans_order_survives_playing_a_card()
+    public void PlayCardCommand_when_the_AI_answers_rebuilds_the_hand_once_and_otherwise_replaces_only_changed_cards()
+    {
+        _vm.NewGameCommand.Execute(null);
+        _vm.PlaceBidCommand.Execute("pass");
+        var changes = new List<NotifyCollectionChangedAction>();
+        _vm.HumanCards.CollectionChanged += (_, e) => changes.Add(e.Action);
+
+        // The human's card leaves the hand (one rebuild); then the AI's moves change
+        // nothing in it, until the human's next turn makes some cards legal again.
+        PlayFirstLegalCard();
+
+        Assert.Equal(1, changes.Count(a => a == NotifyCollectionChangedAction.Reset));
+        Assert.All
+        (
+            changes.Where(a => a != NotifyCollectionChangedAction.Reset),
+            a => Assert.True(a is NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Replace, a.ToString())
+        );
+        Assert.True(changes.Count(a => a == NotifyCollectionChangedAction.Replace) <= _vm.HumanCards.Count);
+        Assert.Equal(11, _vm.HumanCards.Count);
+    }
+
+
+
+    [Fact]
+    public void PlayCardCommand_when_the_human_has_rearranged_the_hand_keeps_the_order()
     {
         _vm.NewGameCommand.Execute(null);
         _vm.MoveCard(0, 12 - 1);
@@ -601,15 +657,15 @@ public class GameViewModelTests
 
 
     [Fact]
-    public void PropertyChanged_is_raised_only_when_a_value_changes()
+    public void PropertyChanged_when_a_value_changes_is_raised_and_otherwise_not()
     {
         var changed = new List<string?>();
         _vm.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
 
-        _vm.StatusMessage = "x";
-        _vm.StatusMessage = "x";
-        _vm.IsBiddingVisible = false;
+        // The log opens (a change); the page's size leaves the layout as it was (none).
+        _vm.ToggleLogCommand.Execute(null);
+        _vm.SetPageSize(0, 0);
 
-        Assert.Equal([nameof(GameViewModel.StatusMessage)], changed);
+        Assert.Equal([nameof(GameViewModel.IsLogVisible)], changed);
     }
 }

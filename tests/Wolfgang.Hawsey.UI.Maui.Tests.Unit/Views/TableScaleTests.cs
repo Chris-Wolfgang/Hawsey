@@ -13,14 +13,21 @@ namespace Wolfgang.Hawsey.UI.Maui.Tests.Unit.Views;
 /// then centred.
 /// </summary>
 [Collection(nameof(ApplicationCurrentCollection))]
-public class TableScaleTests
+public sealed class TableScaleTests : IDisposable
 {
+    public void Dispose()
+    {
+        Application.Current = null;
+    }
+
+
+
     [Theory]
     [InlineData(TableScale.DesignWidth, TableScale.DesignHeight, 1.0)]
     [InlineData(TableScale.DesignWidth * 2, TableScale.DesignHeight * 2, 1.0)]
     [InlineData(TableScale.DesignWidth / 2, TableScale.DesignHeight, 0.5)]
     [InlineData(TableScale.DesignWidth, TableScale.DesignHeight / 4, 0.25)]
-    public void Fit_scales_down_to_the_tighter_side_and_never_up(double width, double height, double expected)
+    public void Fit_when_the_space_is_given_scales_down_to_the_tighter_side_and_never_up(double width, double height, double expected)
     {
         Assert.Equal(expected, TableScale.Fit(width, height), precision: 6);
     }
@@ -31,7 +38,7 @@ public class TableScaleTests
     [InlineData(0, 400)]
     [InlineData(400, 0)]
     [InlineData(-1, -1)]
-    public void Fit_before_the_page_has_a_size_is_one(double width, double height)
+    public void Fit_when_the_page_has_no_size_is_one(double width, double height)
     {
         Assert.Equal(1.0, TableScale.Fit(width, height));
     }
@@ -39,7 +46,7 @@ public class TableScaleTests
 
 
     [Fact]
-    public void Centre_splits_the_spare_space_evenly()
+    public void Centre_when_there_is_spare_space_splits_it_evenly()
     {
         Assert.Equal(100, TableScale.Centre(available: 832, scale: 0.5, designSize: 1264));
     }
@@ -47,7 +54,7 @@ public class TableScaleTests
 
 
     [Fact]
-    public void Bounds_is_the_scaled_table_centred_in_the_space()
+    public void Bounds_when_the_space_is_given_is_the_scaled_table_centred_in_it()
     {
         Assert.Equal
         (
@@ -83,7 +90,7 @@ public class TableScaleTests
 
 
     [Fact]
-    public void GamePage_on_a_tablet_shows_the_table_with_the_panels_over_it()
+    public void GamePage_when_on_a_tablet_shows_the_table_with_the_panels_over_it()
     {
         var (page, host) = SizedGamePage(1100, 700);
 
@@ -95,7 +102,7 @@ public class TableScaleTests
 
 
     [Fact]
-    public void GamePage_on_a_phone_shows_the_compact_layout_with_the_panels_over_the_page()
+    public void GamePage_when_on_a_phone_shows_the_compact_layout_with_the_panels_over_the_page()
     {
         var (page, host) = SizedGamePage(915, 412);
 
