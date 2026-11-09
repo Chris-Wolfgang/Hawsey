@@ -99,7 +99,7 @@ The engine does no I/O. On `net10.0` it is marked trim- and Native AOT-compatibl
 
 Hawsey is a **4-player partnership trick-taking game** dealt from a 48-card pinochle deck (two each of 9, 10, J, Q, K, A in all four suits). Each player gets 12 cards. Two teams of two sit across from each other: North/South and East/West. Each hand has three phases:
 
-1. **Bidding.** Players pass or bid the number of tricks their team will take. The minimum bid is set by the house rules (default 6).
+1. **Bidding.** Players pass or bid the number of tricks their team will take, up to 11. The minimum bid is set by the house rules (default 6). Bidding all 12 is the Hawsey bid, below.
 2. **Trump selection.** The winning bidder names a trump suit, or plays **ace high** (no trump).
 3. **Trick play.** Players follow suit when they can. The trick goes to the highest trump or, if no trump was played, the highest card of the suit led.
 
