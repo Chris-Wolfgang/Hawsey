@@ -14,7 +14,6 @@ Last full sync: template `e5e665a` (2026-09-26, Hawsey #24).
 |---|---|---|
 | `.github/workflows/pr.yaml` | InspectCode `timeout-minutes: 35` (template 20) | Set while the MAUI app (and its `dotnet workload restore`) was on `main`. The app now lives on `dev/maui`, so this can return to the template value. |
 | `.github/workflows/pr.yaml` | InspectCode retries when it can't connect to MSBuild | Seen twice on 2026-11-06. It isn't in the template yet. |
-| `.github/workflows/pr.yaml` | Also runs on a push to `dev/maui`; only `main`'s push uploads the InspectCode SARIF | `main` is merged down into `dev/maui` without a PR, so that push run is the only build of the merge (#1090). |
 | `.github/dependabot.yml` | pip ignores `semgrep`, `mcp` and `opentelemetry-*` | `semgrep.txt` uses overrides, which Dependabot can't apply. Update them with the uv command in that file's header. |
 | `.github/workflows/codeql.yaml` | `timeout-minutes: 45` (template 30) | Same history as the InspectCode timeout; can return to the template value. |
 | `.github/workflows/release.yaml` | Builds and attaches a reproducible-build manifest | See [REPRODUCIBLE-BUILD.md](REPRODUCIBLE-BUILD.md) (#91). |
