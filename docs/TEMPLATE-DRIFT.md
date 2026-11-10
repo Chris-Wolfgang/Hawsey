@@ -16,7 +16,7 @@ Last full sync: template `e5e665a` (2026-09-26, Hawsey #24).
 | `.github/workflows/pr.yaml` | InspectCode retries when it can't connect to MSBuild | Seen twice on 2026-11-06. It isn't in the template yet. |
 | `.github/dependabot.yml` | pip ignores `semgrep`, `mcp` and `opentelemetry-*` | `semgrep.txt` uses overrides, which Dependabot can't apply. Update them with the uv command in that file's header. |
 | `.github/workflows/codeql.yaml` | `timeout-minutes: 45` (template 30) | Same history as the InspectCode timeout; can return to the template value. |
-| `.github/workflows/release.yaml` | Builds and attaches a reproducible-build manifest | See [REPRODUCIBLE-BUILD.md](REPRODUCIBLE-BUILD.md) (#91). |
+| `.github/workflows/release.yaml` | Builds and attaches a reproducible-build manifest and `SHA256SUMS.txt`, and attests both with the packages | See [REPRODUCIBLE-BUILD.md](REPRODUCIBLE-BUILD.md) (#91, #1077). The template has no canonical form yet (repo-template#808); take it when it lands. |
 | `.github/workflows/benchmarks.yaml`, `BannedSymbols.txt` | Template placeholders filled in | Project path and namespace are Hawsey's. |
 | `.config/dotnet-tools.json` | Adds `microsoft.coyote.cli` | Concurrency tests for the engine's `GameSession` (#843). |
 | `.editorconfig` | Trimming, AOT and single-file analyzers at `warning` | The engine is AOT- and trim-compatible (#844). A candidate to feed back to the template. |
