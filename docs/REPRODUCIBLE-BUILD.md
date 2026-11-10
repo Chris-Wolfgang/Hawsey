@@ -57,9 +57,26 @@ called `manifest.json`:
 }
 ```
 
-`copyright` is recorded because `Directory.Build.props` stamps the current year
-into the assembly. A rebuild in a later year must pass the recorded value back in
-(step 2). The expected hashes for a release are the `assemblies` values.
+`copyright` is recorded because releases built before #1107 stamped the build
+year into the assembly, so a rebuild in a later year must pass the recorded value
+back in (step 2). From #1107 on, `Directory.Build.props` holds a literal copyright
+and passing it back in changes nothing. The expected hashes for a release are the
+`assemblies` values.
+
+From the first release built with #1113, the release also attaches
+`SHA256SUMS.txt`, in the format `sha256sum` reads. It has one line for each
+`.nupkg` and `.snupkg`, and one line for each assembly and PDB inside them, named
+`<package-file>/<entry>`:
+
+```text
+<sha256>  Wolfgang.Hawsey.Engine.0.2.0.nupkg
+<sha256>  Wolfgang.Hawsey.Engine.0.2.0.nupkg/lib/net10.0/Wolfgang.Hawsey.Engine.dll
+<sha256>  Wolfgang.Hawsey.Engine.0.2.0.snupkg
+<sha256>  Wolfgang.Hawsey.Engine.0.2.0.snupkg/lib/net10.0/Wolfgang.Hawsey.Engine.pdb
+```
+
+Its DLL lines carry the same hashes as the manifest's `assemblies`; its PDB lines
+add the symbols, so a rebuild can be checked for both.
 
 ## 1. Check the provenance attestation
 
@@ -76,6 +93,16 @@ gh attestation verify pkg/Wolfgang.Hawsey.Engine.0.2.0/Wolfgang.Hawsey.Engine.0.
 A pass proves the package bytes came from `release.yaml` in this repository at
 the commit named in the attestation. That commit must match the manifest's
 `commit`.
+
+From the first release built with #1113, the same attestation also covers
+`SHA256SUMS.txt` and the manifest. Check them with the same command before
+trusting the hashes they list:
+
+```bash
+gh attestation verify SHA256SUMS.txt \
+  --repo Chris-Wolfgang/Hawsey \
+  --signer-workflow Chris-Wolfgang/Hawsey/.github/workflows/release.yaml
+```
 
 ## 2. Rebuild and compare hashes
 
@@ -116,6 +143,22 @@ sha256sum published/lib/*/Wolfgang.Hawsey.Engine.dll
 ```
 
 All three sets must match: your rebuild, the published package and the manifest.
+
+With a `SHA256SUMS.txt` (releases built with #1113 and later), check the
+downloaded packages directly, then compare each rebuilt DLL and PDB against the
+line for its entry:
+
+```bash
+grep -E 'pkg$' SHA256SUMS.txt | sha256sum -c      # the .nupkg and .snupkg you downloaded
+for tfm in netstandard2.0 net10.0; do
+  for ext in dll pdb; do
+    pkg=$([ "$ext" = dll ] && echo nupkg || echo snupkg)
+    want=$(grep " Wolfgang.Hawsey.Engine.0.2.0.$pkg/lib/$tfm/Wolfgang.Hawsey.Engine.$ext\$" SHA256SUMS.txt | cut -d' ' -f1)
+    got=$(sha256sum "src/Wolfgang.Hawsey.Engine/bin/Release/$tfm/Wolfgang.Hawsey.Engine.$ext" | cut -d' ' -f1)
+    [ "$want" = "$got" ] && echo "OK   $tfm $ext" || echo "DIFF $tfm $ext"
+  done
+done
+```
 
 ## 3. Report the result
 
