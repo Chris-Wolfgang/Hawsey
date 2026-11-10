@@ -1895,7 +1895,24 @@ jobs:
         if: runner.os == 'Linux'
         run: echo "VSTEST_DISABLE_ARTIFACTS_DIRECTORY_VERIFICATION=1" >> "$GITHUB_ENV"
 
+      # windows-11-arm: pwsh has crashed inside setup-dotnet's installer (Internal CLR
+      # error 0x80131506, exit 0xC0000005) while installing the .NET 10 SDK - once in
+      # 19 runs in the week this stage was added. A runner fault, not a build fault, so
+      # retry the install once before the leg fails.
       - name: Setup .NET
+        id: setup-dotnet
+        continue-on-error: true
+        uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73  # v6.1.0
+        with:
+          dotnet-version: |
+            6.0.x
+            7.0.x
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Setup .NET (retry once)
+        if: steps.setup-dotnet.outcome == 'failure'
         uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73  # v6.1.0
         with:
           dotnet-version: |
