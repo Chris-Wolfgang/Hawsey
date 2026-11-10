@@ -12,6 +12,9 @@ name: AOT Smoke
 #
 # Linux only: Native AOT needs the platform linker (clang on ubuntu-latest);
 # Windows runners and dev boxes need the VS C++ tools, which are not assumed.
+# Two legs (#1078, fleet test-matrix standard): linux-x64 and linux-arm64, each
+# built natively on its own runner. The x64 leg keeps the check name the ruleset
+# already requires.
 
 on:
   pull_request:
@@ -28,9 +31,21 @@ concurrency:
 
 jobs:
   aot-smoke:
-    name: Publish + run Native AOT consumer
-    runs-on: ubuntu-latest
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Publish + run Native AOT consumer
+            os: ubuntu-latest
+            rid: linux-x64
+            elf: x86-64
+          - name: Publish + run Native AOT consumer (linux-arm64)
+            os: ubuntu-24.04-arm
+            rid: linux-arm64
+            elf: ARM aarch64
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
@@ -45,16 +60,21 @@ jobs:
       # PublishAot comes from the consumer's .csproj on purpose, never from the command
       # line: a -p: global property flows into every referenced project, and the
       # engine's netstandard2.0 slot cannot be AOT-compiled (NETSDK1207).
-      - name: Publish (Native AOT, linux-x64)
+      - name: Publish (Native AOT, ${{ matrix.rid }})
+        env:
+          RID: ${{ matrix.rid }}
         run: >
           dotnet publish examples/Wolfgang.Hawsey.Engine.AotSmoke/Wolfgang.Hawsey.Engine.AotSmoke.csproj
-          -c Release -r linux-x64 -o aot-out
+          -c Release -r "$RID" -o aot-out
           -warnaserror
 
-      - name: Confirm the output is a native binary
+      - name: Confirm the output is a native binary for this architecture
+        env:
+          ELF_ARCH: ${{ matrix.elf }}
         run: |
           file aot-out/Wolfgang.Hawsey.Engine.AotSmoke
           file aot-out/Wolfgang.Hawsey.Engine.AotSmoke | grep -q 'ELF 64-bit'
+          file aot-out/Wolfgang.Hawsey.Engine.AotSmoke | grep -q "$ELF_ARCH"
           if [ -f aot-out/Wolfgang.Hawsey.Engine.AotSmoke.dll ]; then
             echo "::error::A managed Wolfgang.Hawsey.Engine.AotSmoke.dll was published - this is not a Native AOT build."
             exit 1
