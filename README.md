@@ -145,6 +145,23 @@ The engine is UI-agnostic. Each `GameEngine` method takes the current `GameState
 
 See the [NuGet package page](https://www.nuget.org/packages/Wolfgang.Hawsey.Engine/) for the authoritative per-TFM compatibility matrix.
 
+### Test matrix
+
+Every pull request runs the tests on five legs, each over the TFMs that runtime
+supports there:
+
+| Leg | Runner | TFMs |
+|---|---|---|
+| Linux x64 | `ubuntu-24.04` | net5.0 to net10.0 |
+| Windows x64 | `windows-latest` | net5.0 to net10.0, .NET Framework 4.6.2 to 4.8.1 |
+| macOS ARM64 | `macos-latest` | net6.0 to net10.0 |
+| Linux ARM64 | `ubuntu-24.04-arm` | net6.0 to net10.0 |
+| Windows ARM64 | `windows-11-arm` | net6.0 to net10.0 |
+
+The ARM64 and macOS legs start at net6.0, the first .NET with ARM64 support on
+those systems. .NET Framework runs on Windows x64 only. The Native AOT smoke test
+publishes and runs on linux-x64 and linux-arm64.
+
 ---
 
 ## 🔍 Code Quality & Static Analysis

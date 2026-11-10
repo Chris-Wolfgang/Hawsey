@@ -14,6 +14,7 @@ Last full sync: template `e5e665a` (2026-09-26, Hawsey #24).
 |---|---|---|
 | `.github/workflows/pr.yaml` | InspectCode `timeout-minutes: 35` (template 20) | Set while the MAUI app (and its `dotnet workload restore`) was on `main`. The app now lives on `dev/maui`, so this can return to the template value. |
 | `.github/workflows/pr.yaml` | InspectCode retries when it can't connect to MSBuild | Seen twice on 2026-11-06. It isn't in the template yet. |
+| `.github/workflows/pr.yaml` | Adds `Stage 4: Linux ARM64 Tests` and `Stage 5: Windows ARM64 Tests` as one matrix job, `test-arm64`, built from Stage 3's steps | The fleet test-matrix standard requires them (#1078); the template has no canonical stages yet (repo-template#811). Take the template's form when it lands. |
 | `.github/dependabot.yml` | pip ignores `semgrep`, `mcp` and `opentelemetry-*` | `semgrep.txt` uses overrides, which Dependabot can't apply. Update them with the uv command in that file's header. |
 | `.github/workflows/codeql.yaml` | `timeout-minutes: 45` (template 30) | Same history as the InspectCode timeout; can return to the template value. |
 | `.github/workflows/release.yaml` | Builds and attaches a reproducible-build manifest and `SHA256SUMS.txt`, and attests both with the packages | See [REPRODUCIBLE-BUILD.md](REPRODUCIBLE-BUILD.md) (#91, #1077). The template has no canonical form yet (repo-template#808); take it when it lands. |
@@ -30,6 +31,9 @@ Last full sync: template `e5e665a` (2026-09-26, Hawsey #24).
 `aot-smoke.yaml`, `coyote.yaml`, `cross-platform-differential.yaml`, `fuzz.yaml`,
 `pr-benchmarks.yaml`, `release-apps.yaml` and `reproducible-build.yaml`. These cover engine- and
 app-specific checks and the Blazor app's deployment, which the template has no equivalent for.
+
+`aot-smoke.yaml` runs on linux-x64 and linux-arm64 (#1078). When the template ships its
+canonical `aot-smoke.yaml` (repo-template#811), compare the two and take the template's form.
 
 ## Template files Hawsey doesn't have
 
