@@ -2238,7 +2238,9 @@ jobs:
           TEST_ASSEMBLIES="|"
           if [ -d ./tests ]; then
             while IFS= read -r -d '' proj; do
-              asm=$(grep -oE '<AssemblyName>[^<]+' "$proj" 2>/dev/null | head -1 | cut -d'>' -f2)
+              # `|| true`: this job's bash runs with pipefail (Stage 3's macOS default
+              # bash -e does not), and grep exits 1 when the csproj sets no <AssemblyName>.
+              asm=$(grep -oE '<AssemblyName>[^<]+' "$proj" 2>/dev/null | head -1 | cut -d'>' -f2 || true)
               if [ -z "$asm" ]; then
                 asm=$(basename "$proj"); asm="${asm%.*}"
               fi
