@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794172650901,
+  "lastUpdate": 1794354551302,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -1006,6 +1006,60 @@ window.BENCHMARK_DATA = {
             "value": 375947.65380859375,
             "unit": "ns",
             "range": "± 2936.2565054073593"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a98b31dc47b976b1b179cb746ddd0d0be06cec2c",
+          "message": "test(blazor): add Wolfgang.Hawsey.UI.Blazor.Tests.Unit (#1124)\n\n* test(coverage): allow [ExcludeFromCodeCoverage] on the Blazor host's Main (#1122)\n\nComment-only change to coverlet.runsettings: the WebAssembly host's\nProgram.Main creates and runs the host and throws outside a browser, so\nit joins infrastructure detection as the second allowed exclusion.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n* test(blazor): add Wolfgang.Hawsey.UI.Blazor.Tests.Unit (#1122)\n\nMove the host's root components and GameSession registration out of\nProgram.cs into HawseyHost.Configure, and test it plus App.razor's\nrouting (the game page in MainLayout at /, NotFound for an unknown\naddress) with bUnit. Program.Main keeps only the browser-only create,\nconfigure and run, marked [ExcludeFromCodeCoverage].\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-10T18:45:06-05:00",
+          "tree_id": "6b54f2725720ea61f839d7d6405ef7ff813b6831",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/a98b31dc47b976b1b179cb746ddd0d0be06cec2c"
+        },
+        "date": 1794354549842,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 346.5290387471517,
+            "unit": "ns",
+            "range": "± 3.7697583541759436"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 37.728287855784096,
+            "unit": "ns",
+            "range": "± 0.08871399726585168"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 138.50928982098898,
+            "unit": "ns",
+            "range": "± 0.8608959910783697"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 176987.50773111978,
+            "unit": "ns",
+            "range": "± 2711.16062590174"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGameWithSimpleAi",
+            "value": 221390.2775065104,
+            "unit": "ns",
+            "range": "± 3246.8255214966493"
           }
         ]
       }
