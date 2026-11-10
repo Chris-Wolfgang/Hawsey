@@ -51,9 +51,12 @@ on:
       - dev/maui
   # A push to main re-runs the same gates on the merged result and keeps the InspectCode
   # alert set on main current (a pull_request run attributes its SARIF to the PR ref).
+  # A push to dev/maui does the same for main merged down into it, which goes in without
+  # a PR; only main's push uploads the InspectCode SARIF (inspectcode-upload).
   push:
     branches:
       - main
+      - dev/maui
 
 concurrency:
   # The event name is part of the group on purpose: while a repository migrates to this
@@ -423,8 +426,8 @@ jobs:
     # Dependabot guard in this file already tests the author.
     if: >-
       always() && (needs.inspectcode.result == 'success' || needs.inspectcode.result == 'failure')
-      && (github.event_name == 'push'
-          || (github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.user.login != 'dependabot[bot]'))
+      && ((github.event_name == 'push' && github.ref == 'refs/heads/main')
+          || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.user.login != 'dependabot[bot]'))
     timeout-minutes: 10
     permissions:
       contents: read
