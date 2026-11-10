@@ -1885,17 +1885,18 @@ jobs:
         with:
           persist-credentials: false
 
-      # vstest (SDK 10.0.4xx) refuses to finish a run when its session directory under
-      # XDG_RUNTIME_DIR is readable by other users, and on ubuntu-24.04-arm that is
-      # /run/user/1001: every test passes and `dotnet test` still exits 1. A private
-      # 0700 directory keeps the check on instead of disabling it.
-      - name: Give vstest a private runtime directory (Linux)
+      # SDK 10.0.4xx keeps VSTest's test-session files in a user-private directory under
+      # /run/user/<uid> (dotnet/sdk#57029). On ubuntu-24.04-arm that base is readable by
+      # other users, so VSTest refuses it and `dotnet test` exits 1 with every test
+      # passing. VSTEST_ARTIFACTS_BASE_DIRECTORY is the documented override; a 0700
+      # directory keeps the privacy check on instead of disabling it.
+      - name: Give VSTest a private artifacts base directory (Linux)
         if: runner.os == 'Linux'
         run: |
-          dir="$RUNNER_TEMP/xdg-runtime"
+          dir="$RUNNER_TEMP/vstest-artifacts"
           mkdir -p "$dir"
           chmod 700 "$dir"
-          echo "XDG_RUNTIME_DIR=$dir" >> "$GITHUB_ENV"
+          echo "VSTEST_ARTIFACTS_BASE_DIRECTORY=$dir" >> "$GITHUB_ENV"
 
       - name: Setup .NET
         uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73  # v6.1.0
