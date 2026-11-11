@@ -133,3 +133,19 @@ Run 42084306341 on 7a35852: **91.78%**, with 46 survivors. 18 are exception-mess
 | `Deck.Shuffle`: the `cards` null guard | Statement removed | Killed: without the guard, `ToArray` still throws `ArgumentNullException`, but for its own `source` parameter. The test only checked the exception type, and now also checks that the parameter is `cards`. |
 
 The killing test was checked by applying the mutant by hand: only that test fails.
+
+## Weekly run on `main` (2026-11-08)
+
+Run 42480350616 on efa657e: **91.94%** against the floor of 90. The report holds 48 surviving mutants on 45 lines, and every one falls into a category accepted above. No new gap.
+
+| Category | Survivors |
+|---|---:|
+| Exception-message strings | 18 |
+| `ConfigureAwait(false)` becomes `true` (including the four `AdvanceAsync` phase calls and the three AI pauses) | 7 |
+| `\|\|` and `&&` variants of the `GameSession` pause guards | 6 |
+| Removed `random` / `rules` null guards in `GameEngine` and `GameRunner` | 4 |
+| The AI's rank comparisons, `>` becomes `>=` / `<` becomes `<=` | 4 |
+| `SimpleAiStrategy.CountInHand` | 3 |
+| `_generation++` becomes `--`; `CompletedTricks.Count >= 0`; `GameState.Winner`'s final ternary; the one-legal-card shortcut; `bestScore` starting at +1; the `FollowSuitValidator` empty-hand return | 1 each |
+
+Each survivor was classified by mutator and source line from the run's `mutation-report.json`.
