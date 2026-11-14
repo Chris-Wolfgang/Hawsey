@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net10.0;net11.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Version>0.1.0</Version>
@@ -23,6 +23,17 @@
          net8.0+; the netstandard2.0 slot is unaffected. -->
     <IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">true</IsAotCompatible>
     <IsTrimmable Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">true</IsTrimmable>
+  </PropertyGroup>
+
+  <!-- net11.0 compiles against the Microsoft.NETCore.App.Ref package from NuGet instead of the
+       copy bundled in the SDK. SDK 11.0.100 ships a different build of that pack per OS (the
+       facade reference assemblies carry other MVIDs), and the PDB records each reference's MVID,
+       so the Linux and Windows output hashes differed. The NuGet package is one artifact for every
+       OS. Pointing the targeting-pack root at an empty folder makes restore download the pack;
+       package pruning keeps reading its data from the SDK's own packs folder. -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net11.0'">
+    <NetCoreTargetingPackRoot>$(MSBuildProjectDirectory)/obj/no-targeting-packs</NetCoreTargetingPackRoot>
+    <PrunePackageTargetingPackRoots>$(NetCoreRoot)packs</PrunePackageTargetingPackRoots>
   </PropertyGroup>
 
   <!-- PolySharp emits its polyfill files in a run-dependent order, and the order of
