@@ -33,6 +33,17 @@
        order. Add a type here if a netstandard2.0 build reports it missing, but know
        that a SECOND generated type brings the order problem back (MemberNotNullWhenAttribute
        did once); prefer code that needs no polyfill. -->
+  <!-- net11.0 compiles against the Microsoft.NETCore.App.Ref package from NuGet instead of the
+       copy bundled in the SDK. SDK 11.0.100 ships a different build of that pack per OS (the
+       facade reference assemblies carry other MVIDs), and the PDB records each reference's MVID,
+       so the Linux and Windows output hashes differed. The NuGet package is one artifact for every
+       OS. Pointing the targeting-pack root at an empty folder makes restore download the pack;
+       package pruning keeps reading its data from the SDK's own packs folder. -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net11.0'">
+    <NetCoreTargetingPackRoot>$(MSBuildProjectDirectory)/obj/no-targeting-packs</NetCoreTargetingPackRoot>
+    <PrunePackageTargetingPackRoots>$(NetCoreRoot)packs</PrunePackageTargetingPackRoots>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PolySharpIncludeGeneratedTypes>System.Runtime.CompilerServices.IsExternalInit</PolySharpIncludeGeneratedTypes>
   </PropertyGroup>
