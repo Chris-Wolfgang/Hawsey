@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794665563984,
+  "lastUpdate": 1794686395103,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -1114,6 +1114,60 @@ window.BENCHMARK_DATA = {
             "value": 251920.99641927084,
             "unit": "ns",
             "range": "± 10137.622462498939"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "914a1acedcba662d99661c516282c2cdbf8c0976",
+          "message": "Bump the dotnet-dependencies group with 12 updates (#1131)\n\nBumps bunit from 2.14.0 to 2.15.2\nBumps dotnet-reportgenerator-globaltool from 5.5.12 to 5.6.0\nBumps dotnet-stryker from 5.0.0 to 5.1.0\nBumps jetbrains.resharper.globaltools from 2026.2.4.1 to 2026.3.0\nBumps Meziantou.Analyzer from 3.0.321 to 3.0.340\nBumps Microsoft.AspNetCore.Components.Web from 10.0.14 to 10.0.15\nBumps Microsoft.AspNetCore.Components.WebAssembly from 10.0.14 to 10.0.15\nBumps Microsoft.AspNetCore.Components.WebAssembly.DevServer from 10.0.14 to 11.0.0\nBumps microsoft.cst.devskim.cli from 1.0.100 to 1.0.103\nBumps Microsoft.SourceLink.GitHub from 10.0.403 to 11.0.100\nBumps PolySharp from 1.16.0 to 1.17.1\nBumps SonarAnalyzer.CSharp from 10.35.0.4138 to 10.36.0.15337\n\n---\nupdated-dependencies:\n- dependency-name: bunit\n  dependency-version: 2.15.2\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: dotnet-dependencies\n- dependency-name: bunit\n  dependency-version: 2.15.2\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: dotnet-dependencies\n- dependency-name: dotnet-reportgenerator-globaltool\n  dependency-version: 5.6.0\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: dotnet-dependencies\n- dependency-name: dotnet-stryker\n  dependency-version: 5.1.0\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: dotnet-dependencies\n- dependency-name: jetbrains.resharper.globaltools\n  dependency-version: 2026.3.0\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: dotnet-dependencies\n- dependency-name: Meziantou.Analyzer\n  dependency-version: 3.0.340\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Microsoft.AspNetCore.Components.Web\n  dependency-version: 10.0.15\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Microsoft.AspNetCore.Components.WebAssembly\n  dependency-version: 10.0.15\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Microsoft.AspNetCore.Components.WebAssembly.DevServer\n  dependency-version: 11.0.0\n  dependency-type: direct:production\n  update-type: version-update:semver-major\n  dependency-group: dotnet-dependencies\n- dependency-name: microsoft.cst.devskim.cli\n  dependency-version: 1.0.103\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Microsoft.SourceLink.GitHub\n  dependency-version: 11.0.100\n  dependency-type: direct:production\n  update-type: version-update:semver-major\n  dependency-group: dotnet-dependencies\n- dependency-name: PolySharp\n  dependency-version: 1.17.1\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: dotnet-dependencies\n- dependency-name: SonarAnalyzer.CSharp\n  dependency-version: 10.36.0.15337\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: dotnet-dependencies\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2026-11-14T14:58:32-05:00",
+          "tree_id": "c7756f60afa7221f8e6740d20d2eea7c035c1d9c",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/914a1acedcba662d99661c516282c2cdbf8c0976"
+        },
+        "date": 1794686393764,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 545.4964056015015,
+            "unit": "ns",
+            "range": "± 6.18836999011565"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 78.71026198069255,
+            "unit": "ns",
+            "range": "± 0.2946976882510785"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 240.11785777409872,
+            "unit": "ns",
+            "range": "± 0.9476093873244826"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 447499.0771484375,
+            "unit": "ns",
+            "range": "± 1530.0719074566837"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGameWithSimpleAi",
+            "value": 629093.0919596354,
+            "unit": "ns",
+            "range": "± 1918.6395117932275"
           }
         ]
       }
