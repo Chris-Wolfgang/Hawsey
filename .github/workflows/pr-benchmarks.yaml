@@ -60,8 +60,11 @@ jobs:
           run_suite() {  # $1 = checkout root, $2 = output json
             local proj="$1/$BENCH_PROJECT"
             [ -f "$proj" ] || { echo "no benchmark project in $1"; return 1; }
-            dotnet run --project "$proj" -c Release -- --filter "*" --job short --memory --exporters json \
-              --artifacts "$1/bdn-artifacts" > /dev/null
+            # Run from the checkout root so dotnet picks that checkout's global.json. From the
+            # head checkout, a PR that moves global.json to a new SDK major would build the base
+            # suite with the head's SDK, and every base benchmark failed with no statistics.
+            ( cd "$1" && dotnet run --project "$proj" -c Release -- --filter "*" --job short --memory --exporters json \
+              --artifacts "$1/bdn-artifacts" > /dev/null )
             jq -s '{Benchmarks: [.[].Benchmarks[]]}' "$1"/bdn-artifacts/results/*-report-full-compressed.json > "$2"
           }
           declare -f run_suite > run_suite.sh
