@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794686395103,
+  "lastUpdate": 1794698523191,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -1168,6 +1168,60 @@ window.BENCHMARK_DATA = {
             "value": 629093.0919596354,
             "unit": "ns",
             "range": "± 1918.6395117932275"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "369582b5d30166ae73d6cd4df6f5bb30aec36929",
+          "message": "build: add net11.0 to the engine and its unit tests, pin SDK 11 (#1121, part 2) (#1130)\n\n* ci: install the .NET 11.0.x SDK and keep net11.0 in every test stage\n\nPorts repo-template#831 to Hawsey: 11.0.x beside 10.0.x in every\nactions/setup-dotnet step (including the Hawsey-only aot-smoke, coyote,\nfuzz, differential, reproducible-build, pr-benchmarks and release-apps\nsteps and the ARM64 stages), and 11\\.0 in the pr.yaml TFM filters and\nthe build-pr.ps1 Windows mirror.\n\nRefs #1121\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n* build: add net11.0 to the engine and its unit tests, pin SDK 11\n\n- Wolfgang.Hawsey.Engine: netstandard2.0;net10.0;net11.0\n- Engine unit tests: net11.0 appended (picks up the net8.0+ package slot)\n- global.json: 11.0.100 with latestFeature (latestFeature never crosses\n  a major, so the 10.0.100 pin cannot build net11.0)\n- changelog fragment net11-target.md\n\nRefs #1121\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n* build: compile net11.0 against the NuGet targeting pack\n\nSDK 11.0.100 bundles a different build of Microsoft.NETCore.App.Ref on Linux\nand Windows: the facade reference assemblies carry other MVIDs. The IL is\nidentical, but the PDB's referenced-assembly records differ, so the cross-OS\ncompare failed for net11.0 only. Restore now downloads the pack from NuGet,\nwhich is one artifact for every OS. Same fix as IEnumerable-Extensions#653\n(787521b), where the compare went green.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n* build: keep the net11.0 targeting-pack block apart from the PolySharp comment\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-14T18:20:33-05:00",
+          "tree_id": "6e25809ba23dae57fe2e0f41725c1758982207c3",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/369582b5d30166ae73d6cd4df6f5bb30aec36929"
+        },
+        "date": 1794698521719,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 489.5241912206014,
+            "unit": "ns",
+            "range": "± 3.907886688425748"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 89.7288361787796,
+            "unit": "ns",
+            "range": "± 0.4380306377211771"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 277.8013240496318,
+            "unit": "ns",
+            "range": "± 2.116296547370897"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 380008.2718098958,
+            "unit": "ns",
+            "range": "± 1716.3438368117318"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGameWithSimpleAi",
+            "value": 523703.3616536458,
+            "unit": "ns",
+            "range": "± 7529.034395300725"
           }
         ]
       }
