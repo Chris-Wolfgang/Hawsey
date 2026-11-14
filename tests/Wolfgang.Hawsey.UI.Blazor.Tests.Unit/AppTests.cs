@@ -22,7 +22,11 @@ public sealed class AppTests : BunitContext
         var app = Render<App>();
 
         Assert.NotEmpty(app.FindAll(".statusbar"));
-        Assert.NotEmpty(app.FindAll("button").Where(b => b.TextContent.Contains("NEW GAME", StringComparison.Ordinal)));
+        Assert.Contains
+        (
+            app.FindAll("button"),
+            b => b.TextContent.Contains("NEW GAME", StringComparison.Ordinal)
+        );
     }
 
 
