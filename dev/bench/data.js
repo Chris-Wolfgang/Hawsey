@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794354551302,
+  "lastUpdate": 1794665563984,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -1060,6 +1060,60 @@ window.BENCHMARK_DATA = {
             "value": 221390.2775065104,
             "unit": "ns",
             "range": "± 3246.8255214966493"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c784506eb5a5cfbd92574780f1eae44a42c0a50f",
+          "message": "ci: install the .NET 11.0.x SDK and keep net11.0 in every test stage (#1129)\n\nPorts repo-template#831 to Hawsey: 11.0.x beside 10.0.x in every\nactions/setup-dotnet step (including the Hawsey-only aot-smoke, coyote,\nfuzz, differential, reproducible-build, pr-benchmarks and release-apps\nsteps and the ARM64 stages), and 11\\.0 in the pr.yaml TFM filters and\nthe build-pr.ps1 Windows mirror.\n\nRefs #1121\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-14T09:05:16-05:00",
+          "tree_id": "50f97366cdfd51fb2f0e57bc4944c68ea86776d0",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/c784506eb5a5cfbd92574780f1eae44a42c0a50f"
+        },
+        "date": 1794665562615,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 386.48707389831543,
+            "unit": "ns",
+            "range": "± 3.7690212076594447"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 40.71894290049871,
+            "unit": "ns",
+            "range": "± 0.6069904265770407"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 163.54888900121054,
+            "unit": "ns",
+            "range": "± 2.0965082598027953"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 199914.95768229166,
+            "unit": "ns",
+            "range": "± 816.4798887169645"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGameWithSimpleAi",
+            "value": 251920.99641927084,
+            "unit": "ns",
+            "range": "± 10137.622462498939"
           }
         ]
       }
