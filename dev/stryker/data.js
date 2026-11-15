@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794141887142,
+  "lastUpdate": 1794749256371,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "Mutation score": [
@@ -161,6 +161,33 @@ window.BENCHMARK_DATA = {
           {
             "name": "Mutation score (tests/Wolfgang.Hawsey.Engine.Tests.Unit)",
             "value": 91.94,
+            "unit": "%"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang",
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "369582b5d30166ae73d6cd4df6f5bb30aec36929",
+          "message": "build: add net11.0 to the engine and its unit tests, pin SDK 11 (#1121, part 2) (#1130)\n\n* ci: install the .NET 11.0.x SDK and keep net11.0 in every test stage\n\nPorts repo-template#831 to Hawsey: 11.0.x beside 10.0.x in every\nactions/setup-dotnet step (including the Hawsey-only aot-smoke, coyote,\nfuzz, differential, reproducible-build, pr-benchmarks and release-apps\nsteps and the ARM64 stages), and 11\\.0 in the pr.yaml TFM filters and\nthe build-pr.ps1 Windows mirror.\n\nRefs #1121\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n* build: add net11.0 to the engine and its unit tests, pin SDK 11\n\n- Wolfgang.Hawsey.Engine: netstandard2.0;net10.0;net11.0\n- Engine unit tests: net11.0 appended (picks up the net8.0+ package slot)\n- global.json: 11.0.100 with latestFeature (latestFeature never crosses\n  a major, so the 10.0.100 pin cannot build net11.0)\n- changelog fragment net11-target.md\n\nRefs #1121\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n* build: compile net11.0 against the NuGet targeting pack\n\nSDK 11.0.100 bundles a different build of Microsoft.NETCore.App.Ref on Linux\nand Windows: the facade reference assemblies carry other MVIDs. The IL is\nidentical, but the PDB's referenced-assembly records differ, so the cross-OS\ncompare failed for net11.0 only. Restore now downloads the pack from NuGet,\nwhich is one artifact for every OS. Same fix as IEnumerable-Extensions#653\n(787521b), where the compare went green.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n* build: keep the net11.0 targeting-pack block apart from the PolySharp comment\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-14T23:20:33Z",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/369582b5d30166ae73d6cd4df6f5bb30aec36929"
+        },
+        "date": 1794749252338,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "Mutation score (tests/Wolfgang.Hawsey.Engine.Tests.Unit)",
+            "value": 91.82,
             "unit": "%"
           }
         ]
