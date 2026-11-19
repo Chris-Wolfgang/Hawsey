@@ -1,3 +1,5 @@
+using System;
+
 namespace Wolfgang.Hawsey.Engine.Cards;
 
 /// <summary>
