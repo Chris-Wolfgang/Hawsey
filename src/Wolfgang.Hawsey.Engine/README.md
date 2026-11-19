@@ -8,7 +8,7 @@ Play it in the browser: [chris-wolfgang.github.io/Hawsey/play](https://chris-wol
 dotnet add package Wolfgang.Hawsey.Engine
 ```
 
-Targets `netstandard2.0` and `net10.0`. On `net10.0` it is trimmable and Native AOT-compatible.
+Targets `netstandard2.0`, `net10.0` and `net11.0`. On `net10.0` and `net11.0` it is trimmable and Native AOT-compatible.
 
 ## Play one human against three AI seats: `GameSession`
 
