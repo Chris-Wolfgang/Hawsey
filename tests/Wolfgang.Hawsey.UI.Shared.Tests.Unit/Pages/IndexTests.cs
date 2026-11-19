@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
 using Wolfgang.Hawsey.Engine.Bidding;
 using Wolfgang.Hawsey.Engine.Game;
@@ -743,5 +744,171 @@ public sealed class IndexTests : BunitContext
         session.StartNewGame();
 
         Assert.Equal(renders, page.RenderCount);
+    }
+
+
+    private int FocusCalls() =>
+        JSInterop
+            .Invocations
+            .Count(i => i.Identifier.EndsWith("focus", StringComparison.Ordinal));
+
+
+
+    [Fact]
+    public void Render_when_no_game_has_started_has_a_heading_and_a_polite_live_status()
+    {
+        UseSession();
+        var page = Render<IndexPage>();
+
+        Assert.Equal("Hawsey", page.Find("h1").TextContent);
+
+        var status = page.Find(".statusbar");
+        Assert.Equal("status", status.GetAttribute("role"));
+        Assert.Equal("polite", status.GetAttribute("aria-live"));
+    }
+
+
+
+    [Fact]
+    public void Hand_when_dealt_names_each_card_and_marks_unplayable_ones_disabled()
+    {
+        UseSession();
+        var page = Render<IndexPage>();
+
+        ClickButton(page, NewGame);
+
+        var cards = page.FindAll(".hand .card");
+        Assert.All
+        (
+            cards,
+            c =>
+            {
+                Assert.Equal("button", c.GetAttribute("role"));
+                Assert.Equal("0", c.GetAttribute("tabindex"));
+                Assert.Matches("^(Nine|Ten|Jack|Queen|King|Ace) of (Clubs|Diamonds|Hearts|Spades)$", c.GetAttribute("aria-label"));
+                Assert.Equal("true", c.GetAttribute("aria-disabled"));
+                Assert.False(c.HasAttribute("aria-pressed"));
+            }
+        );
+    }
+
+
+
+    [Fact]
+    public void BidPicker_when_it_opens_is_a_labelled_modal_dialog_that_takes_focus_once()
+    {
+        UseSession();
+        var page = Render<IndexPage>();
+
+        ClickButton(page, NewGame);
+
+        var dialog = page.Find(".modal-card");
+        Assert.Equal("dialog", dialog.GetAttribute("role"));
+        Assert.Equal("true", dialog.GetAttribute("aria-modal"));
+        Assert.Equal("Your bid", page.Find("#" + dialog.GetAttribute("aria-labelledby")).TextContent);
+        Assert.Equal(1, FocusCalls());
+
+        page.Render();
+
+        Assert.Equal(1, FocusCalls());
+    }
+
+
+
+    [Fact]
+    public void TrumpPicker_when_it_follows_the_bid_takes_focus_and_closes_cleanly()
+    {
+        UseSession();
+        var page = Render<IndexPage>();
+
+        ClickButton(page, NewGame);
+        ClickButton(page, "Bid 7");
+
+        var dialog = page.Find(".modal-card");
+        Assert.Equal("Pick trump", page.Find("#" + dialog.GetAttribute("aria-labelledby")).TextContent);
+        Assert.Equal(2, FocusCalls());
+
+        ClickButton(page, "♠ Spades");
+
+        Assert.Empty(page.FindAll(".modal-card"));
+        Assert.Equal(2, FocusCalls());
+    }
+
+
+
+    [Fact]
+    public void CardKeyDown_when_Enter_is_pressed_on_a_legal_card_plays_it_and_names_it_on_the_table()
+    {
+        UseSession();
+        var page = Render<IndexPage>();
+
+        StartGameAndWinBid(page, "♠ Spades");
+
+        var card = page.FindAll(".hand .card.playable")[0];
+        var name = card.GetAttribute("aria-label");
+        Assert.Equal("false", card.GetAttribute("aria-disabled"));
+
+        card.KeyDown(new KeyboardEventArgs { Key = "Enter" });
+
+        Assert.Equal(11, page.FindAll(".hand .card").Count);
+        var played = page.Find(".trick-slot.south .trick-card");
+        Assert.Equal("img", played.GetAttribute("role"));
+        Assert.Equal(name, played.GetAttribute("aria-label"));
+    }
+
+
+
+    [Fact]
+    public void CardKeyDown_when_another_key_is_pressed_does_nothing()
+    {
+        UseSession();
+        var page = Render<IndexPage>();
+
+        StartGameAndWinBid(page, "♠ Spades");
+
+        page.FindAll(".hand .card.playable")[0].KeyDown(new KeyboardEventArgs { Key = "a" });
+
+        Assert.Equal(12, page.FindAll(".hand .card").Count);
+    }
+
+
+
+    [Fact]
+    public void HawseyExchange_when_Space_is_pressed_on_a_card_marks_it_pressed_in_a_non_modal_dialog()
+    {
+        UseSession();
+        var page = Render<IndexPage>();
+
+        ClickButton(page, NewGame);
+        page.Find(".modal-card > button.btn.red").Click();
+        ClickButton(page, "♠ Spades");
+
+        var dialog = page.Find(".modal-card");
+        Assert.Equal("dialog", dialog.GetAttribute("role"));
+        Assert.False(dialog.HasAttribute("aria-modal"));
+        Assert.Equal("Hawsey exchange", page.Find("#" + dialog.GetAttribute("aria-labelledby")).TextContent);
+
+        page.FindAll(".hand .card")[0].KeyDown(new KeyboardEventArgs { Key = " " });
+
+        var cards = page.FindAll(".hand .card");
+        Assert.Equal("true", cards[0].GetAttribute("aria-pressed"));
+        Assert.Equal("false", cards[1].GetAttribute("aria-pressed"));
+    }
+
+
+
+    [Fact]
+    public void RoundSummary_when_a_round_ends_is_a_labelled_modal_dialog()
+    {
+        UseSession();
+        var page = Render<IndexPage>();
+
+        ClickButton(page, NewGame);
+        PlayUntil(page, "Next round");
+
+        var dialog = page.Find(".modal-card.round-summary");
+        Assert.Equal("dialog", dialog.GetAttribute("role"));
+        Assert.Equal("true", dialog.GetAttribute("aria-modal"));
+        Assert.Equal("Round complete", page.Find("#" + dialog.GetAttribute("aria-labelledby")).TextContent);
     }
 }
