@@ -160,6 +160,16 @@ public class GameSessionBidsAndExchangeTests
 
 
     [Fact]
+    public void PlaceHumanBid_when_action_is_null_throws_even_out_of_turn()
+    {
+        var session = TestGameSessions.Unpaced();
+
+        Assert.Equal("action", Assert.Throws<ArgumentNullException>(() => session.PlaceHumanBid(null!)).ParamName);
+    }
+
+
+
+    [Fact]
     public async Task PerformHawseyExchange_when_the_cards_are_not_two_held_cards_each_returns_false()
     {
         var session = await AtHumanHawseyExchangeAsync();

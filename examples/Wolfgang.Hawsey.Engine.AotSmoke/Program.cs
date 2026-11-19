@@ -48,14 +48,15 @@ internal static class Program
             }
         }
 
-        if (hawseyExchanges == 0)
+        // Not a game failure, so it is kept out of the games-completed count.
+        var hawseyPathUnexercised = hawseyExchanges == 0;
+        if (hawseyPathUnexercised)
         {
             Console.Error.WriteLine("No game reached a Hawsey exchange; that path went unexercised.");
-            failures++;
         }
 
         Console.WriteLine($"AOT smoke: {GameCount - failures}/{GameCount} games completed, {hawseyExchanges} Hawsey exchanges.");
-        return failures == 0 ? 0 : 1;
+        return failures == 0 && !hawseyPathUnexercised ? 0 : 1;
     }
 
 
