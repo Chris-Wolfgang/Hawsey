@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794698523191,
+  "lastUpdate": 1795125283185,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -1222,6 +1222,60 @@ window.BENCHMARK_DATA = {
             "value": 523703.3616536458,
             "unit": "ns",
             "range": "± 7529.034395300725"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f5ff1ead50c54c26551ada2b5d8665b803dbec8d",
+          "message": "fix: drop unused netstandard2.0 deps, keep Blazor DevServer on 10.0 (#1135) (#1138)\n\nThe engine's netstandard2.0 slot referenced System.Memory and\nMicrosoft.Bcl.HashCode without using either, so both shipped as package\ndependencies. The grouped Dependabot bump lifted the WebAssembly DevServer\nto 11.0.0 beside a net10.0 app; put it back on 10.0.15 and ignore\nsemver-major updates for Microsoft.AspNetCore.*.\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-19T16:50:15-05:00",
+          "tree_id": "7d1abab3cd2520f87ed41b36740406c78a31cd4e",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/f5ff1ead50c54c26551ada2b5d8665b803dbec8d"
+        },
+        "date": 1795125282025,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 432.0915452639262,
+            "unit": "ns",
+            "range": "± 0.9058079024829001"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 60.27670476833979,
+            "unit": "ns",
+            "range": "± 0.4416843138820411"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 204.94685367743173,
+            "unit": "ns",
+            "range": "± 0.8294600772575572"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 261800.5880533854,
+            "unit": "ns",
+            "range": "± 1791.75794673671"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGameWithSimpleAi",
+            "value": 343333.4641927083,
+            "unit": "ns",
+            "range": "± 2924.715980008725"
           }
         ]
       }
