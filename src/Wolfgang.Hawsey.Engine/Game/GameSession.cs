@@ -299,8 +299,16 @@ public sealed class GameSession
     /// not the human's turn to bid, or a number bid is below
     /// <see cref="GameState.MinimumLegalBid"/> or above <see cref="GameState.MaximumBid"/>.
     /// </summary>
+    /// <param name="action">The bid the human makes: a number bid, a pass or the Hawsey bid.</param>
+    /// <returns><see langword="true"/> when the bid was placed.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="action"/> is <see langword="null"/>.</exception>
     public bool PlaceHumanBid(BidAction action)
     {
+        if (action == null)
+        {
+            throw new ArgumentNullException(nameof(action));
+        }
+
         lock (_sync)
         {
             if (!TryGetOpenBidding(_generation, out var state) || state.NextToAct != HumanPosition)
@@ -424,8 +432,8 @@ public sealed class GameSession
         lock (_sync)
         {
             if (_state is not { Phase: GamePhase.HawseyExchange, HawseyBidder: HumanPosition }
-                || discard.Length != 2
-                || fromPartner.Length != 2
+                || discard.Length != GameState.HawseyExchangeCardCount
+                || fromPartner.Length != GameState.HawseyExchangeCardCount
                 || !Holds(_state.Hands[HumanPosition], discard)
                 || !Holds(_state.Hands[HumanPosition.Partner()], fromPartner))
             {
@@ -461,7 +469,7 @@ public sealed class GameSession
         lock (_sync)
         {
             if (_state is not { Phase: GamePhase.HawseyExchange, HawseyBidder: HumanPosition }
-                || discard.Length != 2
+                || discard.Length != GameState.HawseyExchangeCardCount
                 || !Holds(_state.Hands[HumanPosition], discard))
             {
                 return false;
@@ -537,6 +545,8 @@ public sealed class GameSession
     /// completes a trick, a round or the game, the matching events are raised,
     /// exactly as for an AI play.
     /// </summary>
+    /// <param name="card">The card the human plays from their hand.</param>
+    /// <returns><see langword="true"/> when the card was played.</returns>
     public bool PlayHumanCard(Card card)
     {
         PlayOutcome outcome;

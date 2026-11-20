@@ -12,10 +12,11 @@ public sealed class TrickResult
     /// </summary>
     /// <param name="winner">The player who won the trick.</param>
     /// <param name="cards">The cards that were played in the trick.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="cards"/> is <see langword="null"/>.</exception>
     public TrickResult(PlayerPosition winner, IReadOnlyList<PlayedCard> cards)
     {
         Winner = winner;
-        Cards = cards;
+        Cards = cards ?? throw new ArgumentNullException(nameof(cards));
     }
 
 

@@ -249,13 +249,13 @@
             <div class="modal-card">
                 <h2>Hawsey exchange</h2>
                 <p class="modal-sub">
-                    Click <strong>2 cards</strong> in your hand to discard.
+                    Click <strong>@GameState.HawseyExchangeCardCount cards</strong> in your hand to discard.
                     Your partner gives you their <strong>2 best</strong> for the chosen trump.
                 </p>
                 <p class="modal-sub">
-                    Selected: <strong>@_hawseyDiscardIndexes.Count / 2</strong>
+                    Selected: <strong>@_hawseyDiscardIndexes.Count / @GameState.HawseyExchangeCardCount</strong>
                 </p>
-                <button class="btn primary" disabled="@(_hawseyDiscardIndexes.Count != 2)"
+                <button class="btn primary" disabled="@(_hawseyDiscardIndexes.Count != GameState.HawseyExchangeCardCount)"
                         @onclick="ConfirmHawseyDiscardAsync">Discard &amp; receive</button>
             </div>
         </div>
@@ -698,7 +698,7 @@
 
     private void ToggleHawseyDiscard(int index)
     {
-        if (!_hawseyDiscardIndexes.Remove(index) && _hawseyDiscardIndexes.Count < 2)
+        if (!_hawseyDiscardIndexes.Remove(index) && _hawseyDiscardIndexes.Count < GameState.HawseyExchangeCardCount)
         {
             _hawseyDiscardIndexes.Add(index);
         }
@@ -706,7 +706,7 @@
 
     private async Task ConfirmHawseyDiscardAsync()
     {
-        if (_hawseyDiscardIndexes.Count != 2) return;
+        if (_hawseyDiscardIndexes.Count != GameState.HawseyExchangeCardCount) return;
         var discard = _hawseyDiscardIndexes.Select(i => HumanHand[i]).ToArray();
         _hawseyDiscardIndexes.Clear();
         _hawseyExchangeVisible = false;
@@ -783,7 +783,7 @@
             case WaitingFor.HumanHawseyExchange:
                 _hawseyExchangeVisible = true;
                 _hawseyDiscardIndexes.Clear();
-                _statusMessage = "Hawsey! Pick 2 cards to discard.";
+                _statusMessage = $"Hawsey! Pick {GameState.HawseyExchangeCardCount} cards to discard.";
                 break;
 
             case WaitingFor.HumanCard:

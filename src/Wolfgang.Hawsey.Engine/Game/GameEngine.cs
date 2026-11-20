@@ -34,6 +34,11 @@ public sealed class GameEngine
 
 
 
+    /// <summary>The cards each player gets per pass round the table when dealing.</summary>
+    private const int CardsPerDeal = 2;
+
+
+
     /// <summary>
     /// Starts a new game by dealing the first hand.
     /// </summary>
@@ -476,14 +481,14 @@ public sealed class GameEngine
             throw new ArgumentNullException(nameof(cardsFromPartner));
         }
 
-        if (cardsToDiscard.Length != 2)
+        if (cardsToDiscard.Length != GameState.HawseyExchangeCardCount)
         {
-            throw new InvalidOperationException("Must discard exactly 2 cards.");
+            throw new InvalidOperationException($"Must discard exactly {GameState.HawseyExchangeCardCount} cards.");
         }
 
-        if (cardsFromPartner.Length != 2)
+        if (cardsFromPartner.Length != GameState.HawseyExchangeCardCount)
         {
-            throw new InvalidOperationException("Partner must give exactly 2 cards.");
+            throw new InvalidOperationException($"Partner must give exactly {GameState.HawseyExchangeCardCount} cards.");
         }
     }
 
@@ -703,13 +708,13 @@ public sealed class GameEngine
 
         var hands = new Dictionary<PlayerPosition, List<Card>>
         {
-            [PlayerPosition.North] = new List<Card>(12),
-            [PlayerPosition.East] = new List<Card>(12),
-            [PlayerPosition.South] = new List<Card>(12),
-            [PlayerPosition.West] = new List<Card>(12)
+            [PlayerPosition.North] = new List<Card>(GameState.TricksPerRound),
+            [PlayerPosition.East] = new List<Card>(GameState.TricksPerRound),
+            [PlayerPosition.South] = new List<Card>(GameState.TricksPerRound),
+            [PlayerPosition.West] = new List<Card>(GameState.TricksPerRound)
         };
 
-        // Deal 2 at a time, starting left of dealer, going clockwise
+        // Deal CardsPerDeal at a time, starting left of dealer, going clockwise
         var positions = new PlayerPosition[4];
         var pos = dealer.NextClockwise();
 
@@ -721,13 +726,15 @@ public sealed class GameEngine
 
         var cardIndex = 0;
 
-        // 6 rounds of dealing 2 cards to each player
-        for (var round = 0; round < 6; round++)
+        // Pass round the table until each player holds a full hand.
+        for (var round = 0; round < GameState.TricksPerRound / CardsPerDeal; round++)
         {
             for (var p = 0; p < 4; p++)
             {
-                hands[positions[p]].Add(deck[cardIndex++]);
-                hands[positions[p]].Add(deck[cardIndex++]);
+                for (var c = 0; c < CardsPerDeal; c++)
+                {
+                    hands[positions[p]].Add(deck[cardIndex++]);
+                }
             }
         }
 
