@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1795138332218,
+  "lastUpdate": 1795182558619,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -1330,6 +1330,60 @@ window.BENCHMARK_DATA = {
             "value": 504670.07047526044,
             "unit": "ns",
             "range": "± 1732.6618843986228"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "189714e59c355d5ed5c9ea01dd835ca8bc1ef01a",
+          "message": "build(engine): turn off implicit usings in the multi-targeted projects (#1137, part 2) (#1140)\n\n* refactor(engine): one source for rule constants, null guards, doc gaps (#1137)\n\n- SimpleAiStrategy caps its bid with GameState.MaximumBid instead of its\n  own copy; Deal sizes hands with TricksPerRound and a CardsPerDeal const.\n- New GameState.HawseyExchangeCardCount replaces the literal 2 in the\n  engine, GameSession and the Blazor page.\n- GameState/TrickResult constructors and PlaceHumanBid throw\n  ArgumentNullException; PlaceHumanBid/PlayHumanCard get param/returns docs;\n  GameState's summary names CurrentTrick as read-only too.\n- AotSmoke no longer counts the unexercised-Hawsey check as a failed game.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n* build(engine): turn off implicit usings in the multi-targeted projects (#1137)\n\nThe engine (3 TFMs) and its unit tests (14 TFMs) now write their System.*\nusings out, per the fleet rule for multi-targeted projects. No code change.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-20T08:47:23-05:00",
+          "tree_id": "1abff74d0caf3cb4a070b477870fe077a8ced054",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/189714e59c355d5ed5c9ea01dd835ca8bc1ef01a"
+        },
+        "date": 1795182557177,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 357.02365223566693,
+            "unit": "ns",
+            "range": "± 4.84072209062937"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 39.22131568193436,
+            "unit": "ns",
+            "range": "± 0.10261247058760518"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 136.42301003138223,
+            "unit": "ns",
+            "range": "± 5.093060314895486"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 181689.20475260416,
+            "unit": "ns",
+            "range": "± 2805.541401401121"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGameWithSimpleAi",
+            "value": 260025.43294270834,
+            "unit": "ns",
+            "range": "± 3658.3816795879347"
           }
         ]
       }
