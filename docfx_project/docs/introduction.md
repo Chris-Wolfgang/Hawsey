@@ -4,7 +4,7 @@
 
 ## Overview
 
-The engine holds the rules and nothing else. It does no I/O and has no UI. A caller starts a game with `GameEngine.StartGame`, then moves it forward with `PlaceBid`, `SelectTrump`, `ExchangeHawseyCards` and `PlayCard`. Each call takes the current `GameState` and returns the next one. `GameRunner` plays a complete game with an `IPlayerStrategy` making every decision.
+The engine holds the rules and nothing else. It does no I/O and has no UI. A caller starts a game with `GameEngine.StartGame`, then moves it forward with `PlaceBid`, `SelectTrump`, `ExchangeHawseyCards` and `PlayCard`. Each call takes the current `GameState` and returns the next one. `GameRunner` plays a complete game with an `IPlayerStrategy` making every decision. `GameSession` runs a live game for a UI: one human seat, `SimpleAiStrategy` in the other three, and events (`StateChanged`, `TrickCompleted`, `RoundCompleted`, `GameOver`) for each change.
 
 ## Key Features
 
@@ -13,7 +13,8 @@ The engine holds the rules and nothing else. It does no I/O and has no UI. A cal
 - Trick play: `Trick`, `PlayedCard`, `FollowSuitValidator`, `TrickResult`
 - House rules: `HouseRules` (`MustBeat`, `MustTrump`, `MinimumBid`, `PointsToWin`) and `TrumpMode` (`Suited` or `AceHigh`)
 - Scoring: `RoundScore`
-- Targets `netstandard2.0` and `net10.0`; trim- and Native AOT-compatible on `net10.0`
+- Live game: `GameSession`, `WaitingFor`, `SimpleAiStrategy`, `TrickCompletedEventArgs`, `GameOverEventArgs`
+- Targets `netstandard2.0`, `net10.0` and `net11.0`; trim- and Native AOT-compatible on `net10.0` and `net11.0`
 
 ## Getting Help
 

@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Wolfgang.Hawsey.Engine.Players;
 
 namespace Wolfgang.Hawsey.Engine.TrickPlay;
