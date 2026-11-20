@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1795185102350,
+  "lastUpdate": 1795197634801,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -1438,6 +1438,60 @@ window.BENCHMARK_DATA = {
             "value": 530787.5218098959,
             "unit": "ns",
             "range": "± 1150.7414828344472"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "380ebcbfea773adc6f55ae32102dd45115cfb3b8",
+          "message": "fix(blazor): make the game playable by keyboard and screen reader (#1136) (#1142)\n\n* refactor(engine): one source for rule constants, null guards, doc gaps (#1137)\n\n- SimpleAiStrategy caps its bid with GameState.MaximumBid instead of its\n  own copy; Deal sizes hands with TricksPerRound and a CardsPerDeal const.\n- New GameState.HawseyExchangeCardCount replaces the literal 2 in the\n  engine, GameSession and the Blazor page.\n- GameState/TrickResult constructors and PlaceHumanBid throw\n  ArgumentNullException; PlaceHumanBid/PlayHumanCard get param/returns docs;\n  GameState's summary names CurrentTrick as read-only too.\n- AotSmoke no longer counts the unexercised-Hawsey check as a failed game.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n* fix(blazor): make the game playable by keyboard and screen reader (#1136)\n\n- Hand cards are role=\"button\" with tabindex, an aria-label naming the\n  card, aria-disabled/aria-pressed, and Enter/Space act as a click.\n- The four pickers are role=\"dialog\" with aria-labelledby (aria-modal on\n  all but the Hawsey exchange, which needs the hand) and take focus once\n  when they open.\n- The status bar is a polite live region; played cards and the dealer\n  puck have text alternatives; the page and not-found page get a\n  visually hidden <h1> for FocusOnNavigate; :focus-visible ring in CSS.\n- 8 bUnit tests cover the new behaviour.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-20T12:57:06-05:00",
+          "tree_id": "0f3b88c25d9431864cf4d837fec32235a9035569",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/380ebcbfea773adc6f55ae32102dd45115cfb3b8"
+        },
+        "date": 1795197633138,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 437.3063669204712,
+            "unit": "ns",
+            "range": "± 6.487540574134082"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 60.53792532285055,
+            "unit": "ns",
+            "range": "± 1.7973485365961994"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 207.53892596562704,
+            "unit": "ns",
+            "range": "± 6.597855965527441"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 258266.29296875,
+            "unit": "ns",
+            "range": "± 2226.5153767096863"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGameWithSimpleAi",
+            "value": 351659.80745442706,
+            "unit": "ns",
+            "range": "± 6169.395161258779"
           }
         ]
       }
