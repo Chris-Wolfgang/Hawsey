@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1795182558619,
+  "lastUpdate": 1795185102350,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -1384,6 +1384,60 @@ window.BENCHMARK_DATA = {
             "value": 260025.43294270834,
             "unit": "ns",
             "range": "± 3658.3816795879347"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6b3fd9840ecb9d7ea08961fc61c6c77df8eaa585",
+          "message": "docs: net11.0 target, SDK 11 pin, Blazor host tests and GameSession (#1134) (#1141)\n\nREADME, package readme, docfx pages, CONTRIBUTING and copilot-instructions\nnow list net11.0 and the 11.0 SDK prerequisite, the five-leg test matrix\nreaches net11.0, the project tables gain the Blazor host test project, and\nthe README/introduction name GameSession and its companions. CHANGELOG's\n0.1.0 entry names the dev/maui branch correctly.\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-20T09:27:19-05:00",
+          "tree_id": "9d65729df07b652676c0b4a19a7bc1459027f2ce",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/6b3fd9840ecb9d7ea08961fc61c6c77df8eaa585"
+        },
+        "date": 1795185101214,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 487.5304180781047,
+            "unit": "ns",
+            "range": "± 1.2711670889316022"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 95.17963832616806,
+            "unit": "ns",
+            "range": "± 0.7977876076246704"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 288.9533888498942,
+            "unit": "ns",
+            "range": "± 6.9286528708385555"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 385125.82893880206,
+            "unit": "ns",
+            "range": "± 4398.1925510801975"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGameWithSimpleAi",
+            "value": 530787.5218098959,
+            "unit": "ns",
+            "range": "± 1150.7414828344472"
           }
         ]
       }
