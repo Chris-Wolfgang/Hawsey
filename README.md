@@ -76,6 +76,8 @@ var final = runner.RunGame(myStrategy, HouseRules.Default, PlayerPosition.South,
 
 One strategy instance makes the decisions for every seat; each method receives the `PlayerPosition` it is deciding for.
 
+To drive a live game with one human seat and `SimpleAiStrategy` in the other three (what the Blazor app does), use `GameSession`: it tells the UI what it is `WaitingFor`, takes the human's moves (`PlaceHumanBid`, `PlayHumanCard`, ...) and raises `StateChanged`, `TrickCompleted`, `RoundCompleted` and `GameOver`. The [package readme](src/Wolfgang.Hawsey.Engine/README.md) has a worked example.
+
 ---
 
 ## ✨ Features
@@ -89,9 +91,10 @@ One strategy instance makes the decisions for every seat; each method receives t
 | Players and teams | `PlayerPosition`, `Team` |
 | Scoring | `RoundScore` |
 | Game flow | `GameEngine`, `GameState`, `GamePhase` |
+| Live game | `GameSession` (one human seat, AI for the other three), `WaitingFor`, `SimpleAiStrategy`, `TrickCompletedEventArgs`, `GameOverEventArgs` |
 | Strategy hooks | `IPlayerStrategy`, `GameRunner` |
 
-The engine does no I/O. On `net10.0` it is marked trim- and Native AOT-compatible (`IsTrimmable`, `IsAotCompatible`); `examples/Wolfgang.Hawsey.Engine.AotSmoke` plays complete games through a Native AOT build of it.
+The engine does no I/O. On `net10.0` and `net11.0` it is marked trim- and Native AOT-compatible (`IsTrimmable`, `IsAotCompatible`); `examples/Wolfgang.Hawsey.Engine.AotSmoke` plays complete games through a Native AOT build of it.
 
 ---
 
@@ -124,8 +127,9 @@ The game's namesake bid: the bidder plays alone to take all 12 tricks. The bidde
 | `src/Wolfgang.Hawsey.Engine` | Game-logic library (cards, bidding, trick play, scoring, rules). The NuGet package. |
 | `src/Wolfgang.Hawsey.UI.Blazor` | Blazor WebAssembly app, played at [chris-wolfgang.github.io/Hawsey/play](https://chris-wolfgang.github.io/Hawsey/play/). Its components are in `src/Wolfgang.Hawsey.UI.Shared`; the game logic is the engine's `GameSession` ([ADR 0007](docs/adr/0007-game-session-in-the-engine-and-testable-uis.md)). Not published as a package. |
 | `src/Wolfgang.Hawsey.UI.Shared` | The Blazor app's Razor components and styles. |
-| `tests/Wolfgang.Hawsey.Engine.Tests.Unit` | Engine unit tests, run on every target framework from `net462` to `net10.0`. |
+| `tests/Wolfgang.Hawsey.Engine.Tests.Unit` | Engine unit tests, run on every target framework from `net462` to `net11.0`. |
 | `tests/Wolfgang.Hawsey.UI.Shared.Tests.Unit` | bUnit tests for the Blazor app's game page, against a real `GameSession`. |
+| `tests/Wolfgang.Hawsey.UI.Blazor.Tests.Unit` | bUnit tests for the Blazor WebAssembly host (`App` and its routing). |
 | `tests/Wolfgang.Hawsey.Engine.Tests.Concurrency` | Coyote concurrency tests for the engine's `GameSession`. |
 | `benchmarks/Wolfgang.Hawsey.Engine.Benchmarks` | BenchmarkDotNet benchmarks for the engine. |
 | `examples/Wolfgang.Hawsey.Engine.AotSmoke` | Native AOT smoke test that plays complete games through the engine. |
@@ -142,6 +146,7 @@ The engine is UI-agnostic. Each `GameEngine` method takes the current `GameState
 
 - `netstandard2.0`
 - `net10.0`
+- `net11.0`
 
 See the [NuGet package page](https://www.nuget.org/packages/Wolfgang.Hawsey.Engine/) for the authoritative per-TFM compatibility matrix.
 
@@ -152,11 +157,11 @@ supports there:
 
 | Leg | Runner | TFMs |
 |---|---|---|
-| Linux x64 | `ubuntu-24.04` | net5.0 to net10.0 |
-| Windows x64 | `windows-latest` | net5.0 to net10.0, .NET Framework 4.6.2 to 4.8.1 |
-| macOS ARM64 | `macos-latest` | net6.0 to net10.0 |
-| Linux ARM64 | `ubuntu-24.04-arm` | net6.0 to net10.0 |
-| Windows ARM64 | `windows-11-arm` | net6.0 to net10.0 |
+| Linux x64 | `ubuntu-24.04` | net5.0 to net11.0 |
+| Windows x64 | `windows-latest` | net5.0 to net11.0, .NET Framework 4.6.2 to 4.8.1 |
+| macOS ARM64 | `macos-latest` | net6.0 to net11.0 |
+| Linux ARM64 | `ubuntu-24.04-arm` | net6.0 to net11.0 |
+| Windows ARM64 | `windows-11-arm` | net6.0 to net11.0 |
 
 The ARM64 and macOS legs start at net6.0, the first .NET with ARM64 support on
 those systems. .NET Framework runs on Windows x64 only. The Native AOT smoke test
@@ -195,7 +200,7 @@ This repository uses **`BannedSymbols.txt`** to prohibit synchronous APIs and en
 ## 🛠️ Building from Source
 
 ### Prerequisites
-- [.NET SDK](https://dotnet.microsoft.com/download) 10.0
+- [.NET SDK](https://dotnet.microsoft.com/download) 11.0 (`global.json` pins `11.0.100` with `latestFeature` roll-forward)
 - [PowerShell 7](https://github.com/PowerShell/PowerShell) (`pwsh`) for the scripts under `scripts/`
 
 ### Build Steps
