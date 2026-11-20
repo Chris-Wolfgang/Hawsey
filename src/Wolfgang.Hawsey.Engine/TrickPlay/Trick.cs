@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Players;
 

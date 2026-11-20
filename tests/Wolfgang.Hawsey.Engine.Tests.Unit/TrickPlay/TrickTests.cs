@@ -1,3 +1,4 @@
+using System;
 using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Players;
 using Wolfgang.Hawsey.Engine.TrickPlay;
