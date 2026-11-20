@@ -50,7 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The engine has one scoring path: `RoundScore` scores each round and `GameState.Winner` names the winner. Unused types, including a second scoring path that disagreed on who wins a tie, were removed before the first release. (#891)
 - `GameSession.PlayHumanCard` works out the legal plays once, inside the engine, instead of checking legality itself and then having the engine check again. (#893)
 - The engine's version attributes are audited and pinned by tests: FileVersion and InformationalVersion follow `<Version>`, and AssemblyVersion stays at 1.0.0.0 as ADR 0006 records. (#852)
-- The .NET MAUI app (Android, Windows, iOS, Mac Catalyst) is not part of this release: it continues on the `feature/maui` branch until it is ready. This release ships the engine and the Blazor web app. (#931)
+- The .NET MAUI app (Android, Windows, iOS, Mac Catalyst) is not part of this release: it continues on the `dev/maui` branch until it is ready. This release ships the engine and the Blazor web app. (#931)
 
 [Unreleased]: https://github.com/Chris-Wolfgang/Hawsey/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/Chris-Wolfgang/Hawsey/releases/tag/v0.1.0

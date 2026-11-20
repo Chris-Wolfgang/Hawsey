@@ -14,7 +14,7 @@ Documentation for `Wolfgang.Hawsey.Engine`, the game engine for Hawsey: a four-p
 
 ## About Hawsey
 
-The engine is a UI-agnostic .NET library. It models the pinochle deck, bidding, trump selection, the Hawsey exchange, trick play and scoring. Each `GameEngine` method takes the current `GameState` and returns the next one. It targets `netstandard2.0` and `net10.0`.
+The engine is a UI-agnostic .NET library. It models the pinochle deck, bidding, trump selection, the Hawsey exchange, trick play and scoring. Each `GameEngine` method takes the current `GameState` and returns the next one. It targets `netstandard2.0`, `net10.0` and `net11.0`.
 
 ## Installation
 
