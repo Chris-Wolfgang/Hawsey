@@ -5,6 +5,12 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
+    # The Blazor projects target net10.0, so their ASP.NET Core packages must stay on the
+    # 10.0 line. The grouped "*" update once lifted the WebAssembly DevServer to 11.0.0 beside
+    # a 10.0 app. Move these to a new major deliberately, together with the TFM.
+    ignore:
+      - dependency-name: "Microsoft.AspNetCore.*"
+        update-types: ["version-update:semver-major"]
     labels:
       - "dependencies"
     groups:
