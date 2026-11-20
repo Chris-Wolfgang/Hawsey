@@ -528,3 +528,27 @@ html, body {
 .modal-card.round-summary .rs-grid .them { color: var(--them-red); font-weight: 700; }
 .modal-card.round-summary .rs-grid .pos { color: #6cf06c; }
 .modal-card.round-summary .rs-grid .neg { color: var(--them-red); }
+
+/* ─── Accessibility ──────────────────────────────────────────── */
+/* A visible keyboard focus ring on every control, the hand's cards included. */
+button:focus-visible,
+.hand .card:focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 2px;
+}
+
+/* Dialogs take focus when they open; the ring would only frame the whole card. */
+.modal-card:focus { outline: none; }
+
+/* Read by screen readers, not shown (the page's <h1>). */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
