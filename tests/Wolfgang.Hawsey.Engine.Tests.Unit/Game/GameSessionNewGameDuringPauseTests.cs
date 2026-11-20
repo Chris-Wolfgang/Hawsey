@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Wolfgang.Hawsey.Engine.Bidding;
 using Wolfgang.Hawsey.Engine.Rules;
 using Wolfgang.Hawsey.Engine.Game;

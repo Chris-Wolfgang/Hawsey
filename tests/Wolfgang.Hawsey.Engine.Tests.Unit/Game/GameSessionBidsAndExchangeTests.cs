@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Wolfgang.Hawsey.Engine.Bidding;
 using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Game;
@@ -155,6 +158,16 @@ public class GameSessionBidsAndExchangeTests
         var session = TestGameSessions.Unpaced();
 
         Assert.Equal("discard", Assert.Throws<ArgumentNullException>(() => session.PerformHumanHawseyExchange(null!)).ParamName);
+    }
+
+
+
+    [Fact]
+    public void PlaceHumanBid_when_action_is_null_throws_even_out_of_turn()
+    {
+        var session = TestGameSessions.Unpaced();
+
+        Assert.Equal("action", Assert.Throws<ArgumentNullException>(() => session.PlaceHumanBid(null!)).ParamName);
     }
 
 

@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Wolfgang.Hawsey.Engine.Bidding;
 using Wolfgang.Hawsey.Engine.Cards;
 using Wolfgang.Hawsey.Engine.Game;
@@ -15,8 +18,6 @@ namespace Wolfgang.Hawsey.Engine.Strategy;
 /// </summary>
 public sealed class SimpleAiStrategy : IPlayerStrategy
 {
-    private const int HighestAiBid = 11;
-
     private const int CopiesPerCard = 2;
 
     /// <summary>
@@ -53,7 +54,7 @@ public sealed class SimpleAiStrategy : IPlayerStrategy
             return new BidAction.NumberBid(state.Rules.MinimumBid);
         }
 
-        var bid = Math.Min(score, HighestAiBid);
+        var bid = Math.Min(score, GameState.MaximumBid);
 
         return bid > state.HighBid
             ? new BidAction.NumberBid(bid)

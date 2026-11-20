@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Wolfgang.Hawsey.Engine.Bidding;
 using Wolfgang.Hawsey.Engine.Cards;
@@ -12,8 +14,9 @@ namespace Wolfgang.Hawsey.Engine.Game;
 /// A snapshot of the entire game state at a point in time. Each method on
 /// <see cref="GameEngine"/> returns a freshly-constructed instance rather than mutating
 /// the previous state, so callers should treat the exposed <see cref="Hands"/> and
-/// <see cref="CompletedTricks"/> collections as read-only — mutating them is unsupported
-/// and can corrupt subsequent engine transitions.
+/// <see cref="CompletedTricks"/> collections, and the <see cref="CurrentTrick"/>, as
+/// read-only — mutating them (for example calling <see cref="Trick.Play"/> on
+/// <see cref="CurrentTrick"/>) is unsupported and can corrupt subsequent engine transitions.
 /// </summary>
 // MA0016: GameState exposes Dictionary<,> and List<> on its public surface so the engine
 // can pass the collections it constructs internally without copying or wrapping. Switching
@@ -51,6 +54,9 @@ public sealed class GameState
     /// <param name="highBid">The highest number bid so far while bidding, or <c>0</c> when nobody has bid (<see cref="HighBid"/>).</param>
     /// <param name="highBidder">The player holding <paramref name="highBid"/>, or <c>null</c> when nobody has bid (<see cref="HighBidder"/>).</param>
     /// <param name="roundScore">The round the engine has just scored, or <c>null</c> (<see cref="RoundScore"/>).</param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="hands"/>, <paramref name="completedTricks"/> or <paramref name="rules"/> is <see langword="null"/>.
+    /// </exception>
     public GameState
     (
         GamePhase phase,
@@ -75,15 +81,15 @@ public sealed class GameState
     {
         Phase = phase;
         Dealer = dealer;
-        Hands = hands;
+        Hands = hands ?? throw new ArgumentNullException(nameof(hands));
         TrumpSuit = trumpSuit;
         TrumpMode = trumpMode;
         BiddingResult = biddingResult;
-        CompletedTricks = completedTricks;
+        CompletedTricks = completedTricks ?? throw new ArgumentNullException(nameof(completedTricks));
         CurrentTrick = currentTrick;
         NorthSouthScore = northSouthScore;
         EastWestScore = eastWestScore;
-        Rules = rules;
+        Rules = rules ?? throw new ArgumentNullException(nameof(rules));
         NextToAct = nextToAct;
         TricksPlayedInRound = tricksPlayedInRound;
         IsHawseyRound = isHawseyRound;
@@ -271,6 +277,14 @@ public sealed class GameState
     /// <see cref="TricksPerRound"/> tricks, and loses them otherwise.
     /// </summary>
     public const int HawseyBidAmount = 24;
+
+
+
+    /// <summary>
+    /// The cards swapped in a Hawsey exchange: the bidder discards this many and takes
+    /// as many from their partner.
+    /// </summary>
+    public const int HawseyExchangeCardCount = 2;
 
 
 
