@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1795125283185,
+  "lastUpdate": 1795138332218,
   "repoUrl": "https://github.com/Chris-Wolfgang/Hawsey",
   "entries": {
     "BenchmarkDotNet": [
@@ -1276,6 +1276,60 @@ window.BENCHMARK_DATA = {
             "value": 343333.4641927083,
             "unit": "ns",
             "range": "± 2924.715980008725"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "101e99f61fc4d65804f959e499ba2e213394e2d3",
+          "message": "refactor(engine): one source for rule constants, null guards, doc gaps (#1137) (#1139)\n\n- SimpleAiStrategy caps its bid with GameState.MaximumBid instead of its\n  own copy; Deal sizes hands with TricksPerRound and a CardsPerDeal const.\n- New GameState.HawseyExchangeCardCount replaces the literal 2 in the\n  engine, GameSession and the Blazor page.\n- GameState/TrickResult constructors and PlaceHumanBid throw\n  ArgumentNullException; PlaceHumanBid/PlayHumanCard get param/returns docs;\n  GameState's summary names CurrentTrick as read-only too.\n- AotSmoke no longer counts the unexercised-Hawsey check as a failed game.\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-19T20:28:24-05:00",
+          "tree_id": "76d8e4a667a69ff6108ef5e9ff2c3b375bd2bd26",
+          "url": "https://github.com/Chris-Wolfgang/Hawsey/commit/101e99f61fc4d65804f959e499ba2e213394e2d3"
+        },
+        "date": 1795138331304,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.Shuffle",
+            "value": 421.3718099594116,
+            "unit": "ns",
+            "range": "± 1.7712781646875255"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.GetLegalPlays",
+            "value": 58.97468304634094,
+            "unit": "ns",
+            "range": "± 0.21101796701237038"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.SortHandByStrength",
+            "value": 185.12027939160666,
+            "unit": "ns",
+            "range": "± 0.8821515093693756"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGame",
+            "value": 367836.4108886719,
+            "unit": "ns",
+            "range": "± 2441.4438590187215"
+          },
+          {
+            "name": "Wolfgang.Hawsey.Engine.Benchmarks.EngineBenchmarks.PlayFullGameWithSimpleAi",
+            "value": 504670.07047526044,
+            "unit": "ns",
+            "range": "± 1732.6618843986228"
           }
         ]
       }
