@@ -6,6 +6,9 @@
 
 <div class="table">
 
+    @* The page's top-level heading: FocusOnNavigate (App.razor) moves focus here. *@
+    <h1 class="visually-hidden" tabindex="-1">Hawsey</h1>
+
     @if (State?.TrumpSuit is { } trump)
     {
         var sym = SuitSymbol(trump);
@@ -50,7 +53,7 @@
             <span>Tricks: @TricksWon(PlayerPosition.North)</span>
         </div>
         @if (BidBadge(PlayerPosition.North) is { } pb) { <span class="bid-badge @pb.Class">@pb.Text</span> }
-        @if (IsDealer(PlayerPosition.North)) { <div class="dealer-puck">D</div> }
+        @if (IsDealer(PlayerPosition.North)) { <div class="dealer-puck" role="img" aria-label="Dealer">D</div> }
         <div class="opponent-hand">
             @for (var i = 0; i < HandCount(PlayerPosition.North); i++)
             {
@@ -72,7 +75,7 @@
             <span>Tricks: @TricksWon(PlayerPosition.West)</span>
         </div>
         @if (BidBadge(PlayerPosition.West) is { } wb) { <span class="bid-badge @wb.Class">@wb.Text</span> }
-        @if (IsDealer(PlayerPosition.West)) { <div class="dealer-puck">D</div> }
+        @if (IsDealer(PlayerPosition.West)) { <div class="dealer-puck" role="img" aria-label="Dealer">D</div> }
     </div>
 
     <div class="seat right @SeatActiveClass(PlayerPosition.East)">
@@ -88,7 +91,7 @@
             <span>Tricks: @TricksWon(PlayerPosition.East)</span>
         </div>
         @if (BidBadge(PlayerPosition.East) is { } eb) { <span class="bid-badge @eb.Class">@eb.Text</span> }
-        @if (IsDealer(PlayerPosition.East)) { <div class="dealer-puck">D</div> }
+        @if (IsDealer(PlayerPosition.East)) { <div class="dealer-puck" role="img" aria-label="Dealer">D</div> }
     </div>
 
     <div class="trick-area">
@@ -119,7 +122,7 @@
     </div>
 
     <div class="seat you @SeatActiveClass(PlayerPosition.South)">
-        @if (IsDealer(PlayerPosition.South)) { <div class="dealer-puck">D</div> }
+        @if (IsDealer(PlayerPosition.South)) { <div class="dealer-puck" role="img" aria-label="Dealer">D</div> }
         <div class="nameplate">
             <div class="avatar"></div>
             <span class="name">YOU</span>
@@ -138,21 +141,31 @@
             var isDragging = _dragIndex == index;
             var isSelectedForDiscard = _hawseyExchangeVisible && _hawseyDiscardIndexes.Contains(index);
             var interactive = _hawseyExchangeVisible || canPlay;
-            <div class="card @(IsRed(card) ? "red" : "") @(canPlay ? "playable" : "") @(!interactive ? "disabled" : "") @(isDragging ? "dragging" : "") @(isSelectedForDiscard ? "selected-discard" : "")"
+            var pressed = _hawseyExchangeVisible ? AriaBool(isSelectedForDiscard) : null;
+            @* role="button" + tabindex: Tab reaches each card and Enter or Space plays or selects
+               it. A div, not a <button>: the hand is reordered by dragging, and a <button> is not
+               reliably draggable in every browser. aria-disabled: an unplayable card can still be dragged. *@
+            <div role="button"
+                 tabindex="0"
+                 class="card @(IsRed(card) ? "red" : "") @(canPlay ? "playable" : "") @(!interactive ? "disabled" : "") @(isDragging ? "dragging" : "") @(isSelectedForDiscard ? "selected-discard" : "")"
+                 aria-label="@card.ToString()"
+                 aria-disabled="@AriaBool(!interactive)"
+                 aria-pressed="@pressed"
                  draggable="true"
                  @ondragstart="@(() => OnDragStart(index))"
                  @ondragover:preventDefault="true"
                  @ondragover="@(() => { })"
                  @ondragend="OnDragEnd"
                  @ondrop="@(() => OnDrop(index))"
-                 @onclick="() => OnCardClickAsync(index, card)">
-                <span class="rank">@RankText(card.Rank)</span>
-                <span class="suit">@SuitSymbol(card.Suit)</span>
+                 @onclick="() => OnCardClickAsync(index, card)"
+                 @onkeydown="e => OnCardKeyDownAsync(e, index, card)">
+                <span class="rank" aria-hidden="true">@RankText(card.Rank)</span>
+                <span class="suit" aria-hidden="true">@SuitSymbol(card.Suit)</span>
             </div>
         }
     </div>
 
-    <div class="statusbar">@_statusMessage</div>
+    <div class="statusbar" role="status" aria-live="polite">@_statusMessage</div>
 
     <div class="controls left">
         <button class="btn" @onclick="StartNewGameAsync">&#9776; NEW GAME</button>
@@ -178,8 +191,8 @@
     @if (_trumpPickerVisible)
     {
         <div class="modal-backdrop">
-            <div class="modal-card">
-                <h2>Pick trump</h2>
+            <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="trump-picker-title" tabindex="-1" @ref="_dialogRef">
+                <h2 id="trump-picker-title">Pick trump</h2>
                 <div class="trump-buttons">
                     <button class="btn red"   @onclick="@(() => SelectTrumpAsync(Suit.Hearts))">♥ Hearts</button>
                     <button class="btn red"   @onclick="@(() => SelectTrumpAsync(Suit.Diamonds))">♦ Diamonds</button>
@@ -194,15 +207,15 @@
     @if (_roundSummary is { } rs)
     {
         <div class="modal-backdrop">
-            <div class="modal-card round-summary">
+            <div class="modal-card round-summary" role="dialog" aria-modal="true" aria-labelledby="round-summary-title" tabindex="-1" @ref="_dialogRef">
                 @if (rs.IsGameOver)
                 {
                     var winClass = rs.GameWinnerLabel == "US" ? "us" : "them";
-                    <h2 class="@winClass"><span class="@winClass">@rs.GameWinnerLabel</span> wins the game!</h2>
+                    <h2 id="round-summary-title" class="@winClass"><span class="@winClass">@rs.GameWinnerLabel</span> wins the game!</h2>
                 }
                 else
                 {
-                    <h2>Round complete</h2>
+                    <h2 id="round-summary-title">Round complete</h2>
                 }
 
                 <div class="rs-bid">
@@ -246,8 +259,9 @@
     @if (_hawseyExchangeVisible)
     {
         <div class="modal-backdrop bid-mode">
-            <div class="modal-card">
-                <h2>Hawsey exchange</h2>
+            @* Not aria-modal: the player picks the discards from the hand outside this dialog. *@
+            <div class="modal-card" role="dialog" aria-labelledby="hawsey-exchange-title" tabindex="-1" @ref="_dialogRef">
+                <h2 id="hawsey-exchange-title">Hawsey exchange</h2>
                 <p class="modal-sub">
                     Click <strong>@GameState.HawseyExchangeCardCount cards</strong> in your hand to discard.
                     Your partner gives you their <strong>2 best</strong> for the chosen trump.
@@ -264,8 +278,8 @@
     @if (_bidPickerVisible)
     {
         <div class="modal-backdrop bid-mode">
-            <div class="modal-card">
-                <h2>Your bid</h2>
+            <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="bid-picker-title" tabindex="-1" @ref="_dialogRef">
+                <h2 id="bid-picker-title">Your bid</h2>
                 <p class="modal-sub">
                     @if (IsHumanStuck)
                     {
@@ -316,6 +330,11 @@
     private readonly List<int> _hawseyDiscardIndexes = new();
     private bool _logVisible;
     private RoundSummarySnapshot? _roundSummary;
+
+    // The open dialog's container, and which dialog last received focus, so focus moves
+    // into a dialog once when it opens rather than on every render.
+    private ElementReference _dialogRef;
+    private string? _focusedDialog;
     private string _statusMessage = "Welcome to Hawsey. Click NEW GAME to start.";
 
     private sealed record RoundSummarySnapshot
@@ -644,16 +663,58 @@
         var card = play.Card;
         builder.OpenElement(0, "div");
         builder.AddAttribute(1, "class", "trick-card" + (IsRed(card) ? " red" : ""));
-        builder.OpenElement(2, "span");
-        builder.AddAttribute(3, "class", "rank");
-        builder.AddContent(4, RankText(card.Rank));
+        // "J" and a bare suit symbol mean nothing to a screen reader: name the card instead.
+        builder.AddAttribute(2, "role", "img");
+        builder.AddAttribute(3, "aria-label", card.ToString());
+        builder.OpenElement(4, "span");
+        builder.AddAttribute(5, "class", "rank");
+        builder.AddAttribute(6, "aria-hidden", "true");
+        builder.AddContent(7, RankText(card.Rank));
         builder.CloseElement();
-        builder.OpenElement(5, "span");
-        builder.AddAttribute(6, "class", "suit");
-        builder.AddContent(7, SuitSymbol(card.Suit));
+        builder.OpenElement(8, "span");
+        builder.AddAttribute(9, "class", "suit");
+        builder.AddAttribute(10, "aria-hidden", "true");
+        builder.AddContent(11, SuitSymbol(card.Suit));
         builder.CloseElement();
         builder.CloseElement();
     };
+
+    private static string AriaBool(bool value) => value ? "true" : "false";
+
+    private string? OpenDialog()
+    {
+        if (_trumpPickerVisible)
+        {
+            return "trump";
+        }
+
+        if (_roundSummary is not null)
+        {
+            return "round-summary";
+        }
+
+        if (_hawseyExchangeVisible)
+        {
+            return "hawsey-exchange";
+        }
+
+        return _bidPickerVisible ? "bid" : null;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var open = OpenDialog();
+        if (open == _focusedDialog)
+        {
+            return;
+        }
+
+        _focusedDialog = open;
+        if (open is not null)
+        {
+            await _dialogRef.FocusAsync();
+        }
+    }
 
     protected override void OnInitialized()
     {
@@ -807,6 +868,10 @@
 
         await InvokeAsync(StateHasChanged);
     }
+
+    // Enter and Space act on a focused card as a click does (the WAI-ARIA button pattern).
+    private Task OnCardKeyDownAsync(KeyboardEventArgs e, int index, Card card) =>
+        e.Key is "Enter" or " " ? OnCardClickAsync(index, card) : Task.CompletedTask;
 
     private async Task OnCardClickAsync(int index, Card card)
     {
