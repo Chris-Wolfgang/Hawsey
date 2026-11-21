@@ -10,7 +10,7 @@
       "rollForward": true
     },
     "cyclonedx": {
-      "version": "6.3.1",
+      "version": "6.3.2",
       "commands": [
         "dotnet-CycloneDX"
       ],
@@ -31,7 +31,7 @@
       "rollForward": true
     },
     "dotnet-reportgenerator-globaltool": {
-      "version": "5.6.0",
+      "version": "5.6.1",
       "commands": [
         "reportgenerator"
       ],
