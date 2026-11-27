@@ -15,9 +15,11 @@ tagged source compiles to. This guide covers:
   `lib/net10.0/Wolfgang.Hawsey.Engine.dll`, and their `.pdb` files. CI builds are
   deterministic (`Deterministic` plus `ContinuousIntegrationBuild`, which also
   normalises source paths to `/_/`). Two independent clones of the same commit at
-  different paths produce identical DLLs and PDBs. CI checks this on every change
-  by building twice on Windows and twice on Linux, then comparing within each OS
-  and between Windows and Linux (#82, #997).
+  different paths produce identical DLLs and PDBs. CI checks this on every pull
+  request (`reproducible-build.yaml`, the canonical repo-template copy): it packs
+  twice on Linux and fails unless the DLLs and PDBs are byte-identical and the
+  packages match entry by entry, then packs once on Windows and reports the
+  cross-OS comparison in the job summary without failing (#82, #997, #1077).
 - **Any OS works, from the first release built with #997.** MSBuild writes the
   sources it generates (`AssemblyInfo.cs`, `GlobalUsings.g.cs`, the
   target-framework attributes) with the OS line ending, CRLF on Windows and LF on
